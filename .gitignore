@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Maven
+epms/target/
+epms/.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+
+# Local overrides (never commit real credentials)
+application-local.properties

@@ -1,0 +1,40 @@
+package com.epms.controller;
+
+import com.epms.dto.request.AnnouncementRequest;
+import com.epms.dto.response.ApiResponse;
+import com.epms.security.service.CurrentUserService;
+import com.epms.service.AnnouncementService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/announcements")
+@RequiredArgsConstructor
+public class AnnouncementController {
+
+    private final AnnouncementService announcementService;
+    private final CurrentUserService currentUserService;
+
+    @GetMapping
+    public ApiResponse<?> getAll() {
+        return new ApiResponse<>(true, "Announcements retrieved", announcementService.getAll());
+    }
+
+    @PostMapping
+    public ApiResponse<?> create(@Valid @RequestBody AnnouncementRequest request, Authentication authentication) {
+        Long userId = currentUserService.getCurrentUserId(authentication);
+        return new ApiResponse<>(true, "Announcement created", announcementService.create(request, userId));
+    }
+
+    @PutMapping("/{id}")
+    public ApiResponse<?> update(@PathVariable Long id, @Valid @RequestBody AnnouncementRequest request) {
+        return new ApiResponse<>(true, "Announcement updated", announcementService.update(id, request));
+    }
+
+    @PatchMapping("/{id}/archive")
+    public ApiResponse<?> archive(@PathVariable Long id) {
+        return new ApiResponse<>(true, "Announcement archived", announcementService.archive(id));
+    }
+}

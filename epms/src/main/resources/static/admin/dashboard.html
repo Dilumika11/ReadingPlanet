@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Dashboard – Reading Planet EPMS</title>
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="admin-body">
+
+<aside class="admin-sidebar" id="sidebar">
+    <div class="sidebar-brand">
+        <i class="fas fa-book-open"></i>
+        <span>EPMS</span>
+    </div>
+    <div class="sidebar-user" id="sidebarUser">
+        <div class="user-avatar"><i class="fas fa-user"></i></div>
+        <div>
+            <div class="user-name" id="userName">—</div>
+            <div class="user-role" id="userRole">—</div>
+        </div>
+    </div>
+    <nav class="sidebar-nav" id="sidebarNav">
+        <!-- Populated by JS based on role -->
+    </nav>
+    <div class="sidebar-footer">
+        <button type="button" id="logoutBtn" class="btn-logout">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+    </div>
+</aside>
+
+<div class="admin-main">
+    <header class="admin-topbar">
+        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard</h1>
+    </header>
+
+    <main class="admin-content" id="adminContent">
+        <!-- Dynamic content -->
+    </main>
+</div>
+
+<script src="/js/admin-dashboard.js"></script>
+</body>
+</html>

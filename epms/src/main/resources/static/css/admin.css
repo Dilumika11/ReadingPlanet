@@ -453,6 +453,18 @@ table.data-table tr:hover td { background: #f8fafc; }
 .badge-completed { background: #c6f6d5; color: #276749; }
 .badge-cancelled { background: #fed7d7; color: #c53030; }
 
+/* Epic 4: Administration, Finance & Royalty statuses */
+.badge-active { background: #c6f6d5; color: #276749; }
+.badge-draft { background: #e2e8f0; color: #4a5568; }
+.badge-expired { background: #fed7d7; color: #c53030; }
+.badge-calculated { background: #bee3f8; color: #2b6cb0; }
+.badge-approved { background: #c3dafe; color: #434190; }
+.badge-recorded { background: #feebc8; color: #c05621; }
+.badge-posted { background: #c6f6d5; color: #276749; }
+.badge-published { background: #c6f6d5; color: #276749; }
+.badge-archived { background: #e2e8f0; color: #4a5568; }
+.badge-finalized { background: #c6f6d5; color: #276749; }
+
 .empty-state {
     text-align: center;
     padding: 2.5rem 1rem;

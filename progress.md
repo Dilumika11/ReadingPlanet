@@ -63,9 +63,17 @@ Still open:
 - Spec requires Epic 4 to emit events (royalty calculated, payment approved, report finalized, etc.) to the Shared Core audit service
 - Nothing wired yet — depends on Shared Core exposing an audit-log API/service to call into
 
-### 8. Frontend
-- Only the shared admin-login/dashboard shell exists; it currently calls `/api/production` and `/api/warehouse` (someone else's epics), not any Epic 4 endpoint
-- No screens built yet for: Royalty Dashboard, Royalty Agreements, Royalty Calculations, Royalty Statements, Royalty Payments, Finance Dashboard, Expenses, Invoices, Financial Reports, Analytics Dashboard (spec section 37)
+### 8. Frontend — partially done
+Built (verified end-to-end in a real browser, not just curl): Admin/Finance Dashboard (aggregate stats),
+Categories, Genres, Settings, Announcements, Royalty Agreements (create/activate/expire), Royalty
+Calculations (create + list, agreement dropdown), Expenses (create/approve). All wired into the shared
+admin-login/dashboard shell — `FINANCE_STAFF` and `ADMIN` now land on a real dashboard instead of
+"Access Denied".
+
+Still missing: Royalty Statements view (real formatting, not just the raw calculation), Royalty
+Payments screen (approve/schedule/process/mark-paid — backend exists, no UI), Invoices, Financial
+Reports, Analytics Dashboard (spec section 37) — all blocked on their backend pieces per items 3-5
+above.
 
 ### 9. Tests
 - No unit/integration/API tests written yet for anything above (spec section 55 has the checklist: duplicate-calculation prevention, payment-without-approval rejection, finalized-report immutability, author IDOR, etc.)

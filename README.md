@@ -29,6 +29,10 @@ Then open:
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
 - Staff login page: http://localhost:8080/admin-login.html
 
+See `TESTING.md` for a runnable demo script and a walkthrough mapping each
+demoed behavior back to a Sprint 0 user story. See `progress.md` for what's
+done vs. still open on Epic 4.
+
 ## Running against real MySQL
 
 1. Create the database using `docs/epms-schema.sql`.

@@ -18,4 +18,6 @@ public interface RoyaltyCalculationRepository extends JpaRepository<RoyaltyCalcu
     );
 
     List<RoyaltyCalculation> findByRoyaltyAgreementId(Long royaltyAgreementId);
+
+    List<RoyaltyCalculation> findByRoyaltyAgreementIdIn(List<Long> royaltyAgreementIds);
 }

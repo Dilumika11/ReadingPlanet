@@ -16,4 +16,6 @@ public interface RoyaltyAgreementRepository extends JpaRepository<RoyaltyAgreeme
     );
 
     List<RoyaltyAgreement> findByBookIdAndStatus(Long bookId, String status);
+
+    List<RoyaltyAgreement> findByStatus(String status);
 }

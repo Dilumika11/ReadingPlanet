@@ -13,5 +13,5 @@ public interface AnnouncementService {
 
     Announcement update(Long id, AnnouncementRequest request);
 
-    Announcement archive(Long id);
+    void delete(Long id);
 }

@@ -38,9 +38,10 @@ public interface RoyaltyService {
      * royaltyAmount = royaltyBase * (royaltyPercentage / 100) using
      * BigDecimal.
      *
-     * NOTE: sales figures are supplied directly in the request as an
-     * interim substitute for pulling completed sales from Epic 3 (no
-     * API contract exists yet) — see docs/epic-4-spec.pdf section 52.
+     * Books sold and gross sales are pulled from the COMPLETED sales
+     * received from Epic 3 (via SalesDataService) for the agreement's book
+     * over the period — see docs/epic-4-spec.pdf section 52. A period with
+     * no completed sales is rejected rather than producing a zero statement.
      */
     RoyaltyCalculation calculate(RoyaltyCalculationRequest request, Long calculatedBy);
 

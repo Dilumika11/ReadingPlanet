@@ -73,6 +73,18 @@
         return data;
     }
 
+    async function apiUpload(url, formData) {
+        const res = await fetch(url, { method: "POST", headers: authHeaders(), body: formData });
+        if (res.status === 401) {
+            clearSession();
+            window.location.replace("/admin-login.html");
+            return null;
+        }
+        const data = await res.json().catch(function () { return {}; });
+        if (!res.ok) throw new Error(data.message || ("Upload failed (" + res.status + ")"));
+        return data;
+    }
+
     function isEditableStatus(status) {
         const s = (status || "").toUpperCase();
         return s === "PENDING" || s === "SCHEDULED";
@@ -83,6 +95,107 @@
         return t.getFullYear() + "-" +
             String(t.getMonth() + 1).padStart(2, "0") + "-" +
             String(t.getDate()).padStart(2, "0");
+    }
+
+    function money(v) {
+        const n = Number(v);
+        if (isNaN(n)) return "—";
+        return "Rs " + n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function monthStartISO(monthsAgo) {
+        const t = new Date();
+        t.setDate(1);
+        t.setMonth(t.getMonth() - monthsAgo);
+        return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-01";
+    }
+
+    function lastDayOfPrevMonthISO() {
+        const t = new Date();
+        t.setDate(0); // day 0 of this month = last day of previous month
+        return t.getFullYear() + "-" + String(t.getMonth() + 1).padStart(2, "0") + "-" +
+            String(t.getDate()).padStart(2, "0");
+    }
+
+    // ---- Date / filter validation (mirrors com.epms.validation.DateRanges) ----
+    const MAX_FILTER_YEARS = 5;
+    const MAX_ROYALTY_PERIOD_DAYS = 366;
+
+    function parseISO(s) {
+        if (!s || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
+        const d = new Date(s + "T00:00:00");
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function daysBetween(a, b) {
+        return Math.round((b - a) / 86400000);
+    }
+
+    /** Returns an error string or null. Rules: ordered, start not in future, ≤ 5 years. */
+    function validateFilterRange(from, to) {
+        const f = parseISO(from), t = parseISO(to);
+        if (!f || !t) return "Enter both dates as YYYY-MM-DD.";
+        if (t < f) return "The end date cannot be before the start date.";
+        if (f > parseISO(todayISO())) return "The start date is in the future — there are no sales to report yet.";
+        if (daysBetween(f, t) > MAX_FILTER_YEARS * 366) return "Choose a range of " + MAX_FILTER_YEARS + " years or less.";
+        return null;
+    }
+
+    /** Royalty sales period: ordered, entirely in the past, ≤ 1 year, inside the agreement's dates. */
+    function validateRoyaltyPeriod(start, end, agreement) {
+        const s = parseISO(start), e = parseISO(end);
+        if (!s || !e) return "Enter both period dates as YYYY-MM-DD.";
+        if (e < s) return "Period end cannot be before period start.";
+        if (e > parseISO(todayISO())) return "Period end is in the future — royalties are calculated on completed sales only.";
+        if (daysBetween(s, e) + 1 > MAX_ROYALTY_PERIOD_DAYS) return "A sales period cannot exceed one year — split it into shorter periods.";
+        if (agreement) {
+            if (s < parseISO(agreement.effectiveDate)) return "Period starts before the agreement's effective date (" + agreement.effectiveDate + ").";
+            if (agreement.expiryDate && e > parseISO(agreement.expiryDate)) return "Period ends after the agreement expired (" + agreement.expiryDate + ").";
+        }
+        return null;
+    }
+
+    function validateAgreementDates(effective, expiry) {
+        const ef = parseISO(effective);
+        if (!ef) return "Enter the effective date as YYYY-MM-DD.";
+        if (expiry) {
+            const ex = parseISO(expiry);
+            if (!ex) return "Enter the expiry date as YYYY-MM-DD.";
+            if (ex <= ef) return "Expiry must be after the effective date.";
+        }
+        return null;
+    }
+
+    /** Show/clear an inline error under a field (and mark the input). */
+    function setFieldError(inputId, message) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        let el = input.parentElement.querySelector(".field-error");
+        if (message) {
+            if (!el) { el = document.createElement("div"); el.className = "field-error"; input.parentElement.appendChild(el); }
+            el.textContent = message;
+            input.classList.add("invalid");
+        } else {
+            if (el) el.remove();
+            input.classList.remove("invalid");
+        }
+    }
+
+    /** Keep a start/end pair of calendars consistent: end.min = start, start.max = end (capped at today). */
+    function linkDateRange(startId, endId, opts) {
+        opts = opts || {};
+        const start = document.getElementById(startId), end = document.getElementById(endId);
+        if (!start || !end) return;
+        const cap = opts.maxToday ? todayISO() : "";
+        function sync() {
+            if (cap) { start.max = end.value && end.value < cap ? end.value : cap; end.max = cap; }
+            else if (end.value) start.max = end.value;
+            if (start.value) end.min = start.value;
+            if (opts.onChange) opts.onChange();
+        }
+        start.addEventListener("input", sync);
+        end.addEventListener("input", sync);
+        sync();
     }
 
     function escapeHtml(str) {
@@ -115,6 +228,17 @@
     document.getElementById("userRole").textContent =
         (user.roles || []).join(", ").replace(/_/g, " ");
 
+    // Brand chrome: header "Account" pill shows who is signed in, and the
+    // breadcrumb in the title band follows whatever screen sets #pageTitle.
+    const headerUserName = document.getElementById("headerUserName");
+    if (headerUserName) headerUserName.textContent = user.fullName || user.email;
+    const crumbTitle = document.getElementById("crumbTitle");
+    const pageTitleEl = document.getElementById("pageTitle");
+    if (crumbTitle && pageTitleEl && window.MutationObserver) {
+        new MutationObserver(function () { crumbTitle.textContent = pageTitleEl.textContent; })
+            .observe(pageTitleEl, { childList: true, characterData: true, subtree: true });
+    }
+
     const navItems = [];
     if (isProductionStaff(user)) {
         navItems.push(
@@ -137,6 +261,7 @@
     if (isAdminRole(user)) {
         navItems.push(
             { id: "epic4-dashboard", label: "Admin Dashboard", icon: "fa-chart-pie" },
+            { id: "books", label: "Books", icon: "fa-book" },
             { id: "categories", label: "Categories", icon: "fa-tags" },
             { id: "genres", label: "Genres", icon: "fa-bookmark" },
             { id: "settings", label: "Settings", icon: "fa-cog" },
@@ -148,9 +273,9 @@
             navItems.push({ id: "epic4-dashboard", label: "Finance Dashboard", icon: "fa-chart-pie" });
         }
         navItems.push(
+            { id: "revenue", label: "Revenue", icon: "fa-chart-line" },
             { id: "royalty-agreements", label: "Royalty Agreements", icon: "fa-file-contract" },
-            { id: "royalty-calculations", label: "Royalty Calculations", icon: "fa-calculator" },
-            { id: "expenses", label: "Expenses", icon: "fa-receipt" }
+            { id: "royalty-calculations", label: "Royalty Calculations", icon: "fa-calculator" }
         );
     }
 
@@ -199,13 +324,14 @@
         else if (viewId === "adjust-stock") renderAdjustStock();
         else if (viewId === "transactions") renderTransactions();
         else if (viewId === "epic4-dashboard") renderEpic4Dashboard();
+        else if (viewId === "revenue") renderRevenue();
+        else if (viewId === "books") renderBooks();
         else if (viewId === "categories") renderCategories();
         else if (viewId === "genres") renderGenres();
         else if (viewId === "settings") renderSettings();
         else if (viewId === "announcements") renderAnnouncements();
         else if (viewId === "royalty-agreements") renderRoyaltyAgreements();
         else if (viewId === "royalty-calculations") renderRoyaltyCalculations();
-        else if (viewId === "expenses") renderExpenses();
     }
 
     // ===================== PRODUCTION =====================
@@ -852,7 +978,13 @@
         try {
             const res = await api("/api/admin/dashboard");
             const stats = (res && res.data) || {};
-            content.innerHTML =
+            let rev = null;
+            try {
+                const revRes = await api("/api/finance/revenue");
+                rev = (revRes && revRes.data) || null;
+            } catch (ignored) { /* revenue is optional on the dashboard */ }
+
+            let html =
                 '<div class="stats-grid">' +
                 '  <div class="stat-card"><div class="stat-label">Categories</div><div class="stat-value">' +
                 (stats.totalCategories != null ? stats.totalCategories : "—") + '</div></div>' +
@@ -860,75 +992,253 @@
                 (stats.totalGenres != null ? stats.totalGenres : "—") + '</div></div>' +
                 '  <div class="stat-card"><div class="stat-label">Announcements</div><div class="stat-value">' +
                 (stats.totalAnnouncements != null ? stats.totalAnnouncements : "—") + '</div></div>' +
+                '  <div class="stat-card"><div class="stat-label">Active Royalty Agreements</div><div class="stat-value">' +
+                (stats.activeRoyaltyAgreements != null ? stats.activeRoyaltyAgreements : "—") + '</div></div>' +
+                '</div>';
+
+            if (rev) {
+                html +=
+                    '<div class="stats-grid">' +
+                    '  <div class="stat-card"><div class="stat-label">Revenue (last 12 months)</div><div class="stat-value">' +
+                    money(rev.totalRevenue) + '</div></div>' +
+                    '  <div class="stat-card"><div class="stat-label">Completed Sales</div><div class="stat-value">' +
+                    rev.completedSales + '</div></div>' +
+                    '  <div class="stat-card"><div class="stat-label">Books Sold</div><div class="stat-value">' +
+                    rev.booksSold + '</div></div>' +
+                    '  <div class="stat-card"><div class="stat-label">Royalties Calculated</div><div class="stat-value">' +
+                    money(stats.totalRoyaltiesCalculated || 0) + '</div></div>' +
+                    '</div>';
+            }
+
+            content.innerHTML = html;
+        } catch (err) {
+            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
+        }
+    }
+
+    // ---- US38: Monitor revenue from completed sales ----
+    async function renderRevenue(from, to) {
+        pageTitle.textContent = "Revenue";
+        from = from || monthStartISO(11);
+        to = to || todayISO();
+        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+        try {
+            const res = await api("/api/finance/revenue?from=" + from + "&to=" + to);
+            const rev = (res && res.data) || {};
+            const excluded = rev.excluded || {};
+            const channels = rev.revenueByChannel || {};
+
+            let monthRows = "";
+            (rev.monthlyRevenue || []).forEach(function (m) {
+                monthRows += "<tr><td>" + escapeHtml(m.month) + "</td><td>" + m.completedSales + "</td><td>" +
+                    m.booksSold + "</td><td><strong>" + money(m.revenue) + "</strong></td></tr>";
+            });
+
+            let bookRows = "";
+            (rev.topBooks || []).forEach(function (b) {
+                bookRows += "<tr><td>#" + b.bookId + "</td><td>" + escapeHtml(b.bookTitle) + "</td><td>" +
+                    b.booksSold + "</td><td><strong>" + money(b.revenue) + "</strong></td></tr>";
+            });
+
+            let channelRows = "";
+            Object.keys(channels).forEach(function (k) {
+                channelRows += "<tr><td>" + escapeHtml(k) + "</td><td><strong>" + money(channels[k]) + "</strong></td></tr>";
+            });
+
+            content.innerHTML =
+                '<div class="content-card"><form id="filterForm" novalidate><div class="form-grid">' +
+                '<div class="form-group"><label>From</label><input type="date" id="from" value="' + from + '"></div>' +
+                '<div class="form-group"><label>To</label><input type="date" id="to" value="' + to + '"></div>' +
+                '</div><div class="form-actions"><button type="submit" class="btn btn-primary">' +
+                '<i class="fas fa-filter"></i> Apply</button></div></form></div>' +
+                '<div class="stats-grid">' +
+                '  <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value">' + money(rev.totalRevenue) + '</div></div>' +
+                '  <div class="stat-card"><div class="stat-label">Completed Sales</div><div class="stat-value">' + rev.completedSales + '</div></div>' +
+                '  <div class="stat-card"><div class="stat-label">Books Sold</div><div class="stat-value">' + rev.booksSold + '</div></div>' +
+                '  <div class="stat-card"><div class="stat-label">Average Sale</div><div class="stat-value">' + money(rev.averageSaleValue) + '</div></div>' +
                 '</div>' +
-                '<div class="content-card"><h2>Epic 4 — Administration, Finance &amp; Royalty</h2>' +
-                '<p class="card-desc">Revenue, sales and royalty analytics aren\'t available yet — they depend ' +
-                'on Epic 3\'s completed-sales data, which doesn\'t exist yet. Use the sidebar to manage ' +
-                'categories, genres, royalty agreements, calculations and expenses.</p></div>';
+                '<div class="content-card"><h2>Monthly Revenue</h2>' +
+                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Month</th><th>Completed Sales</th>' +
+                "<th>Books Sold</th><th>Revenue</th></tr></thead><tbody>" +
+                (monthRows || '<tr><td colspan="4" class="empty-state">No completed sales in this period.</td></tr>') +
+                "</tbody></table></div></div>" +
+                '<div class="content-card"><h2>Top Books</h2>' +
+                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Book</th><th>Title</th>' +
+                "<th>Books Sold</th><th>Revenue</th></tr></thead><tbody>" +
+                (bookRows || '<tr><td colspan="4" class="empty-state">No data.</td></tr>') +
+                "</tbody></table></div></div>" +
+                '<div class="content-card"><h2>Revenue by Channel</h2>' +
+                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Channel</th><th>Revenue</th></tr></thead><tbody>' +
+                (channelRows || '<tr><td colspan="2" class="empty-state">No data.</td></tr>') +
+                "</tbody></table></div></div>" +
+                '<div class="content-card"><h2>Excluded from Revenue</h2>' +
+                '<p class="card-desc">Received from Epic 3 but not counted — only completed sales contribute to revenue and royalties.</p>' +
+                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Status</th><th>Transactions</th><th>Amount</th></tr></thead><tbody>' +
+                '<tr><td><span class="badge badge-cancelled">CANCELLED</span></td><td>' + (excluded.cancelledCount || 0) + "</td><td>" + money(excluded.cancelledAmount || 0) + "</td></tr>" +
+                '<tr><td><span class="badge badge-returned">RETURNED</span></td><td>' + (excluded.returnedCount || 0) + "</td><td>" + money(excluded.returnedAmount || 0) + "</td></tr>" +
+                "</tbody></table></div></div>";
+
+            const filterMsg = document.createElement("div");
+            document.getElementById("filterForm").prepend(filterMsg);
+            linkDateRange("from", "to", { maxToday: true, onChange: function () {
+                const err = validateFilterRange(document.getElementById("from").value, document.getElementById("to").value);
+                setFieldError("to", err);
+            } });
+            document.getElementById("filterForm").onsubmit = function (e) {
+                e.preventDefault();
+                const f = document.getElementById("from").value, t = document.getElementById("to").value;
+                const err = validateFilterRange(f, t);
+                setFieldError("to", err);
+                filterMsg.innerHTML = err ? '<div class="alert alert-error">' + escapeHtml(err) + '</div>' : "";
+                if (err) return;
+                renderRevenue(f, t);
+            };
         } catch (err) {
             content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
         }
     }
 
-    async function renderCategories() {
-        pageTitle.textContent = "Categories";
+    // ---- Books: the online-store catalogue (title/author accept Sinhala Unicode) ----
+    async function renderBooks(editId) {
+        pageTitle.textContent = "Books";
         content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
         try {
-            const res = await api("/api/categories");
-            const items = (res && res.data) || [];
-            let rows = "";
-            items.forEach(function (c) {
-                rows += "<tr><td>#" + c.categoryId + "</td><td>" + escapeHtml(c.categoryName) + "</td><td>" +
-                    escapeHtml(c.description || "—") + '</td><td><span class="badge badge-' +
-                    (c.status || "").toLowerCase() + '">' + escapeHtml(c.status) + "</span></td><td>";
-                rows += c.status !== "ARCHIVED"
-                    ? '<button type="button" class="btn-icon btn-archive" data-id="' + c.categoryId +
-                      '" title="Archive"><i class="fas fa-box-archive"></i></button>'
-                    : '<span class="muted">—</span>';
-                rows += "</td></tr>";
+            const [booksRes, catsRes, genresRes] = await Promise.all([
+                api("/api/books"), api("/api/categories"), api("/api/genres")
+            ]);
+            const books = (booksRes && booksRes.data) || [];
+            const cats = ((catsRes && catsRes.data) || []);
+            const genres = ((genresRes && genresRes.data) || []);
+            const catName = {}; cats.forEach(function (c) { catName[c.categoryId] = c.categoryName; });
+            const genreName = {}; genres.forEach(function (g) { genreName[g.genreId] = g.genreName; });
+            const editing = editId ? books.find(function (b) { return b.bookId === editId; }) : null;
+
+            let catOptions = '<option value="">— Select a category —</option>';
+            cats.forEach(function (c) {
+                catOptions += '<option value="' + c.categoryId + '"' + (editing && editing.categoryId === c.categoryId ? " selected" : "") + '>' +
+                    escapeHtml(c.categoryName) + "</option>";
             });
+            let genreOptions = '<option value="">— None —</option>';
+            genres.forEach(function (g) {
+                    genreOptions += '<option value="' + g.genreId + '"' + (editing && editing.genreId === g.genreId ? " selected" : "") + '>' +
+                        escapeHtml(g.genreName) + "</option>";
+                });
+
+            let rows = "";
+            books.forEach(function (b) {
+                const cover = b.coverImage
+                    ? '<img class="book-thumb" src="/uploads/covers/' + escapeHtml(b.coverImage) + '" alt="">'
+                    : '<div class="book-thumb book-thumb-empty" title="No cover yet"><i class="fas fa-image"></i></div>';
+                rows += "<tr><td>" + cover + "</td>" +
+                    "<td><strong>" + escapeHtml(b.title) + "</strong><div class=\"muted\">" + escapeHtml(b.authorName) + "</div></td>" +
+                    "<td>" + escapeHtml(catName[b.categoryId] || "—") + (b.genreId ? '<div class="muted">' + escapeHtml(genreName[b.genreId] || "") + "</div>" : "") + "</td>" +
+                    "<td>" + money(b.price) + "</td>" +
+                    "<td>" + (b.newArrival ? '<span class="badge badge-calculated">New</span>' : "") + "</td>" +
+                    '<td class="actions-cell">' +
+                    '<label class="btn-icon btn-cover" title="Upload cover"><i class="fas fa-camera"></i>' +
+                    '<input type="file" accept="image/jpeg,image/png,image/webp" data-id="' + b.bookId + '" hidden></label> ' +
+                    '<button type="button" class="btn-icon btn-edit" data-id="' + b.bookId + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
+                    '<button type="button" class="btn-icon btn-delete" data-id="' + b.bookId + '" data-name="' + escapeHtml(b.title) + '" title="Delete"><i class="fas fa-trash"></i></button>' +
+                    "</td></tr>";
+            });
+
             content.innerHTML =
                 '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>New Category</h2>' +
+                '<div class="content-card"><h2>' + (editing ? "Edit Book #" + editing.bookId : "Add a Book") + '</h2>' +
+                '<p class="card-desc">Books appear in the Online Store under their category. Titles and author names can be in ' +
+                'Sinhala (Unicode) — e.g. <span lang="si">සයිකෝ</span>. Upload the cover from the table after saving.</p>' +
                 '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>Name <span class="req">*</span></label>' +
-                '<input type="text" id="categoryName" maxlength="100" required></div>' +
+                '<div class="form-group"><label>Title <span class="req">*</span></label>' +
+                '<input type="text" id="title" lang="si" maxlength="255" required value="' + escapeHtml(editing ? editing.title : "") + '"></div>' +
+                '<div class="form-group"><label>Author <span class="req">*</span></label>' +
+                '<input type="text" id="authorName" lang="si" maxlength="150" required value="' + escapeHtml(editing ? editing.authorName : "") + '"></div>' +
+                '<div class="form-group"><label>Category <span class="req">*</span></label>' +
+                '<select id="categoryId" required>' + catOptions + '</select></div>' +
+                '<div class="form-group"><label>Genre</label>' +
+                '<select id="genreId">' + genreOptions + '</select></div>' +
+                '<div class="form-group"><label>Price (Rs) <span class="req">*</span></label>' +
+                '<input type="number" id="price" min="0" step="0.01" required value="' + (editing ? editing.price : "") + '"></div>' +
+                '<div class="form-group"><label>ISBN</label>' +
+                '<input type="text" id="isbn" maxlength="20" value="' + escapeHtml(editing ? (editing.isbn || "") : "") + '"></div>' +
+                '<div class="form-group"><label>Author ID (Epic 1, optional)</label>' +
+                '<input type="number" id="authorId" min="1" value="' + (editing && editing.authorId ? editing.authorId : "") + '">' +
+                '<span class="hint">Links the book to the author\'s royalty agreements.</span></div>' +
+                '<div class="form-group"><label>&nbsp;</label>' +
+                '<label class="checkbox"><input type="checkbox" id="newArrival"' + (editing && editing.newArrival ? " checked" : "") + '> Show in New Arrivals</label></div>' +
                 '<div class="form-group full"><label>Description</label>' +
-                '<input type="text" id="categoryDescription" maxlength="255"></div></div>' +
-                '<div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-plus"></i> Create</button></div></form></div>' +
-                '<div class="content-card"><h2>All Categories</h2><div id="listMessage"></div>' +
+                '<textarea id="description" lang="si" maxlength="2000" rows="3">' + escapeHtml(editing ? (editing.description || "") : "") + '</textarea></div>' +
+                '</div><div class="form-actions">' +
+                '<button type="submit" class="btn btn-primary" id="submitBtn"><i class="fas fa-save"></i> ' + (editing ? "Save Changes" : "Add Book") + '</button>' +
+                (editing ? '<button type="button" class="btn btn-secondary" id="cancelEdit">Cancel</button>' : "") +
+                '</div></form></div>' +
+                '<div class="content-card"><h2>Catalogue (' + books.length + ')</h2>' +
                 '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                '<th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
-                (rows || '<tr><td colspan="5" class="empty-state">No categories yet.</td></tr>') +
+                "<th>Cover</th><th>Title / Author</th><th>Category / Genre</th><th>Price</th><th></th><th>Actions</th>" +
+                "</tr></thead><tbody>" +
+                (rows || '<tr><td colspan="6" class="empty-state">No books yet — add the first one above.</td></tr>') +
                 "</tbody></table></div></div>";
+
+            const msgEl = document.getElementById("formMessage");
 
             document.getElementById("createForm").onsubmit = async function (e) {
                 e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const name = document.getElementById("categoryName").value.trim();
-                if (!name) { msgEl.innerHTML = '<div class="alert alert-error">Name is required.</div>'; return; }
+                const body = {
+                    title: document.getElementById("title").value.trim(),
+                    authorName: document.getElementById("authorName").value.trim(),
+                    categoryId: Number(document.getElementById("categoryId").value) || null,
+                    genreId: Number(document.getElementById("genreId").value) || null,
+                    price: document.getElementById("price").value,
+                    isbn: document.getElementById("isbn").value.trim(),
+                    authorId: Number(document.getElementById("authorId").value) || null,
+                    newArrival: document.getElementById("newArrival").checked,
+                    description: document.getElementById("description").value.trim()
+                };
+                if (!body.title || !body.authorName || !body.categoryId || body.price === "") {
+                    msgEl.innerHTML = '<div class="alert alert-error">Title, author, category and price are required.</div>';
+                    return;
+                }
                 try {
-                    await api("/api/categories", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            categoryName: name,
-                            description: document.getElementById("categoryDescription").value.trim() || null
-                        })
-                    });
-                    navigate("categories");
+                    if (editing) {
+                        await api("/api/books/" + editing.bookId, { method: "PUT", body: JSON.stringify(body) });
+                    } else {
+                        await api("/api/books", { method: "POST", body: JSON.stringify(body) });
+                    }
+                    renderBooks();
                 } catch (err) {
                     msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
                 }
             };
-            content.querySelectorAll(".btn-archive").forEach(function (btn) {
+
+            const cancel = document.getElementById("cancelEdit");
+            if (cancel) cancel.onclick = function () { renderBooks(); };
+
+            content.querySelectorAll(".btn-edit").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    renderBooks(Number(btn.getAttribute("data-id")));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            });
+            content.querySelectorAll(".btn-delete").forEach(function (btn) {
                 btn.addEventListener("click", async function () {
+                    if (!window.confirm('Delete "' + btn.getAttribute("data-name") + '" from the catalogue? Its cover image will be removed too. This cannot be undone.')) return;
                     try {
-                        await api("/api/categories/" + btn.getAttribute("data-id") + "/archive", { method: "PATCH" });
-                        navigate("categories");
+                        await api("/api/books/" + btn.getAttribute("data-id"), { method: "DELETE" });
+                        renderBooks();
                     } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
+                        msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
+                    }
+                });
+            });
+            content.querySelectorAll(".btn-cover input[type=file]").forEach(function (input) {
+                input.addEventListener("change", async function () {
+                    if (!input.files || !input.files[0]) return;
+                    const fd = new FormData();
+                    fd.append("file", input.files[0]);
+                    try {
+                        await apiUpload("/api/books/" + input.getAttribute("data-id") + "/cover", fd);
+                        renderBooks();
+                    } catch (err) {
+                        msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
                     }
                 });
             });
@@ -937,65 +1247,95 @@
         }
     }
 
-    async function renderGenres() {
-        pageTitle.textContent = "Genres";
+    // ---- Generic add / edit / delete screen for the simple admin lists ----
+    // cfg: { title, singular, endpoint, idKey, nameKey, viewId, fields: [{ key, label, required, maxlength, full, lang }] }
+    async function renderCrud(cfg, editId) {
+        pageTitle.textContent = cfg.title;
         content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
         try {
-            const res = await api("/api/genres");
+            const res = await api(cfg.endpoint);
             const items = (res && res.data) || [];
+            const editing = editId ? items.find(function (i) { return i[cfg.idKey] === editId; }) : null;
+
             let rows = "";
-            items.forEach(function (g) {
-                rows += "<tr><td>#" + g.genreId + "</td><td>" + escapeHtml(g.genreName) + "</td><td>" +
-                    escapeHtml(g.description || "—") + '</td><td><span class="badge badge-' +
-                    (g.status || "").toLowerCase() + '">' + escapeHtml(g.status) + "</span></td><td>";
-                rows += g.status !== "ARCHIVED"
-                    ? '<button type="button" class="btn-icon btn-archive" data-id="' + g.genreId +
-                      '" title="Archive"><i class="fas fa-box-archive"></i></button>'
-                    : '<span class="muted">—</span>';
-                rows += "</td></tr>";
+            items.forEach(function (i) {
+                rows += "<tr><td>#" + i[cfg.idKey] + "</td>";
+                cfg.fields.forEach(function (f) {
+                    rows += "<td>" + (f.key === cfg.nameKey ? "<strong>" + escapeHtml(i[f.key]) + "</strong>"
+                        : escapeHtml(i[f.key] || "—")) + "</td>";
+                });
+                rows += '<td class="actions-cell">' +
+                    '<button type="button" class="btn-icon btn-edit" data-id="' + i[cfg.idKey] + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
+                    '<button type="button" class="btn-icon btn-delete" data-id="' + i[cfg.idKey] + '" data-name="' + escapeHtml(i[cfg.nameKey]) + '" title="Delete"><i class="fas fa-trash"></i></button>' +
+                    "</td></tr>";
             });
+
+            let inputs = "";
+            cfg.fields.forEach(function (f) {
+                inputs += '<div class="form-group' + (f.full ? " full" : "") + '"><label>' + escapeHtml(f.label) +
+                    (f.required ? ' <span class="req">*</span>' : "") + "</label>" +
+                    '<input type="text" id="f_' + f.key + '"' + (f.maxlength ? ' maxlength="' + f.maxlength + '"' : "") +
+                    (f.lang ? ' lang="' + f.lang + '"' : "") + (f.required ? " required" : "") +
+                    ' value="' + escapeHtml(editing ? (editing[f.key] || "") : "") + '"></div>';
+            });
+
             content.innerHTML =
                 '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>New Genre</h2>' +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>Name <span class="req">*</span></label>' +
-                '<input type="text" id="genreName" maxlength="100" required></div>' +
-                '<div class="form-group full"><label>Description</label>' +
-                '<input type="text" id="genreDescription" maxlength="255"></div></div>' +
+                '<div class="content-card"><h2>' + (editing ? "Edit " + cfg.singular + " #" + editing[cfg.idKey] : "New " + cfg.singular) + '</h2>' +
+                '<form id="createForm" novalidate><div class="form-grid">' + inputs + '</div>' +
                 '<div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-plus"></i> Create</button></div></form></div>' +
-                '<div class="content-card"><h2>All Genres</h2><div id="listMessage"></div>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                '<th>ID</th><th>Name</th><th>Description</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
-                (rows || '<tr><td colspan="5" class="empty-state">No genres yet.</td></tr>') +
+                '<i class="fas ' + (editing ? "fa-save" : "fa-plus") + '"></i> ' + (editing ? "Save Changes" : "Create") + "</button>" +
+                (editing ? '<button type="button" class="btn btn-secondary" id="cancelEdit">Cancel</button>' : "") +
+                "</div></form></div>" +
+                '<div class="content-card"><h2>All ' + cfg.title + " (" + items.length + ')</h2><div id="listMessage"></div>' +
+                '<div class="table-wrap"><table class="data-table"><thead><tr><th>ID</th>' +
+                cfg.fields.map(function (f) { return "<th>" + escapeHtml(f.label) + "</th>"; }).join("") +
+                "<th>Actions</th></tr></thead><tbody>" +
+                (rows || '<tr><td colspan="' + (cfg.fields.length + 2) + '" class="empty-state">No ' + cfg.title.toLowerCase() + ' yet.</td></tr>') +
                 "</tbody></table></div></div>";
+
+            const msgEl = document.getElementById("formMessage");
+            const listMsg = document.getElementById("listMessage");
 
             document.getElementById("createForm").onsubmit = async function (e) {
                 e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const name = document.getElementById("genreName").value.trim();
-                if (!name) { msgEl.innerHTML = '<div class="alert alert-error">Name is required.</div>'; return; }
+                const body = {};
+                let missing = null;
+                cfg.fields.forEach(function (f) {
+                    const v = document.getElementById("f_" + f.key).value.trim();
+                    body[f.key] = v || null;
+                    if (f.required && !v && !missing) missing = f.label;
+                });
+                if (missing) { msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(missing) + ' is required.</div>'; return; }
                 try {
-                    await api("/api/genres", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            genreName: name,
-                            description: document.getElementById("genreDescription").value.trim() || null
-                        })
-                    });
-                    navigate("genres");
+                    if (editing) {
+                        await api(cfg.endpoint + "/" + editing[cfg.idKey], { method: "PUT", body: JSON.stringify(body) });
+                    } else {
+                        await api(cfg.endpoint, { method: "POST", body: JSON.stringify(body) });
+                    }
+                    renderCrud(cfg);
                 } catch (err) {
                     msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
                 }
             };
-            content.querySelectorAll(".btn-archive").forEach(function (btn) {
+
+            const cancel = document.getElementById("cancelEdit");
+            if (cancel) cancel.onclick = function () { renderCrud(cfg); };
+
+            content.querySelectorAll(".btn-edit").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    renderCrud(cfg, Number(btn.getAttribute("data-id")));
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            });
+            content.querySelectorAll(".btn-delete").forEach(function (btn) {
                 btn.addEventListener("click", async function () {
+                    if (!window.confirm('Delete ' + cfg.singular.toLowerCase() + ' "' + btn.getAttribute("data-name") + '"? This cannot be undone.')) return;
                     try {
-                        await api("/api/genres/" + btn.getAttribute("data-id") + "/archive", { method: "PATCH" });
-                        navigate("genres");
+                        await api(cfg.endpoint + "/" + btn.getAttribute("data-id"), { method: "DELETE" });
+                        renderCrud(cfg);
                     } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
+                        listMsg.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
                     }
                 });
             });
@@ -1003,6 +1343,32 @@
             content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
         }
     }
+
+    const CRUD_CATEGORIES = {
+        title: "Categories", singular: "Category", endpoint: "/api/categories", idKey: "categoryId", nameKey: "categoryName",
+        fields: [
+            { key: "categoryName", label: "Name", required: true, maxlength: 100, lang: "si" },
+            { key: "description", label: "Description", maxlength: 255, full: true, lang: "si" }
+        ]
+    };
+    const CRUD_GENRES = {
+        title: "Genres", singular: "Genre", endpoint: "/api/genres", idKey: "genreId", nameKey: "genreName",
+        fields: [
+            { key: "genreName", label: "Name", required: true, maxlength: 100, lang: "si" },
+            { key: "description", label: "Description", maxlength: 255, full: true, lang: "si" }
+        ]
+    };
+    const CRUD_ANNOUNCEMENTS = {
+        title: "Announcements", singular: "Announcement", endpoint: "/api/announcements", idKey: "announcementId", nameKey: "title",
+        fields: [
+            { key: "title", label: "Title", required: true, maxlength: 200, full: true, lang: "si" },
+            { key: "content", label: "Content", required: true, full: true, lang: "si" }
+        ]
+    };
+
+    function renderCategories() { return renderCrud(CRUD_CATEGORIES); }
+    function renderGenres() { return renderCrud(CRUD_GENRES); }
+    function renderAnnouncements() { return renderCrud(CRUD_ANNOUNCEMENTS); }
 
     async function renderSettings() {
         pageTitle.textContent = "System Settings";
@@ -1056,74 +1422,6 @@
         }
     }
 
-    async function renderAnnouncements() {
-        pageTitle.textContent = "Announcements";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/announcements");
-            const items = (res && res.data) || [];
-            let rows = "";
-            items.forEach(function (a) {
-                rows += "<tr><td>#" + a.announcementId + "</td><td>" + escapeHtml(a.title) + "</td><td>" +
-                    escapeHtml(a.content) + '</td><td><span class="badge badge-' +
-                    (a.status || "").toLowerCase() + '">' + escapeHtml(a.status) + "</span></td><td>";
-                rows += a.status !== "ARCHIVED"
-                    ? '<button type="button" class="btn-icon btn-archive" data-id="' + a.announcementId +
-                      '" title="Archive"><i class="fas fa-box-archive"></i></button>'
-                    : '<span class="muted">—</span>';
-                rows += "</td></tr>";
-            });
-            content.innerHTML =
-                '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>New Announcement</h2>' +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group full"><label>Title <span class="req">*</span></label>' +
-                '<input type="text" id="annTitle" maxlength="200" required></div>' +
-                '<div class="form-group full"><label>Content <span class="req">*</span></label>' +
-                '<input type="text" id="annContent" required></div></div>' +
-                '<div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-plus"></i> Publish</button></div></form></div>' +
-                '<div class="content-card"><h2>All Announcements</h2><div id="listMessage"></div>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                '<th>ID</th><th>Title</th><th>Content</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
-                (rows || '<tr><td colspan="5" class="empty-state">No announcements yet.</td></tr>') +
-                "</tbody></table></div></div>";
-
-            document.getElementById("createForm").onsubmit = async function (e) {
-                e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const title = document.getElementById("annTitle").value.trim();
-                const contentVal = document.getElementById("annContent").value.trim();
-                if (!title || !contentVal) {
-                    msgEl.innerHTML = '<div class="alert alert-error">Title and content are required.</div>';
-                    return;
-                }
-                try {
-                    await api("/api/announcements", {
-                        method: "POST",
-                        body: JSON.stringify({ title: title, content: contentVal })
-                    });
-                    navigate("announcements");
-                } catch (err) {
-                    msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                }
-            };
-            content.querySelectorAll(".btn-archive").forEach(function (btn) {
-                btn.addEventListener("click", async function () {
-                    try {
-                        await api("/api/announcements/" + btn.getAttribute("data-id") + "/archive", { method: "PATCH" });
-                        navigate("announcements");
-                    } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                    }
-                });
-            });
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
     async function renderRoyaltyAgreements() {
         pageTitle.textContent = "Royalty Agreements";
         content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
@@ -1172,6 +1470,12 @@
                 (rows || '<tr><td colspan="9" class="empty-state">No royalty agreements yet.</td></tr>') +
                 "</tbody></table></div></div>";
 
+            linkDateRange("effectiveDate", "expiryDate", { onChange: function () {
+                setFieldError("expiryDate", validateAgreementDates(
+                    document.getElementById("effectiveDate").value, document.getElementById("expiryDate").value) === null
+                    ? null : (document.getElementById("expiryDate").value ? "Expiry must be after the effective date." : null));
+            } });
+
             document.getElementById("createForm").onsubmit = async function (e) {
                 e.preventDefault();
                 const msgEl = document.getElementById("formMessage");
@@ -1179,10 +1483,20 @@
                 const bookId = document.getElementById("bookId").value;
                 const royaltyPercentage = document.getElementById("royaltyPercentage").value;
                 const effectiveDate = document.getElementById("effectiveDate").value;
+                const expiryDate = document.getElementById("expiryDate").value;
                 if (!authorId || !bookId || !royaltyPercentage || !effectiveDate) {
                     msgEl.innerHTML = '<div class="alert alert-error">All required fields must be filled.</div>';
                     return;
                 }
+                const pct = Number(royaltyPercentage);
+                if (!(pct > 0 && pct <= 100)) {
+                    setFieldError("royaltyPercentage", "Royalty % must be between 0.01 and 100.");
+                    return;
+                }
+                setFieldError("royaltyPercentage", null);
+                const dateErr = validateAgreementDates(effectiveDate, expiryDate);
+                setFieldError("expiryDate", dateErr);
+                if (dateErr) { msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(dateErr) + '</div>'; return; }
                 try {
                     await api("/api/royalty-agreements", {
                         method: "POST",
@@ -1191,7 +1505,7 @@
                             bookId: Number(bookId),
                             royaltyPercentage: Number(royaltyPercentage),
                             effectiveDate: effectiveDate,
-                            expiryDate: document.getElementById("expiryDate").value || null
+                            expiryDate: expiryDate || null
                         })
                     });
                     navigate("royalty-agreements");
@@ -1238,7 +1552,11 @@
             const calcs = (calcsRes && calcsRes.data) || [];
 
             let options = '<option value="">— Select an active agreement —</option>';
+            const bookByAgreement = {};
+            const agreementById = {};
             agreements.forEach(function (a) {
+                bookByAgreement[a.royaltyAgreementId] = a.bookId;
+                agreementById[a.royaltyAgreementId] = a;
                 options += '<option value="' + a.royaltyAgreementId + '">' + escapeHtml(a.agreementNumber) +
                     " (Author #" + a.authorId + ", Book #" + a.bookId + ", " + a.royaltyPercentage + "%)</option>";
             });
@@ -1247,7 +1565,7 @@
             calcs.forEach(function (c) {
                 rows += "<tr><td>#" + c.calculationId + "</td><td>" + c.royaltyAgreementId + "</td><td>" +
                     c.salesPeriodStart + " → " + c.salesPeriodEnd + "</td><td>" + c.booksSold + "</td><td>" +
-                    c.grossSales + "</td><td>" + c.deductions + "</td><td><strong>" + c.royaltyAmount +
+                    money(c.grossSales) + "</td><td>" + money(c.deductions) + "</td><td><strong>" + money(c.royaltyAmount) +
                     '</strong></td><td><span class="badge badge-' + (c.status || "").toLowerCase() + '">' +
                     escapeHtml(c.status) + "</span></td></tr>";
             });
@@ -1256,23 +1574,20 @@
                 '<div id="formMessage"></div>' +
                 '<div class="content-card"><h2>Calculate Royalty</h2>' +
                 (agreements.length
-                    ? '<p class="card-desc">Interim: sales figures are entered directly until Epic 3\'s ' +
-                      "completed-sales API exists.</p>"
+                    ? '<p class="card-desc">Books sold and gross sales are taken from the <strong>completed</strong> ' +
+                      "sales received from Epic 3 for the agreement's book over the period.</p>"
                     : '<div class="alert alert-error">No ACTIVE royalty agreements — activate one on the ' +
                       "Royalty Agreements page first.</div>") +
                 '<form id="createForm" novalidate><div class="form-grid">' +
                 '<div class="form-group full"><label>Agreement <span class="req">*</span></label>' +
                 '<select id="agreementId" required>' + options + '</select></div>' +
                 '<div class="form-group"><label>Period Start <span class="req">*</span></label>' +
-                '<input type="date" id="periodStart" required></div>' +
+                '<input type="date" id="periodStart" value="' + monthStartISO(1) + '" required></div>' +
                 '<div class="form-group"><label>Period End <span class="req">*</span></label>' +
-                '<input type="date" id="periodEnd" required></div>' +
-                '<div class="form-group"><label>Books Sold <span class="req">*</span></label>' +
-                '<input type="number" id="booksSold" min="0" required></div>' +
-                '<div class="form-group"><label>Gross Sales <span class="req">*</span></label>' +
-                '<input type="number" id="grossSales" min="0" step="0.01" required></div>' +
+                '<input type="date" id="periodEnd" value="' + lastDayOfPrevMonthISO() + '" required></div>' +
                 '<div class="form-group"><label>Deductions</label>' +
                 '<input type="number" id="deductions" min="0" step="0.01" value="0"></div>' +
+                '<div class="form-group full"><div id="salesPreview" class="card-desc">Select an agreement and period to preview completed sales.</div></div>' +
                 '</div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
                 '<i class="fas fa-calculator"></i> Calculate</button></div></form></div>' +
                 '<div class="content-card"><h2>All Calculations</h2>' +
@@ -1282,18 +1597,64 @@
                 (rows || '<tr><td colspan="8" class="empty-state">No calculations yet.</td></tr>') +
                 "</tbody></table></div></div>";
 
+            async function previewSales() {
+                const el = document.getElementById("salesPreview");
+                const agreementId = document.getElementById("agreementId").value;
+                const periodStart = document.getElementById("periodStart").value;
+                const periodEnd = document.getElementById("periodEnd").value;
+                if (!agreementId || !periodStart || !periodEnd) {
+                    el.innerHTML = "Select an agreement and period to preview completed sales.";
+                    return;
+                }
+                const err = validateRoyaltyPeriod(periodStart, periodEnd, agreementById[agreementId]);
+                setFieldError("periodEnd", err);
+                if (err) { el.innerHTML = '<span style="color:#c53030">' + escapeHtml(err) + "</span>"; return; }
+                el.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up completed sales...';
+                try {
+                    const r = await api("/api/finance/sales/summary?bookId=" + bookByAgreement[agreementId] +
+                        "&from=" + periodStart + "&to=" + periodEnd);
+                    const sum = (r && r.data) || {};
+                    el.innerHTML = "Completed sales for Book #" + sum.bookId + " in this period: <strong>" +
+                        sum.completedSales + " sales</strong>, <strong>" + sum.booksSold + " books sold</strong>, gross <strong>" +
+                        money(sum.grossSales) + "</strong>" +
+                        (sum.booksSold === 0 ? ' <span class="badge badge-cancelled">nothing to calculate</span>' : "");
+                } catch (err) {
+                    el.innerHTML = '<span style="color:#c53030">' + escapeHtml(err.message) + "</span>";
+                }
+            }
+            ["agreementId", "periodStart", "periodEnd"].forEach(function (id) {
+                document.getElementById(id).addEventListener("change", previewSales);
+            });
+            linkDateRange("periodStart", "periodEnd", { maxToday: true });
+            // The period must sit inside the selected agreement's effective dates.
+            document.getElementById("agreementId").addEventListener("change", function () {
+                const a = agreementById[this.value];
+                const ps = document.getElementById("periodStart"), pe = document.getElementById("periodEnd");
+                ps.min = a ? a.effectiveDate : "";
+                pe.min = ps.value || ps.min;
+                if (a && a.expiryDate && a.expiryDate < todayISO()) { ps.max = a.expiryDate; pe.max = a.expiryDate; }
+                else { pe.max = todayISO(); ps.max = pe.value || todayISO(); }
+            });
+
             document.getElementById("createForm").onsubmit = async function (e) {
                 e.preventDefault();
                 const msgEl = document.getElementById("formMessage");
                 const agreementId = document.getElementById("agreementId").value;
                 const periodStart = document.getElementById("periodStart").value;
                 const periodEnd = document.getElementById("periodEnd").value;
-                const booksSold = document.getElementById("booksSold").value;
-                const grossSales = document.getElementById("grossSales").value;
-                if (!agreementId || !periodStart || !periodEnd || booksSold === "" || grossSales === "") {
+                if (!agreementId || !periodStart || !periodEnd) {
                     msgEl.innerHTML = '<div class="alert alert-error">All required fields must be filled.</div>';
                     return;
                 }
+                const periodErr = validateRoyaltyPeriod(periodStart, periodEnd, agreementById[agreementId]);
+                setFieldError("periodEnd", periodErr);
+                if (periodErr) { msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(periodErr) + '</div>'; return; }
+                const ded = Number(document.getElementById("deductions").value || 0);
+                if (isNaN(ded) || ded < 0) {
+                    setFieldError("deductions", "Deductions cannot be negative.");
+                    return;
+                }
+                setFieldError("deductions", null);
                 try {
                     await api("/api/royalties/calculate", {
                         method: "POST",
@@ -1301,8 +1662,6 @@
                             royaltyAgreementId: Number(agreementId),
                             periodStart: periodStart,
                             periodEnd: periodEnd,
-                            booksSold: Number(booksSold),
-                            grossSales: Number(grossSales),
                             deductions: Number(document.getElementById("deductions").value || 0)
                         })
                     });
@@ -1311,87 +1670,6 @@
                     msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
                 }
             };
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
-    async function renderExpenses() {
-        pageTitle.textContent = "Expenses";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/finance/expenses");
-            const items = (res && res.data) || [];
-            let rows = "";
-            items.forEach(function (x) {
-                rows += "<tr><td>#" + x.expenseId + "</td><td>" + escapeHtml(x.category) + "</td><td>" +
-                    escapeHtml(x.description || "—") + "</td><td>" + x.amount + "</td><td>" +
-                    (x.expenseDate || "—") + '</td><td><span class="badge badge-' +
-                    (x.status || "").toLowerCase() + '">' + escapeHtml(x.status) + "</span></td><td>";
-                rows += x.status === "RECORDED"
-                    ? '<button type="button" class="btn-icon btn-approve" data-id="' + x.expenseId +
-                      '" title="Approve"><i class="fas fa-check"></i></button>'
-                    : '<span class="muted">—</span>';
-                rows += "</td></tr>";
-            });
-            content.innerHTML =
-                '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>Record Expense</h2>' +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>Category <span class="req">*</span></label>' +
-                '<input type="text" id="expCategory" maxlength="100" required></div>' +
-                '<div class="form-group"><label>Amount <span class="req">*</span></label>' +
-                '<input type="number" id="expAmount" min="0.01" step="0.01" required></div>' +
-                '<div class="form-group"><label>Date <span class="req">*</span></label>' +
-                '<input type="date" id="expDate" required></div>' +
-                '<div class="form-group full"><label>Description</label>' +
-                '<input type="text" id="expDescription" maxlength="255"></div></div>' +
-                '<div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-plus"></i> Record</button></div></form></div>' +
-                '<div class="content-card"><h2>All Expenses</h2><div id="listMessage"></div>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                "<th>ID</th><th>Category</th><th>Description</th><th>Amount</th><th>Date</th><th>Status</th>" +
-                "<th>Actions</th></tr></thead><tbody>" +
-                (rows || '<tr><td colspan="7" class="empty-state">No expenses yet.</td></tr>') +
-                "</tbody></table></div></div>";
-
-            document.getElementById("expDate").max = todayISO();
-            document.getElementById("createForm").onsubmit = async function (e) {
-                e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const category = document.getElementById("expCategory").value.trim();
-                const amount = document.getElementById("expAmount").value;
-                const expenseDate = document.getElementById("expDate").value;
-                if (!category || !amount || !expenseDate) {
-                    msgEl.innerHTML = '<div class="alert alert-error">All required fields must be filled.</div>';
-                    return;
-                }
-                try {
-                    await api("/api/finance/expenses", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            category: category,
-                            description: document.getElementById("expDescription").value.trim() || null,
-                            amount: Number(amount),
-                            expenseDate: expenseDate
-                        })
-                    });
-                    navigate("expenses");
-                } catch (err) {
-                    msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                }
-            };
-            content.querySelectorAll(".btn-approve").forEach(function (btn) {
-                btn.addEventListener("click", async function () {
-                    try {
-                        await api("/api/finance/expenses/" + btn.getAttribute("data-id") + "/approve", { method: "POST" });
-                        navigate("expenses");
-                    } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                    }
-                });
-            });
         } catch (err) {
             content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
         }

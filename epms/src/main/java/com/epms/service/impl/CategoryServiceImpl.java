@@ -4,6 +4,7 @@ import com.epms.dto.request.CategoryRequest;
 import com.epms.entity.Category;
 import com.epms.exception.BusinessRuleException;
 import com.epms.exception.ResourceNotFoundException;
+import com.epms.repository.BookRepository;
 import com.epms.repository.CategoryRepository;
 import com.epms.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     private final CategoryRepository categoryRepository;
+    private final BookRepository bookRepository;
 
     @Override
     public List<Category> getAll() {
@@ -59,11 +61,16 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category archive(Long id) {
+    public void delete(Long id) {
 
         Category category = getById(id);
-        category.setStatus("ARCHIVED");
 
-        return categoryRepository.save(category);
+        long inUse = bookRepository.countByCategoryId(id);
+        if (inUse > 0) {
+            throw new BusinessRuleException("Category '" + category.getCategoryName() + "' is used by " + inUse
+                    + " book(s) — move those books to another category first");
+        }
+
+        categoryRepository.delete(category);
     }
 }

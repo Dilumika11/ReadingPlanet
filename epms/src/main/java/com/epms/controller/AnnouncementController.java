@@ -33,8 +33,9 @@ public class AnnouncementController {
         return new ApiResponse<>(true, "Announcement updated", announcementService.update(id, request));
     }
 
-    @PatchMapping("/{id}/archive")
-    public ApiResponse<?> archive(@PathVariable Long id) {
-        return new ApiResponse<>(true, "Announcement archived", announcementService.archive(id));
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> delete(@PathVariable Long id) {
+        announcementService.delete(id);
+        return new ApiResponse<>(true, "Announcement deleted", null);
     }
 }

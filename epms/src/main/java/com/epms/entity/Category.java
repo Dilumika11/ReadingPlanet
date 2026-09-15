@@ -21,9 +21,6 @@ public class Category {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "status", nullable = false, length = 20)
-    private String status = "ACTIVE";
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -15,5 +15,6 @@ public interface GenreService {
 
     Genre update(Long id, GenreRequest request);
 
-    Genre archive(Long id);
+    /** Hard delete; books that used the genre keep working with no genre. */
+    void delete(Long id);
 }

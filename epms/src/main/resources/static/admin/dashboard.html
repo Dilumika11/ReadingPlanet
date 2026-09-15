@@ -3,46 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Production Dashboard – Reading Planet EPMS</title>
+    <title>Staff Portal – Reading Planet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Noto+Sans+Sinhala:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body class="admin-body">
 
-<aside class="admin-sidebar" id="sidebar">
-    <div class="sidebar-brand">
-        <i class="fas fa-book-open"></i>
-        <span>EPMS</span>
-    </div>
-    <div class="sidebar-user" id="sidebarUser">
-        <div class="user-avatar"><i class="fas fa-user"></i></div>
-        <div>
-            <div class="user-name" id="userName">—</div>
-            <div class="user-role" id="userRole">—</div>
-        </div>
-    </div>
-    <nav class="sidebar-nav" id="sidebarNav">
-        <!-- Populated by JS based on role -->
-    </nav>
-    <div class="sidebar-footer">
-        <button type="button" id="logoutBtn" class="btn-logout">
-            <i class="fas fa-sign-out-alt"></i> Logout
-        </button>
-    </div>
-</aside>
-
-<div class="admin-main">
-    <header class="admin-topbar">
-        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+<header class="brand-header">
+    <a class="brand-logo" href="/admin/dashboard.html">
+        <img src="/images/reading-planet-logo.png" alt="Reading Planet">
+        <span class="brand-text">
+            <strong>Reading Planet</strong>
+            <span>Staff Portal</span>
+        </span>
+    </a>
+    <div class="brand-header-right">
+        <button type="button" class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
         </button>
-        <h1 class="page-title" id="pageTitle">Dashboard</h1>
-    </header>
+        <span class="brand-pill" id="headerUser">
+            <i class="fas fa-user"></i>
+            <span class="user-label" id="headerUserName">Account</span>
+        </span>
+    </div>
+</header>
 
-    <main class="admin-content" id="adminContent">
-        <!-- Dynamic content -->
-    </main>
+<div class="brand-band">
+    <span class="band-text"><i class="fas fa-book-open"></i>&nbsp; Enterprise Publishing Management System</span>
 </div>
+
+<div class="brand-title-band">
+    <h1 id="pageTitle">Dashboard</h1>
+    <div class="crumb">Staff Portal / <span id="crumbTitle">Dashboard</span></div>
+</div>
+
+<div class="admin-layout">
+    <aside class="admin-sidebar" id="sidebar">
+        <div class="sidebar-user" id="sidebarUser">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div>
+                <div class="user-name" id="userName">—</div>
+                <div class="user-role" id="userRole">—</div>
+            </div>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav">
+            <!-- Populated by JS based on role -->
+        </nav>
+        <div class="sidebar-footer">
+            <button type="button" id="logoutBtn" class="btn-logout">
+                <i class="fas fa-sign-out-alt"></i> Log out
+            </button>
+        </div>
+    </aside>
+
+    <div class="admin-main">
+        <main class="admin-content" id="adminContent">
+            <!-- Dynamic content -->
+        </main>
+    </div>
+</div>
+
+<footer class="brand-footer">
+    <div class="brand-footer-inner">
+        <img src="/images/reading-planet-logo-white.png" alt="Reading Planet">
+        <div class="footer-block">
+            <strong>Reading Planet</strong>
+            1470/1F, Delgahawaththa Road, Pannipitiya<br>
+            Monday – Friday: 8:30 AM – 05:30 PM &nbsp;·&nbsp; Saturday: 08:30 AM – 1:00 PM<br>
+            <a href="mailto:readingplanetpub@gmail.com">readingplanetpub@gmail.com</a>
+        </div>
+    </div>
+    <div class="brand-footer-bottom">
+        <span>Copyright © 2026 Reading Planet. All rights reserved.</span>
+        <span class="call"><i class="fas fa-phone"></i> Call Us: +94 71 446 5690</span>
+    </div>
+</footer>
 
 <script src="/js/admin-dashboard.js"></script>
 </body>

@@ -15,5 +15,6 @@ public interface CategoryService {
 
     Category update(Long id, CategoryRequest request);
 
-    Category archive(Long id);
+    /** Hard delete; refused while any book still uses the category. */
+    void delete(Long id);
 }

@@ -21,9 +21,6 @@ public class Announcement {
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "status", nullable = false, length = 20)
-    private String status = "DRAFT";
-
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 

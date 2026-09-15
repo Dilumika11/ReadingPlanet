@@ -34,8 +34,9 @@ public class GenreController {
         return new ApiResponse<>(true, "Genre updated", genreService.update(id, request));
     }
 
-    @PatchMapping("/{id}/archive")
-    public ApiResponse<?> archive(@PathVariable Long id) {
-        return new ApiResponse<>(true, "Genre archived", genreService.archive(id));
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> delete(@PathVariable Long id) {
+        genreService.delete(id);
+        return new ApiResponse<>(true, "Genre deleted", null);
     }
 }

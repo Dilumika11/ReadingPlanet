@@ -2,6 +2,7 @@ package com.epms.service.impl;
 
 import com.epms.dto.request.RoyaltyAgreementRequest;
 import com.epms.dto.request.RoyaltyCalculationRequest;
+import com.epms.dto.response.SalesSummaryResponse;
 import com.epms.entity.RoyaltyAgreement;
 import com.epms.entity.RoyaltyCalculation;
 import com.epms.exception.BusinessRuleException;
@@ -9,9 +10,12 @@ import com.epms.exception.ResourceNotFoundException;
 import com.epms.repository.RoyaltyAgreementRepository;
 import com.epms.repository.RoyaltyCalculationRepository;
 import com.epms.service.RoyaltyService;
+import com.epms.service.SalesDataService;
+import com.epms.validation.DateRanges;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,10 +26,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class RoyaltyServiceImpl implements RoyaltyService {
 
     private final RoyaltyCalculationRepository royaltyCalculationRepository;
     private final RoyaltyAgreementRepository royaltyAgreementRepository;
+    private final SalesDataService salesDataService;
 
     // --- Agreements ---
 
@@ -47,6 +53,8 @@ public class RoyaltyServiceImpl implements RoyaltyService {
 
     @Override
     public RoyaltyAgreement createAgreement(RoyaltyAgreementRequest request) {
+
+        DateRanges.validateAgreementDates(request.getEffectiveDate(), request.getExpiryDate());
 
         RoyaltyAgreement agreement = new RoyaltyAgreement();
         agreement.setAuthorId(request.getAuthorId());
@@ -135,6 +143,8 @@ public class RoyaltyServiceImpl implements RoyaltyService {
                             + " (status: " + agreement.getStatus() + ") — royalty calculation cannot be finalized");
         }
 
+        DateRanges.validateRoyaltyPeriod(request.getPeriodStart(), request.getPeriodEnd());
+
         if (request.getPeriodStart().isBefore(agreement.getEffectiveDate())
                 || (agreement.getExpiryDate() != null && request.getPeriodEnd().isAfter(agreement.getExpiryDate()))) {
             throw new BusinessRuleException(
@@ -150,8 +160,23 @@ public class RoyaltyServiceImpl implements RoyaltyService {
                             + " and period " + request.getPeriodStart() + " to " + request.getPeriodEnd());
         }
 
+        // Only COMPLETED sales from Epic 3 count — cancelled/returned are excluded upstream.
+        SalesSummaryResponse sales = salesDataService.getCompletedSalesForBook(
+                agreement.getBookId(), request.getPeriodStart(), request.getPeriodEnd());
+
+        if (sales.getBooksSold() == 0) {
+            throw new BusinessRuleException(
+                    "No completed sales found for book " + agreement.getBookId() + " between "
+                            + request.getPeriodStart() + " and " + request.getPeriodEnd() + " — nothing to calculate");
+        }
+
         BigDecimal deductions = request.getDeductions() == null ? BigDecimal.ZERO : request.getDeductions();
-        BigDecimal royaltyBase = request.getGrossSales().subtract(deductions);
+        if (deductions.compareTo(sales.getGrossSales()) > 0) {
+            throw new BusinessRuleException(
+                    "Deductions " + deductions + " exceed gross sales " + sales.getGrossSales() + " for the period");
+        }
+
+        BigDecimal royaltyBase = sales.getGrossSales().subtract(deductions);
         BigDecimal royaltyAmount = royaltyBase
                 .multiply(agreement.getRoyaltyPercentage())
                 .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
@@ -160,8 +185,8 @@ public class RoyaltyServiceImpl implements RoyaltyService {
         calculation.setRoyaltyAgreementId(agreement.getRoyaltyAgreementId());
         calculation.setSalesPeriodStart(request.getPeriodStart());
         calculation.setSalesPeriodEnd(request.getPeriodEnd());
-        calculation.setBooksSold(request.getBooksSold());
-        calculation.setGrossSales(request.getGrossSales());
+        calculation.setBooksSold(sales.getBooksSold());
+        calculation.setGrossSales(sales.getGrossSales());
         calculation.setDeductions(deductions);
         calculation.setRoyaltyBase(royaltyBase);
         calculation.setRoyaltyAmount(royaltyAmount);
@@ -170,7 +195,9 @@ public class RoyaltyServiceImpl implements RoyaltyService {
         calculation.setCalculatedAt(LocalDateTime.now());
 
         try {
-            return royaltyCalculationRepository.save(calculation);
+            // saveAndFlush so the unique constraint fires here, inside the
+            // transaction, rather than at commit where we could not map it.
+            return royaltyCalculationRepository.saveAndFlush(calculation);
         } catch (DataIntegrityViolationException ex) {
             // Backstop against a concurrent duplicate calculation racing
             // past the existsBy check above (DB unique constraint wins).

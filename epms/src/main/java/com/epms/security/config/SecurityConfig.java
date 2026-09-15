@@ -31,7 +31,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/**")
+                        .requestMatchers("/api/auth/**", "/api/public/**")
                         .permitAll()
 
                         .requestMatchers(
@@ -47,6 +47,8 @@ public class SecurityConfig {
                                 "/admin/**",
                                 "/css/**",
                                 "/js/**",
+                                "/images/**",
+                                "/uploads/**",
                                 "/favicon.ico"
                         )
                         .permitAll()

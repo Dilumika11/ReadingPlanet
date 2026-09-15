@@ -4,10 +4,14 @@ import com.epms.dto.request.ExpenseRequest;
 import com.epms.dto.response.ApiResponse;
 import com.epms.security.service.CurrentUserService;
 import com.epms.service.FinanceService;
+import com.epms.service.SalesDataService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,10 +19,36 @@ public class FinanceController {
 
     private final FinanceService financeService;
     private final CurrentUserService currentUserService;
+    private final SalesDataService salesDataService;
+
+    // --- Revenue monitoring (US38) — built from COMPLETED sales received from Epic 3 ---
 
     @GetMapping("/api/finance/revenue")
-    public ApiResponse<?> getRevenue() {
-        return new ApiResponse<>(true, "Revenue retrieved", financeService.getRevenue());
+    public ApiResponse<?> getRevenue(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return new ApiResponse<>(true, "Revenue retrieved", financeService.getRevenue(from, to));
+    }
+
+    /** The raw sales feed as received from Epic 3, for finance to inspect what revenue is built from. */
+    @GetMapping("/api/finance/sales")
+    public ApiResponse<?> getSales(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) String status) {
+        LocalDate periodEnd = to != null ? to : LocalDate.now();
+        LocalDate periodStart = from != null ? from : periodEnd.withDayOfMonth(1).minusMonths(11);
+        return new ApiResponse<>(true, "Sales retrieved", salesDataService.getSales(periodStart, periodEnd, status));
+    }
+
+    /** Completed-sales totals for one book in a period — what a royalty calculation will be based on. */
+    @GetMapping("/api/finance/sales/summary")
+    public ApiResponse<?> getSalesSummary(
+            @RequestParam Long bookId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        return new ApiResponse<>(true, "Sales summary retrieved",
+                salesDataService.getCompletedSalesForBook(bookId, from, to));
     }
 
     @GetMapping("/api/finance/expenses")

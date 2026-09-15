@@ -34,8 +34,9 @@ public class CategoryController {
         return new ApiResponse<>(true, "Category updated", categoryService.update(id, request));
     }
 
-    @PatchMapping("/{id}/archive")
-    public ApiResponse<?> archive(@PathVariable Long id) {
-        return new ApiResponse<>(true, "Category archived", categoryService.archive(id));
+    @DeleteMapping("/{id}")
+    public ApiResponse<?> delete(@PathVariable Long id) {
+        categoryService.delete(id);
+        return new ApiResponse<>(true, "Category deleted", null);
     }
 }

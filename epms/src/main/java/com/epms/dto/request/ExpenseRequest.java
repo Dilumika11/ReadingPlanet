@@ -2,6 +2,7 @@ package com.epms.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
@@ -21,5 +22,6 @@ public class ExpenseRequest {
     private BigDecimal amount;
 
     @NotNull(message = "Expense date is required")
+    @PastOrPresent(message = "Expense date cannot be in the future")
     private LocalDate expenseDate;
 }

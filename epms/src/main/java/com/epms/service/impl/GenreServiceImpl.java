@@ -4,6 +4,8 @@ import com.epms.dto.request.GenreRequest;
 import com.epms.entity.Genre;
 import com.epms.exception.BusinessRuleException;
 import com.epms.exception.ResourceNotFoundException;
+import com.epms.entity.Book;
+import com.epms.repository.BookRepository;
 import com.epms.repository.GenreRepository;
 import com.epms.service.GenreService;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import java.util.List;
 public class GenreServiceImpl implements GenreService {
 
     private final GenreRepository genreRepository;
+    private final BookRepository bookRepository;
 
     @Override
     public List<Genre> getAll() {
@@ -59,11 +62,16 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
-    public Genre archive(Long id) {
+    public void delete(Long id) {
 
         Genre genre = getById(id);
-        genre.setStatus("ARCHIVED");
 
-        return genreRepository.save(genre);
+        // Genre is optional on a book, so detach rather than block.
+        for (Book book : bookRepository.findByGenreId(id)) {
+            book.setGenreId(null);
+            bookRepository.save(book);
+        }
+
+        genreRepository.delete(genre);
     }
 }

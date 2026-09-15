@@ -29,7 +29,6 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         announcement.setTitle(request.getTitle());
         announcement.setContent(request.getContent());
         announcement.setCreatedBy(createdBy);
-        announcement.setStatus("PUBLISHED");
         announcement.setPublishedAt(LocalDateTime.now());
 
         return announcementRepository.save(announcement);
@@ -46,12 +45,8 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     }
 
     @Override
-    public Announcement archive(Long id) {
-
-        Announcement announcement = getById(id);
-        announcement.setStatus("ARCHIVED");
-
-        return announcementRepository.save(announcement);
+    public void delete(Long id) {
+        announcementRepository.delete(getById(id));
     }
 
     private Announcement getById(Long id) {

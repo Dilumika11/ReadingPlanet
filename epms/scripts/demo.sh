@@ -14,6 +14,13 @@ BASE="${BASE_URL:-http://localhost:8080}"
 PASS=0
 FAIL=0
 
+# Pick a Python that actually runs (on Windows, "python3" may be a Store stub).
+PY=""
+for c in python3 python; do
+  if "$c" -c "pass" >/dev/null 2>&1; then PY="$c"; break; fi
+done
+[ -n "$PY" ] || { echo "python3/python is required for JSON parsing"; exit 1; }
+
 step() { printf "\n\033[1;34m== %s ==\033[0m\n" "$1"; }
 ok()   { PASS=$((PASS+1)); printf "  \033[1;32mPASS\033[0m %s\n" "$1"; }
 bad()  { FAIL=$((FAIL+1)); printf "  \033[1;31mFAIL\033[0m %s (got: %s)\n" "$1" "$2"; }
@@ -32,7 +39,7 @@ expect_code() {
 
 # parse_float=str preserves "10000.00" instead of collapsing it to the
 # float 10000.0, so decimal amounts print exactly as the API returned them.
-json() { python3 -c "import sys,json; d=json.load(sys.stdin, parse_float=str); print(d$1)"; }
+json() { "$PY" -c "import sys,json; d=json.load(sys.stdin, parse_float=str); print(d$1)"; }
 
 # Use fresh, randomized names/ids each run so the script is safely
 # re-runnable against the same long-lived dev server without tripping
@@ -40,7 +47,14 @@ json() { python3 -c "import sys,json; d=json.load(sys.stdin, parse_float=str); p
 # rule from a previous run's leftover data.
 RUN_ID=$RANDOM
 DEMO_AUTHOR_ID=$((RANDOM + 1000))
-DEMO_BOOK_ID=$((RANDOM + 1000))
+# Book 1 is part of the dummy Epic 3 catalogue seeded by the dev profile, so it
+# has completed sales to calculate royalties from (see DemoSalesDataInitializer).
+DEMO_BOOK_ID=1
+
+# Royalty period = the previous calendar month (always inside the 12 months of
+# seeded sales, and never in the future).
+PERIOD_START=$("$PY" -c "import datetime as d; t=d.date.today().replace(day=1); print((t-d.timedelta(days=1)).replace(day=1))")
+PERIOD_END=$("$PY" -c "import datetime as d; t=d.date.today().replace(day=1); print(t-d.timedelta(days=1))")
 
 # ---------------------------------------------------------------------------
 step "0. Register + login a Finance Officer and an Admin"
@@ -83,8 +97,14 @@ CATEGORY_ID=$(cat /tmp/demo_last_body | json "['data']['categoryId']")
 CODE=$(expect_code "duplicate category name rejected" POST "/api/categories" "{\"categoryName\":\"Demo Fiction $RUN_ID\"}" "$ADM")
 [ "$CODE" = "409" ] && ok "Duplicate category name -> 409 Conflict" || bad "Duplicate category rejection" "$CODE"
 
-CODE=$(expect_code "archive category" PATCH "/api/categories/$CATEGORY_ID/archive" '' "$ADM")
-[ "$CODE" = "200" ] && ok "Archive category -> 200" || bad "Archive category" "$CODE"
+CODE=$(expect_code "edit category" PUT "/api/categories/$CATEGORY_ID" "{\"categoryName\":\"Demo Fiction $RUN_ID (edited)\",\"description\":\"Edited by demo script\"}" "$ADM")
+[ "$CODE" = "200" ] && ok "Edit category -> 200" || bad "Edit category" "$CODE"
+
+CODE=$(expect_code "delete category" DELETE "/api/categories/$CATEGORY_ID" '' "$ADM")
+[ "$CODE" = "200" ] && ok "Delete category -> 200" || bad "Delete category" "$CODE"
+
+CODE=$(expect_code "delete category in use" DELETE "/api/categories/1" '' "$ADM")
+[ "$CODE" = "409" ] && ok "Delete a category that books still use -> 409 (protects the store catalogue)" || bad "Delete in-use category" "$CODE"
 
 # ---------------------------------------------------------------------------
 step "2. Administration — Genres (US32), Settings (US33), Announcements (US34)"
@@ -107,11 +127,11 @@ step "3. Royalty Agreements (US44) — full CRUD + lifecycle"
 # ---------------------------------------------------------------------------
 
 CODE=$(expect_code "create agreement" POST "/api/royalty-agreements" \
-  "{\"authorId\":$DEMO_AUTHOR_ID,\"bookId\":$DEMO_BOOK_ID,\"royaltyPercentage\":10,\"effectiveDate\":\"2026-01-01\"}" "$FIN")
+  "{\"authorId\":$DEMO_AUTHOR_ID,\"bookId\":$DEMO_BOOK_ID,\"royaltyPercentage\":10,\"effectiveDate\":\"2024-01-01\"}" "$FIN")
 [ "$CODE" = "200" ] && ok "Create royalty agreement (DRAFT) -> 200" || bad "Create agreement" "$CODE"
 AGREEMENT_ID=$(cat /tmp/demo_last_body | json "['data']['royaltyAgreementId']")
 
-CALC_BODY="{\"royaltyAgreementId\":$AGREEMENT_ID,\"periodStart\":\"2026-07-01\",\"periodEnd\":\"2026-07-31\",\"booksSold\":100,\"grossSales\":100000,\"deductions\":0}"
+CALC_BODY="{\"royaltyAgreementId\":$AGREEMENT_ID,\"periodStart\":\"$PERIOD_START\",\"periodEnd\":\"$PERIOD_END\",\"deductions\":0}"
 
 CODE=$(expect_code "calculate before activation is rejected" POST "/api/royalties/calculate" "$CALC_BODY" "$FIN")
 [ "$CODE" = "409" ] && ok "Calculate against a DRAFT agreement -> 409 (no active agreement)" || bad "Reject calc on DRAFT" "$CODE"
@@ -120,15 +140,30 @@ CODE=$(expect_code "activate agreement" POST "/api/royalty-agreements/$AGREEMENT
 [ "$CODE" = "200" ] && ok "Activate royalty agreement -> 200" || bad "Activate agreement" "$CODE"
 
 # ---------------------------------------------------------------------------
-step "4. Royalty Calculation Engine (US45, US42, US43)"
+step "4. Royalty Calculation Engine (US45, US42, US43) — from completed sales"
 # ---------------------------------------------------------------------------
 
+# What Epic 4 received from Epic 3 for this book + period (only COMPLETED counts)
+CODE=$(expect_code "completed sales for book" GET "/api/finance/sales/summary?bookId=$DEMO_BOOK_ID&from=$PERIOD_START&to=$PERIOD_END" '' "$FIN")
+EXPECTED_SOLD=$(cat /tmp/demo_last_body | json "['data']['booksSold']")
+EXPECTED_GROSS=$(cat /tmp/demo_last_body | json "['data']['grossSales']")
+[ "$CODE" = "200" ] && ok "Completed sales for book $DEMO_BOOK_ID, $PERIOD_START..$PERIOD_END: $EXPECTED_SOLD books, gross $EXPECTED_GROSS" \
+  || bad "Sales summary" "$CODE"
+
 CODE=$(expect_code "calculate royalty" POST "/api/royalties/calculate" "$CALC_BODY" "$FIN")
-AMOUNT=$(cat /tmp/demo_last_body | json "['data']['royaltyAmount']")
-if [ "$CODE" = "200" ] && [ "$AMOUNT" = "10000.00" ]; then
-  ok "Calculate royalty: 100,000 gross x 10% = 10,000.00 (BigDecimal, verified exact)"
+CHECK=$(cat /tmp/demo_last_body | "$PY" -c "
+import sys, json
+from decimal import Decimal, ROUND_HALF_UP
+d = json.load(sys.stdin, parse_float=str)['data']
+gross = Decimal(str(d['grossSales'])); amount = Decimal(str(d['royaltyAmount']))
+expected = (gross * Decimal('10') / Decimal('100')).quantize(Decimal('0.01'), ROUND_HALF_UP)
+ok = str(d['booksSold']) == '$EXPECTED_SOLD' and gross == Decimal('$EXPECTED_GROSS') and amount == expected
+print(('OK' if ok else 'MISMATCH') + ' sold=%s gross=%s royalty=%s expected=%s' % (d['booksSold'], gross, amount, expected))
+" 2>/dev/null || echo "MISMATCH (no body)")
+if [ "$CODE" = "200" ] && [[ "$CHECK" == OK* ]]; then
+  ok "Calculate royalty from completed sales x 10%: $CHECK (BigDecimal, verified exact)"
 else
-  bad "Royalty calculation" "code=$CODE amount=$AMOUNT"
+  bad "Royalty calculation" "code=$CODE $CHECK"
 fi
 CALCULATION_ID=$(cat /tmp/demo_last_body | json "['data']['calculationId']")
 
@@ -157,12 +192,34 @@ CODE=$(expect_code "edit approved expense rejected" PUT "/api/finance/expenses/$
   || bad "Reject edit of approved expense" "$CODE"
 
 # ---------------------------------------------------------------------------
-step "6. What's still a TODO stub (expected 500 with a clear message, not a crash)"
+step "6. Revenue Monitoring (US38) — from completed sales received from Epic 3"
 # ---------------------------------------------------------------------------
 
-CODE=$(expect_code "revenue (blocked on Epic 3)" GET "/api/finance/revenue" '' "$FIN")
-MSG=$(cat /tmp/demo_last_body | json "['message']" 2>/dev/null || echo "?")
-echo "  /api/finance/revenue -> HTTP $CODE : $MSG"
+CODE=$(expect_code "revenue last 12 months" GET "/api/finance/revenue" '' "$FIN")
+if [ "$CODE" = "200" ]; then
+  SUMMARY=$(cat /tmp/demo_last_body | "$PY" -c "
+import sys, json
+d = json.load(sys.stdin, parse_float=str)['data']
+x = d['excluded']
+print('total=%s completedSales=%s booksSold=%s months=%d cancelledExcluded=%s returnedExcluded=%s' % (
+    d['totalRevenue'], d['completedSales'], d['booksSold'], len(d['monthlyRevenue']), x['cancelledCount'], x['returnedCount']))")
+  ok "Revenue (trailing 12 months): $SUMMARY"
+else
+  bad "Revenue" "$CODE"
+fi
+
+CODE=$(expect_code "revenue for the royalty period" GET "/api/finance/revenue?from=$PERIOD_START&to=$PERIOD_END" '' "$FIN")
+[ "$CODE" = "200" ] && ok "Revenue filtered to $PERIOD_START..$PERIOD_END -> 200" || bad "Revenue (filtered)" "$CODE"
+
+CODE=$(expect_code "revenue with inverted period" GET "/api/finance/revenue?from=$PERIOD_END&to=$PERIOD_START" '' "$FIN")
+[ "$CODE" = "409" ] && ok "Revenue with end-before-start period -> 409" || bad "Revenue period validation" "$CODE"
+
+CODE=$(expect_code "raw sales feed" GET "/api/finance/sales?from=$PERIOD_START&to=$PERIOD_END&status=CANCELLED" '' "$FIN")
+[ "$CODE" = "200" ] && ok "Raw sales feed (cancelled only, for audit of what was excluded) -> 200" || bad "Sales feed" "$CODE"
+
+# ---------------------------------------------------------------------------
+step "7. What's still a TODO stub (expected 500 with a clear message, not a crash)"
+# ---------------------------------------------------------------------------
 
 CODE=$(expect_code "analytics dashboard (blocked on Epic 1/2/3)" GET "/api/analytics/dashboard" '' "$FIN")
 MSG=$(cat /tmp/demo_last_body | json "['message']" 2>/dev/null || echo "?")

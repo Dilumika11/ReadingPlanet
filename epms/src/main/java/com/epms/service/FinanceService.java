@@ -1,10 +1,12 @@
 package com.epms.service;
 
 import com.epms.dto.request.ExpenseRequest;
+import com.epms.dto.response.RevenueSummaryResponse;
 import com.epms.entity.Expense;
 import com.epms.entity.FinancialInvoice;
 import com.epms.entity.FinancialPayment;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface FinanceService {
@@ -30,11 +32,11 @@ public interface FinanceService {
     FinancialPayment getPayment(Long id);
 
     /**
-     * TODO (Epic 4): revenue monitoring.
-     * Requires consuming Epic 3's completed-sales data — see
-     * docs/epic-4-spec.pdf section 32 and 52 (Integration With Epic 3).
+     * Revenue monitoring (US38): aggregates COMPLETED sales received from
+     * Epic 3 for the period — see docs/epic-4-spec.pdf sections 32 and 52.
+     * Null bounds default to the trailing 12 months.
      */
-    Object getRevenue();
+    RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to);
 
     /**
      * TODO (Epic 4): invoice generation tied to a sales/royalty reference.

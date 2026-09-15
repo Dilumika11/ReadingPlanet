@@ -19,7 +19,6 @@ CREATE TABLE categories (
     category_id BIGINT AUTO_INCREMENT PRIMARY KEY,
     category_name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
@@ -32,7 +31,6 @@ CREATE TABLE genres (
     category_id BIGINT NOT NULL,
     genre_name VARCHAR(100) NOT NULL,
     description VARCHAR(255),
-    status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
@@ -1227,8 +1225,6 @@ CREATE TABLE announcements (
 
     title VARCHAR(200) NOT NULL,
     content TEXT NOT NULL,
-
-    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
     published_at TIMESTAMP NULL,
     expires_at TIMESTAMP NULL,
 
@@ -1246,3 +1242,67 @@ CREATE TABLE announcements (
 ) ENGINE=InnoDB;
 
 
+
+-- Inbound copy of Epic 3 sales data consumed by Epic 4 for revenue
+-- monitoring (US38) and royalty calculation (US45). Epic 4 does not own
+-- sales; only status = 'COMPLETED' rows count toward revenue/royalties.
+-- Seeded with dummy data by the dev profile until Epic 3 exists.
+CREATE TABLE sales_records (
+    sale_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    sale_reference VARCHAR(40) NOT NULL,
+    channel VARCHAR(20) NOT NULL,
+    book_id BIGINT NOT NULL,
+    book_title VARCHAR(255) NOT NULL,
+
+    quantity INT NOT NULL,
+    unit_price DECIMAL(12,2) NOT NULL,
+    sale_amount DECIMAL(12,2) NOT NULL,
+    sale_date DATE NOT NULL,
+
+    status VARCHAR(20) NOT NULL DEFAULT 'COMPLETED',
+
+    received_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT uq_sales_records_reference UNIQUE (sale_reference),
+    INDEX idx_sales_records_book_date (book_id, status, sale_date),
+    INDEX idx_sales_records_date (sale_date)
+
+) ENGINE=InnoDB;
+
+-- Online-store catalogue managed from the admin panel (Epic 4). Kept apart
+-- from Epic 2's books table (which is tied to manuscripts/production).
+-- Text columns are utf8mb4 (database default) so Sinhala titles store as-is.
+CREATE TABLE catalog_books (
+    book_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    title VARCHAR(255) NOT NULL,
+    author_name VARCHAR(150) NOT NULL,
+    author_id BIGINT,
+
+    category_id BIGINT,
+    genre_id BIGINT,
+
+    price DECIMAL(12,2) NOT NULL,
+    isbn VARCHAR(20),
+    description VARCHAR(2000),
+    cover_image VARCHAR(255),
+    new_arrival BOOLEAN NOT NULL DEFAULT FALSE,
+
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_catalog_books_category
+        FOREIGN KEY (category_id)
+        REFERENCES categories(category_id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL,
+
+    CONSTRAINT fk_catalog_books_genre
+        FOREIGN KEY (genre_id)
+        REFERENCES genres(genre_id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+
+) ENGINE=InnoDB;

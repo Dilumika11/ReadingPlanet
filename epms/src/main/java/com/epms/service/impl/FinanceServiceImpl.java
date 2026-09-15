@@ -1,6 +1,7 @@
 package com.epms.service.impl;
 
 import com.epms.dto.request.ExpenseRequest;
+import com.epms.dto.response.RevenueSummaryResponse;
 import com.epms.entity.Expense;
 import com.epms.entity.FinancialInvoice;
 import com.epms.entity.FinancialPayment;
@@ -10,18 +11,23 @@ import com.epms.repository.ExpenseRepository;
 import com.epms.repository.FinancialInvoiceRepository;
 import com.epms.repository.FinancialPaymentRepository;
 import com.epms.service.FinanceService;
+import com.epms.service.SalesDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FinanceServiceImpl implements FinanceService {
 
     private final ExpenseRepository expenseRepository;
     private final FinancialInvoiceRepository financialInvoiceRepository;
     private final FinancialPaymentRepository financialPaymentRepository;
+    private final SalesDataService salesDataService;
 
     @Override
     public List<Expense> getExpenses() {
@@ -103,10 +109,10 @@ public class FinanceServiceImpl implements FinanceService {
     }
 
     @Override
-    public Object getRevenue() {
-        throw new UnsupportedOperationException(
-                "Revenue monitoring not yet implemented — requires Epic 3 completed-sales integration, "
-                        + "see docs/epic-4-spec.pdf section 52");
+    public RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to) {
+        LocalDate periodEnd = to != null ? to : LocalDate.now();
+        LocalDate periodStart = from != null ? from : periodEnd.withDayOfMonth(1).minusMonths(11);
+        return salesDataService.getRevenue(periodStart, periodEnd);
     }
 
     @Override

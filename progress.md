@@ -63,3 +63,21 @@ See `docs/INTEGRATION_CONTRACT.md` for what each teammate needs to provide.
 - Inventory statistics belong to Epic 3 (`/api/analytics/inventory` returns 501).
 - Chart.js and Font Awesome load from cdnjs; without internet access charts and icons are
   missing, but tables and buttons still work.
+
+
+# Epics 1 to 3: status
+
+| Area | Stories | Where |
+|---|---|---|
+| Author profile, manuscripts, files, submission, revisions, version history | US1 to US7 | Author portal (`/author/*`), `/api/author/**` |
+| Getting Published applications, contracts, bank details, admin views of authors and manuscripts | US8 to US10 | `/getting-published`, author Contracts & Royalties page, staff dashboard (admin) |
+| Editor assignment, review, revision requests with deadline, chief editor monitoring | US11 to US15 | Staff dashboard: Editorial Overview, My Review Queue |
+| Designer assignment, design versions, author approval, quality check, ready for printing | US16 to US20 | Staff dashboard: Design Assignments, My Design Work, Quality Control; author Design Approvals page |
+| Print jobs, receiving stock, adjustments, stock transactions | US21 to US24 | Staff dashboard: Print Jobs, Inventory, Receive Stock, Adjust Stock |
+| Store search, cart, checkout (cash on delivery), tracking, cancellation | US25 to US27, US29 | `/store`, `/cart.html`, `/checkout.html`, `/account` |
+| Warehouse packing, dispatch, delivery; wholesale orders with sales approval | US28, US30 | Staff dashboard: Customer Orders, Wholesale Dispatch, Wholesale Orders, Bookstores |
+
+Delivered orders are written to `sales_records`, which feeds Epic 4 revenue and royalties.
+
+Not done yet: online card payment (checkout is cash on delivery), wishlists (browser only),
+and the About, FAQ, Contact and policy pages (their links open the home page).

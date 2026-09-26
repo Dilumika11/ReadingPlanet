@@ -53,8 +53,25 @@
         return hasRole(user, "EXECUTIVE");
     }
 
+    function isChiefEditor(user) {
+        return hasRole(user, "CHIEF_EDITOR");
+    }
+
+    function isEditorialStaff(user) {
+        return hasRole(user, "EDITOR") || isChiefEditor(user);
+    }
+
+    function isDesigner(user) {
+        return hasRole(user, "DESIGNER");
+    }
+
+    function isSalesStaff(user) {
+        return hasRole(user, "SALES_STAFF");
+    }
+
     function isStaff(user) {
-        return isProductionStaff(user) || isWarehouseStaff(user) || isFinanceRole(user) || isAdminRole(user);
+        return isProductionStaff(user) || isWarehouseStaff(user) || isFinanceRole(user) || isAdminRole(user) ||
+            isEditorialStaff(user) || isDesigner(user) || isSalesStaff(user);
     }
 
     function authHeaders() {
@@ -84,7 +101,8 @@
     }
 
     async function apiUpload(url, formData) {
-        const res = await fetch(url, { method: "POST", headers: authHeaders(), body: formData });
+        // Only the token: the browser sets the multipart Content-Type with its boundary
+        const res = await fetch(url, { method: "POST", headers: { "Authorization": "Bearer " + getToken() }, body: formData });
         if (res.status === 401) {
             clearSession();
             window.location.replace("/admin-login.html");
@@ -226,7 +244,7 @@
     }
 
     if (hasRole(user, "AUTHOR") && !isStaff(user)) {
-        window.location.replace("/author/royalties.html");
+        window.location.replace("/author/dashboard.html");
         return;
     }
 
@@ -255,11 +273,29 @@
     }
 
     const navItems = [];
+    // Epic 1-3 screens live in js/epic123.js
+    if (isChiefEditor(user)) {
+        navItems.push({ id: "ed-overview", label: "Editorial Overview", icon: "fa-clipboard-list" });
+    }
+    if (isEditorialStaff(user)) {
+        navItems.push({ id: "ed-queue", label: "My Review Queue", icon: "fa-user-edit" });
+    }
+    if (isDesigner(user)) {
+        navItems.push({ id: "ds-queue", label: "My Design Work", icon: "fa-palette" });
+    }
     if (isProductionStaff(user)) {
         navItems.push(
             { id: "dashboard", label: "Dashboard", icon: "fa-tachometer-alt" },
+            { id: "pm-design-assign", label: "Design Assignments", icon: "fa-user-tag" },
+            { id: "pm-qc", label: "Quality Control", icon: "fa-clipboard-check" },
             { id: "print-jobs", label: "Print Jobs", icon: "fa-print" },
             { id: "create-print-job", label: "Create Print Job", icon: "fa-plus-circle" }
+        );
+    }
+    if (isSalesStaff(user)) {
+        navItems.push(
+            { id: "sa-wholesale", label: "Wholesale Orders", icon: "fa-handshake" },
+            { id: "sa-bookstores", label: "Bookstores", icon: "fa-store" }
         );
     }
     if (isWarehouseStaff(user)) {
@@ -270,12 +306,18 @@
             { id: "inventory", label: "Inventory", icon: "fa-boxes" },
             { id: "receive-stock", label: "Receive Stock", icon: "fa-truck-loading" },
             { id: "adjust-stock", label: "Adjust Stock", icon: "fa-sliders-h" },
-            { id: "transactions", label: "Transactions", icon: "fa-exchange-alt" }
+            { id: "transactions", label: "Transactions", icon: "fa-exchange-alt" },
+            { id: "wh-orders", label: "Customer Orders", icon: "fa-shipping-fast" },
+            { id: "wh-wholesale", label: "Wholesale Dispatch", icon: "fa-truck" }
         );
     }
     if (isAdminRole(user)) {
         navItems.push(
             { id: "epic4-dashboard", label: "Admin Dashboard", icon: "fa-chart-pie" },
+            { id: "ad-applications", label: "Publishing Applications", icon: "fa-inbox" },
+            { id: "ad-manuscripts", label: "Manuscripts", icon: "fa-file-alt" },
+            { id: "ad-authors", label: "Authors", icon: "fa-feather-alt" },
+            { id: "ad-users", label: "User Accounts", icon: "fa-users-cog" },
             { id: "books", label: "Books", icon: "fa-book" },
             { id: "categories", label: "Categories", icon: "fa-tags" },
             { id: "genres", label: "Genres", icon: "fa-bookmark" },
@@ -327,7 +369,10 @@
     const pageTitle = document.getElementById("pageTitle");
 
     function setActiveNav(viewId) {
-        const map = { "edit-print-job": "print-jobs" };
+        const map = {
+            "edit-print-job": "print-jobs", "ed-manuscript": isChiefEditor(user) ? "ed-overview" : "ed-queue",
+            "ds-manuscript": "ds-queue", "pm-manuscript": "pm-qc", "ad-manuscript": "ad-manuscripts"
+        };
         const active = map[viewId] || viewId;
         navEl.querySelectorAll("a").forEach(function (a) {
             a.classList.toggle("active", a.dataset.view === active);
@@ -1264,7 +1309,15 @@
     };
 
     // Default landing page by role
-    if (isExecutive(user) && !isAdminRole(user)) {
+    if (isChiefEditor(user)) {
+        navigate("ed-overview");
+    } else if (isEditorialStaff(user)) {
+        navigate("ed-queue");
+    } else if (isDesigner(user)) {
+        navigate("ds-queue");
+    } else if (isSalesStaff(user)) {
+        navigate("sa-wholesale");
+    } else if (isExecutive(user) && !isAdminRole(user)) {
         navigate("analytics");
     } else if (isAdminRole(user) || isFinanceRole(user)) {
         navigate("epic4-dashboard");

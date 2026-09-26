@@ -28,9 +28,23 @@ mysql -u root -p epms < ../docs/demo-data.sql   # optional demo data (after the 
 Credentials default to `root` / `12345`; override with `DB_URL`, `DB_USERNAME`,
 `DB_PASSWORD`.
 
+Optional settings, all from environment variables (nothing secret is kept in the repo):
+
+| Feature | Variables |
+|---|---|
+| Password reset e-mails | `SPRING_MAIL_HOST`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` (without them the e-mail is written to the log) |
+| Google sign-in | `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_ID`, `SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GOOGLE_CLIENT_SECRET` (the Google buttons stay hidden without them) |
+| Links in e-mails | `APP_BASE_URL` (default `http://localhost:8080`) |
+
 Then open:
-- Staff and author login: http://localhost:8080/admin-login.html
+- Online store: http://localhost:8080/ (store, cart, checkout, account at `/account`)
+- Getting Published (apply as a new author): http://localhost:8080/getting-published
+- Author portal: http://localhost:8080/author-login.html
+- Staff dashboard (every staff role): http://localhost:8080/admin-login.html
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
+
+`bash scripts/demo-lifecycle.sh` (in `epms/`, with the app running) walks one book from
+submission to a delivered order through every role; `bash scripts/demo.sh` checks Epic 4.
 
 Docs:
 - `TESTING.md`: demo accounts, demo script, walkthrough, automated tests
@@ -46,7 +60,12 @@ roles/RBAC):
 - **Epic 1** — Author & Manuscript Management
 - **Epic 2** — Editorial Workflow & Book Production
 - **Epic 3** — Publishing Operations (printing, inventory, orders, delivery)
-- **Epic 4** — Administration, Finance & Royalty Management (this module's active focus)
+- **Epic 4** — Administration, Finance & Royalty Management
+
+All four epics are implemented in this codebase. The public store, cart, account and
+author portal pages come from the team's merged Epic 1/2 build; the author pages reach
+the EPMS API through `js/author-api.js`, and the staff screens for Epics 1 to 3 are in
+`js/epic123.js`.
 
 See `docs/epic-4-spec.pdf` for the full domain spec, ownership boundaries, and API
 contracts for Epic 4.

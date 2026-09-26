@@ -12,4 +12,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     long countByCategoryId(Long categoryId);
 
     List<Book> findByGenreId(Long genreId);
+
+    java.util.Optional<Book> findFirstByStockBookId(Long stockBookId);
 }

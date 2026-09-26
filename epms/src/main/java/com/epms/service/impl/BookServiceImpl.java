@@ -49,6 +49,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final CategoryRepository categoryRepository;
     private final GenreRepository genreRepository;
+    private final com.epms.repository.InventoryRepository inventoryRepository;
 
     @Value("${epms.uploads.dir:uploads}")
     private String uploadsDir;
@@ -101,6 +102,9 @@ public class BookServiceImpl implements BookService {
 
         if (file == null || file.isEmpty()) {
             throw new BusinessRuleException("Choose an image file to upload");
+        }
+        if (file.getSize() > 5L * 1024 * 1024) {
+            throw new BusinessRuleException("Cover images must be 5 MB or smaller");
         }
         String contentType = file.getContentType() == null ? "" : file.getContentType().toLowerCase(Locale.ROOT);
         if (!ALLOWED_IMAGE_TYPES.contains(contentType)) {
@@ -205,7 +209,8 @@ public class BookServiceImpl implements BookService {
                             category == null ? null : category.getCategoryId(),
                             category == null ? null : category.getCategoryName(),
                             genre == null ? null : genre.getGenreName(),
-                            b.getPrice(), coverUrl(b.getCoverImage()), b.isNewArrival(), b.getDescription());
+                            b.getPrice(), coverUrl(b.getCoverImage()), b.isNewArrival(), b.getDescription(),
+                            b.getGenreId(), b.getIsbn(), available(b), b.getStockBookId() != null && available(b) > 0);
                 })
                 .collect(Collectors.toList());
 
@@ -221,6 +226,11 @@ public class BookServiceImpl implements BookService {
                 .collect(Collectors.toList());
 
         return new CatalogResponse(activeCategories, books);
+    }
+
+    private int available(Book b) {
+        if (b.getStockBookId() == null || inventoryRepository == null) return 0;
+        return inventoryRepository.findByBookId(b.getStockBookId()).map(i -> Math.max(0, i.getAvailable())).orElse(0);
     }
 
     @Override

@@ -22,7 +22,9 @@ import java.io.IOException;
  *   <li>ADMIN: categories/genres/settings/announcements/books administration</li>
  *   <li>FINANCE_STAFF: every finance and royalty write</li>
  *   <li>EXECUTIVE and ADMIN: read-only access to finance, royalty and analytics</li>
- *   <li>AUTHOR: only /api/me/royalty/** (own data, resolved from the login)</li>
+ *   <li>AUTHOR: /api/author/** and /api/me/royalty/** (own data, resolved from the login)</li>
+ *   <li>Epic 2/3 roles: /api/editorial, /api/design, /api/production, /api/warehouse,
+ *       /api/customer and /api/sales, each limited to its roles</li>
  * </ul>
  */
 @Configuration
@@ -33,6 +35,13 @@ public class SecurityConfig {
     private static final String FINANCE = "FINANCE_STAFF";
     private static final String EXECUTIVE = "EXECUTIVE";
     private static final String AUTHOR = "AUTHOR";
+    private static final String EDITOR = "EDITOR";
+    private static final String CHIEF_EDITOR = "CHIEF_EDITOR";
+    private static final String DESIGNER = "DESIGNER";
+    private static final String PRODUCTION_MANAGER = "PRODUCTION_MANAGER";
+    private static final String INVENTORY_STAFF = "INVENTORY_STAFF";
+    private static final String SALES_STAFF = "SALES_STAFF";
+    private static final String CUSTOMER = "CUSTOMER";
 
     private static final String[] FINANCE_PATHS = {
             "/api/finance/**",
@@ -93,6 +102,24 @@ public class SecurityConfig {
                         // Current user and their own data
                         .requestMatchers("/api/me/royalty/**").hasRole(AUTHOR)
                         .requestMatchers("/api/me", "/api/announcements/active").authenticated()
+
+                        // Epic 1: an author's own profile and manuscripts
+                        .requestMatchers("/api/author/**").hasRole(AUTHOR)
+
+                        // Epic 2: editorial workflow, design and production
+                        .requestMatchers("/api/editorial/overview", "/api/editorial/counts", "/api/editorial/editors",
+                                "/api/editorial/manuscripts/*/assign").hasRole(CHIEF_EDITOR)
+                        .requestMatchers("/api/editorial/**").hasAnyRole(EDITOR, CHIEF_EDITOR)
+                        .requestMatchers("/api/design/**").hasRole(DESIGNER)
+                        .requestMatchers("/api/production/**").hasAnyRole(PRODUCTION_MANAGER, ADMIN)
+
+                        // Epic 3: warehouse, customers, wholesale sales
+                        .requestMatchers("/api/warehouse/**").hasAnyRole(INVENTORY_STAFF, ADMIN)
+                        .requestMatchers("/api/customer/**").hasRole(CUSTOMER)
+                        .requestMatchers("/api/sales/**").hasRole(SALES_STAFF)
+
+                        // Private files: the service checks who may read each manuscript
+                        .requestMatchers("/api/documents/**").authenticated()
 
                         // Administration
                         .requestMatchers("/api/categories/**", "/api/genres/**", "/api/settings/**",

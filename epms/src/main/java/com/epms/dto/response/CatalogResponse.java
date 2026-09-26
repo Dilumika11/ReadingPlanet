@@ -38,5 +38,11 @@ public class CatalogResponse {
         private String coverUrl;
         private boolean newArrival;
         private String blurb;
+        private Long genreId;
+        private String isbn;
+        /** Copies that can be ordered now (0 when the listing has no stock yet). */
+        private int available;
+        /** Linked to a published book with stock, so it can go in the cart. */
+        private boolean orderable;
     }
 }

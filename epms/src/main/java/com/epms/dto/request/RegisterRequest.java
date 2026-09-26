@@ -4,7 +4,6 @@ import com.epms.enums.Role;
 import com.epms.validation.ValidationMessages;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -28,6 +27,6 @@ public class RegisterRequest {
     @Size(min = 8, message = ValidationMessages.PASSWORD_MIN)
     private String password;
 
-    @NotNull(message = "Role is required")
+    /** AUTHOR or CUSTOMER for self sign-up (defaults to CUSTOMER); any role when an admin creates the account. */
     private Role role;
 }

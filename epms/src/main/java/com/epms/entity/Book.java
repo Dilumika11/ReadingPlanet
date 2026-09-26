@@ -54,6 +54,10 @@ public class Book {
     @Column(name = "cover_image", length = 255)
     private String coverImage;
 
+    // The produced book (books.book_id) whose stock is sold; null = not orderable yet
+    @Column(name = "stock_book_id")
+    private Long stockBookId;
+
     @Column(name = "new_arrival", nullable = false)
     private boolean newArrival = false;
 

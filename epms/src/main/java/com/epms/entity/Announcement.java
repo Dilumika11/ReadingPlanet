@@ -27,6 +27,10 @@ public class Announcement {
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
+    // ALL, or a role name (e.g. AUTHOR) to show the announcement only to that role
+    @Column(name = "audience", nullable = false, length = 30)
+    private String audience = "ALL";
+
     @Column(name = "created_by", nullable = false)
     private Long createdBy;
 
@@ -35,6 +39,16 @@ public class Announcement {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    /** DRAFT (no publish date), SCHEDULED, ACTIVE or EXPIRED, derived from the publish window. */
+    @Transient
+    public String getStatus() {
+        LocalDateTime now = LocalDateTime.now();
+        if (publishedAt == null) return "DRAFT";
+        if (publishedAt.isAfter(now)) return "SCHEDULED";
+        if (expiresAt != null && !expiresAt.isAfter(now)) return "EXPIRED";
+        return "ACTIVE";
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -1,26 +1,37 @@
 package com.epms.service;
 
+import com.epms.dto.response.RevenueSummaryResponse;
+
+import java.time.LocalDate;
+import java.util.Map;
+
 /**
- * TODO (Epic 4): business analytics & executive dashboard.
- * All of these require completed-sales data from Epic 3 and
- * author/book metadata from Epic 1 & 2 — see docs/epic-4-spec.pdf
- * sections 13, 34, 50-52. Use optimized aggregate queries here
- * (non-functional requirement: dashboards must not load full
- * transaction history into memory).
+ * Executive analytics (US48 - US50). Read-only aggregates over Epic 4 data
+ * and the Epic 1/2/3 ports. Every method takes a date range; null bounds
+ * default to the trailing 12 months.
  */
 public interface AnalyticsService {
 
-    Object getDashboard();
+    /** KPIs (revenue this month, year to date, orders, units), revenue by month, channel split, top categories. */
+    Map<String, Object> getDashboard(LocalDate from, LocalDate to);
 
-    Object getRevenueAnalytics();
+    RevenueSummaryResponse getRevenueAnalytics(LocalDate from, LocalDate to);
 
-    Object getSalesAnalytics();
+    /** Orders and units by channel and by month. */
+    Map<String, Object> getSalesAnalytics(LocalDate from, LocalDate to);
 
-    Object getAuthorPerformance();
+    /** Top authors by revenue and units. */
+    Map<String, Object> getAuthorPerformance(LocalDate from, LocalDate to);
 
-    Object getBookPerformance();
+    /** Top 10 books by units and by revenue. */
+    Map<String, Object> getBookPerformance(LocalDate from, LocalDate to);
 
-    Object getRoyaltyAnalytics();
+    /** Units and revenue per month for one book. */
+    Map<String, Object> getBookTrend(Long bookId, LocalDate from, LocalDate to);
 
+    /** Paid vs outstanding royalties, royalty as % of revenue, per-author liability. */
+    Map<String, Object> getRoyaltyAnalytics(LocalDate from, LocalDate to);
+
+    /** Owned by Epic 3 (inventory); not available from Epic 4. */
     Object getInventoryStatistics();
 }

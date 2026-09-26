@@ -31,12 +31,31 @@ public class FinancialReport {
     @Column(name = "generated_date", nullable = false)
     private LocalDateTime generatedDate;
 
-    // REQUESTED -> COLLECTING_DATA -> GENERATED -> REVIEWED -> FINALIZED
+    // GENERATED -> REVIEWED -> FINALIZED (finalized reports are read-only)
     @Column(name = "status", nullable = false, length = 30)
     private String status = "GENERATED";
 
     @Column(name = "report_path")
     private String reportPath;
+
+    // JSON of every figure as generated, so the report re-opens exactly as it was
+    @Column(name = "snapshot_json", columnDefinition = "TEXT")
+    private String snapshotJson;
+
+    @Column(name = "currency", length = 10)
+    private String currency;
+
+    @Column(name = "reviewed_by")
+    private Long reviewedBy;
+
+    @Column(name = "reviewed_at")
+    private LocalDateTime reviewedAt;
+
+    @Column(name = "finalized_by")
+    private Long finalizedBy;
+
+    @Column(name = "finalized_at")
+    private LocalDateTime finalizedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

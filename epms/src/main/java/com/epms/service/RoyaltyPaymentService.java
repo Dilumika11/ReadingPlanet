@@ -1,15 +1,17 @@
 package com.epms.service;
 
+import com.epms.dto.request.RoyaltyPayRequest;
+import com.epms.entity.RoyaltyCalculation;
 import com.epms.entity.RoyaltyPayment;
 
 import java.util.List;
 
 /**
- * TODO (Epic 4): royalty payment workflow.
- * State machine per docs/epic-4-spec.pdf section 8:
- * PENDING -> APPROVED -> SCHEDULED -> PROCESSING -> PAID (or FAILED).
- * A payment must never reach PAID without going through approve() first,
- * and payment_reference must be unique (see entity RoyaltyPayment).
+ * Royalty payment workflow. A payment is created in APPROVED status when
+ * its royalty calculation is approved, then (optionally SCHEDULED ->
+ * PROCESSING ->) PAID. A payment can never reach PAID without that
+ * approval, its bank/cheque reference must be unique, and once PAID it is
+ * immutable.
  */
 public interface RoyaltyPaymentService {
 
@@ -17,11 +19,21 @@ public interface RoyaltyPaymentService {
 
     RoyaltyPayment getById(Long id);
 
+    /** Creates the APPROVED payment for an approved calculation. */
+    RoyaltyPayment createForApprovedCalculation(RoyaltyCalculation calculation, Long approvedByUserId);
+
+    /** Legacy step for payments created as PENDING outside the calculation workflow. */
     RoyaltyPayment approve(Long id, Long approvedByUserId);
 
     RoyaltyPayment schedule(Long id);
 
     RoyaltyPayment process(Long id);
 
-    RoyaltyPayment markPaid(Long id);
+    /**
+     * Records the payment as made: the amount must equal the calculation's
+     * payable amount, the reference must be unique. Marks the calculation
+     * PAID and posts the payment as a ROYALTY expense so profit and loss
+     * reflects it.
+     */
+    RoyaltyPayment markPaid(Long id, RoyaltyPayRequest request, Long userId);
 }

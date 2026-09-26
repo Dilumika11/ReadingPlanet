@@ -10,7 +10,10 @@
         "DESIGNER",
         "INVENTORY_STAFF",
         "SALES_STAFF",
-        "FINANCE_STAFF"
+        "FINANCE_STAFF",
+        "EXECUTIVE",
+        // Authors sign in here too and land on their own "My Royalties" page
+        "AUTHOR"
     ];
 
     // Password toggle
@@ -51,8 +54,9 @@
     }
 
     function dashboardPathForRoles(roles) {
-        // All staff currently share the same dashboard shell;
-        // navigation is filtered by role inside the dashboard.
+        // Authors have their own royalty page; all staff share the same
+        // dashboard shell, with navigation filtered by role inside it.
+        if (roles.length === 1 && roles[0] === "AUTHOR") return "/author/royalties.html";
         return "/admin/dashboard.html";
     }
 

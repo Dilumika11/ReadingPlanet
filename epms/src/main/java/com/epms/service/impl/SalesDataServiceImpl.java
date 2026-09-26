@@ -15,6 +15,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -49,20 +50,38 @@ public class SalesDataServiceImpl implements SalesDataService {
 
         int booksSold = completed.stream().mapToInt(SalesRecord::getQuantity).sum();
 
-        return new SalesSummaryResponse(bookId, from, to, completed.size(), booksSold, sumAmount(completed));
+        return new SalesSummaryResponse(bookId, from, to, completed.size(), booksSold, sumNet(completed));
     }
 
     @Override
-    public RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to) {
+    public List<SalesRecord> getCompletedSaleLines(Long bookId, LocalDate from, LocalDate to) {
+        DateRanges.requireOrdered(from, to, "period start", "period end");
+        return salesRecordRepository.findByBookIdAndStatusAndSaleDateBetweenOrderBySaleDateAscSaleIdAsc(
+                bookId, STATUS_COMPLETED, from, to);
+    }
+
+    @Override
+    public List<SalesRecord> getReturnedSaleLines(Long bookId, LocalDate from, LocalDate to) {
+        DateRanges.requireOrdered(from, to, "period start", "period end");
+        return salesRecordRepository.findByBookIdAndStatusAndSaleDateBetweenOrderBySaleDateAscSaleIdAsc(
+                bookId, STATUS_RETURNED, from, to);
+    }
+
+    @Override
+    public RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to, String channel, Collection<Long> bookIds) {
         validatePeriod(from, to);
 
-        List<SalesRecord> all = salesRecordRepository.findBySaleDateBetweenOrderBySaleDateDesc(from, to);
+        List<SalesRecord> all = salesRecordRepository.findBySaleDateBetweenOrderBySaleDateDesc(from, to).stream()
+                .filter(s -> channel == null || channel.isBlank() || channel.equalsIgnoreCase(s.getChannel()))
+                .filter(s -> bookIds == null || bookIds.contains(s.getBookId()))
+                .collect(Collectors.toList());
 
         List<SalesRecord> completed = withStatus(all, STATUS_COMPLETED);
         List<SalesRecord> cancelled = withStatus(all, STATUS_CANCELLED);
         List<SalesRecord> returned = withStatus(all, STATUS_RETURNED);
 
-        BigDecimal totalRevenue = sumAmount(completed);
+        BigDecimal grossRevenue = sumAmount(completed);
+        BigDecimal totalRevenue = sumNet(completed);
         int booksSold = completed.stream().mapToInt(SalesRecord::getQuantity).sum();
         BigDecimal averageSaleValue = completed.isEmpty()
                 ? BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP)
@@ -71,7 +90,7 @@ public class SalesDataServiceImpl implements SalesDataService {
         // By channel (CUSTOMER / BOOKSTORE), stable key order
         Map<String, BigDecimal> byChannel = new TreeMap<>();
         for (SalesRecord s : completed) {
-            byChannel.merge(s.getChannel(), s.getSaleAmount(), BigDecimal::add);
+            byChannel.merge(s.getChannel(), net(s), BigDecimal::add);
         }
 
         // Monthly trend, oldest -> newest, including empty months in range
@@ -82,7 +101,7 @@ public class SalesDataServiceImpl implements SalesDataService {
             String key = MONTH.format(m);
             List<SalesRecord> rows = byMonth.getOrDefault(key, List.of());
             monthly.add(new RevenueSummaryResponse.MonthlyRevenue(
-                    key, sumAmount(rows), rows.size(), rows.stream().mapToInt(SalesRecord::getQuantity).sum()));
+                    key, sumNet(rows), rows.size(), rows.stream().mapToInt(SalesRecord::getQuantity).sum()));
         }
 
         // Top books by revenue
@@ -93,7 +112,7 @@ public class SalesDataServiceImpl implements SalesDataService {
                         e.getKey(),
                         e.getValue().get(0).getBookTitle(),
                         e.getValue().stream().mapToInt(SalesRecord::getQuantity).sum(),
-                        sumAmount(e.getValue())))
+                        sumNet(e.getValue())))
                 .sorted(Comparator.comparing(RevenueSummaryResponse.BookRevenue::getRevenue).reversed())
                 .limit(TOP_BOOKS)
                 .collect(Collectors.toList());
@@ -102,7 +121,8 @@ public class SalesDataServiceImpl implements SalesDataService {
                 cancelled.size(), sumAmount(cancelled), returned.size(), sumAmount(returned));
 
         return new RevenueSummaryResponse(from, to, totalRevenue, completed.size(), booksSold,
-                averageSaleValue, byChannel, monthly, topBooks, excluded);
+                averageSaleValue, byChannel, monthly, topBooks, excluded,
+                grossRevenue, grossRevenue.subtract(totalRevenue));
     }
 
     private static List<SalesRecord> withStatus(List<SalesRecord> rows, String status) {
@@ -114,6 +134,17 @@ public class SalesDataServiceImpl implements SalesDataService {
     private static BigDecimal sumAmount(List<SalesRecord> rows) {
         return rows.stream()
                 .map(SalesRecord::getSaleAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private static BigDecimal net(SalesRecord s) {
+        return s.getSaleAmount().subtract(s.getDiscount() == null ? BigDecimal.ZERO : s.getDiscount());
+    }
+
+    private static BigDecimal sumNet(List<SalesRecord> rows) {
+        return rows.stream()
+                .map(SalesDataServiceImpl::net)
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .setScale(2, RoundingMode.HALF_UP);
     }

@@ -39,8 +39,18 @@
         return hasRole(user, "ADMIN");
     }
 
+    // Finance and royalty screens: finance staff work in them; admin and
+    // executives can open them read-only (the API enforces the same rule).
     function isFinanceRole(user) {
-        return hasRole(user, "FINANCE_STAFF") || hasRole(user, "ADMIN");
+        return hasRole(user, "FINANCE_STAFF") || hasRole(user, "ADMIN") || hasRole(user, "EXECUTIVE");
+    }
+
+    function isFinanceStaff(user) {
+        return hasRole(user, "FINANCE_STAFF");
+    }
+
+    function isExecutive(user) {
+        return hasRole(user, "EXECUTIVE");
     }
 
     function isStaff(user) {
@@ -215,6 +225,11 @@
         return;
     }
 
+    if (hasRole(user, "AUTHOR") && !isStaff(user)) {
+        window.location.replace("/author/royalties.html");
+        return;
+    }
+
     if (!isStaff(user)) {
         document.body.innerHTML =
             '<div style="padding:3rem;text-align:center;font-family:sans-serif;">' +
@@ -270,12 +285,19 @@
     }
     if (isFinanceRole(user)) {
         if (!isAdminRole(user)) {
-            navItems.push({ id: "epic4-dashboard", label: "Finance Dashboard", icon: "fa-chart-pie" });
+            navItems.push({ id: "epic4-dashboard", label: isExecutive(user) ? "Overview" : "Finance Dashboard", icon: "fa-chart-pie" });
         }
         navItems.push(
+            { id: "analytics", label: "Executive Analytics", icon: "fa-chart-bar" },
             { id: "revenue", label: "Revenue", icon: "fa-chart-line" },
+            { id: "expenses", label: "Expenses", icon: "fa-receipt" },
+            { id: "invoices", label: "Invoices", icon: "fa-file-invoice" },
+            { id: "payments", label: "Payments", icon: "fa-money-check-alt" },
+            { id: "reports", label: "Financial Reports", icon: "fa-file-alt" },
             { id: "royalty-agreements", label: "Royalty Agreements", icon: "fa-file-contract" },
-            { id: "royalty-calculations", label: "Royalty Calculations", icon: "fa-calculator" }
+            { id: "royalty-calculations", label: "Royalty Calculations", icon: "fa-calculator" },
+            { id: "royalty-approvals", label: "Statement Approvals", icon: "fa-check-double" },
+            { id: "royalty-payments", label: "Royalty Payments", icon: "fa-hand-holding-usd" }
         );
     }
 
@@ -323,15 +345,11 @@
         else if (viewId === "receive-stock") renderReceiveStock();
         else if (viewId === "adjust-stock") renderAdjustStock();
         else if (viewId === "transactions") renderTransactions();
-        else if (viewId === "epic4-dashboard") renderEpic4Dashboard();
-        else if (viewId === "revenue") renderRevenue();
         else if (viewId === "books") renderBooks();
         else if (viewId === "categories") renderCategories();
         else if (viewId === "genres") renderGenres();
-        else if (viewId === "settings") renderSettings();
-        else if (viewId === "announcements") renderAnnouncements();
-        else if (viewId === "royalty-agreements") renderRoyaltyAgreements();
-        else if (viewId === "royalty-calculations") renderRoyaltyCalculations();
+        // Epic 4 administration, finance, royalty and analytics screens live in js/epic4.js
+        else if (window.RPViews && window.RPViews[viewId]) window.RPViews[viewId](param);
     }
 
     // ===================== PRODUCTION =====================
@@ -972,133 +990,6 @@
 
     // ===================== EPIC 4: ADMIN / FINANCE / ROYALTY =====================
 
-    async function renderEpic4Dashboard() {
-        pageTitle.textContent = isAdminRole(user) ? "Admin Dashboard" : "Finance Dashboard";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/admin/dashboard");
-            const stats = (res && res.data) || {};
-            let rev = null;
-            try {
-                const revRes = await api("/api/finance/revenue");
-                rev = (revRes && revRes.data) || null;
-            } catch (ignored) { /* revenue is optional on the dashboard */ }
-
-            let html =
-                '<div class="stats-grid">' +
-                '  <div class="stat-card"><div class="stat-label">Categories</div><div class="stat-value">' +
-                (stats.totalCategories != null ? stats.totalCategories : "—") + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Genres</div><div class="stat-value">' +
-                (stats.totalGenres != null ? stats.totalGenres : "—") + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Announcements</div><div class="stat-value">' +
-                (stats.totalAnnouncements != null ? stats.totalAnnouncements : "—") + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Active Royalty Agreements</div><div class="stat-value">' +
-                (stats.activeRoyaltyAgreements != null ? stats.activeRoyaltyAgreements : "—") + '</div></div>' +
-                '</div>';
-
-            if (rev) {
-                html +=
-                    '<div class="stats-grid">' +
-                    '  <div class="stat-card"><div class="stat-label">Revenue (last 12 months)</div><div class="stat-value">' +
-                    money(rev.totalRevenue) + '</div></div>' +
-                    '  <div class="stat-card"><div class="stat-label">Completed Sales</div><div class="stat-value">' +
-                    rev.completedSales + '</div></div>' +
-                    '  <div class="stat-card"><div class="stat-label">Books Sold</div><div class="stat-value">' +
-                    rev.booksSold + '</div></div>' +
-                    '  <div class="stat-card"><div class="stat-label">Royalties Calculated</div><div class="stat-value">' +
-                    money(stats.totalRoyaltiesCalculated || 0) + '</div></div>' +
-                    '</div>';
-            }
-
-            content.innerHTML = html;
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
-    // ---- US38: Monitor revenue from completed sales ----
-    async function renderRevenue(from, to) {
-        pageTitle.textContent = "Revenue";
-        from = from || monthStartISO(11);
-        to = to || todayISO();
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/finance/revenue?from=" + from + "&to=" + to);
-            const rev = (res && res.data) || {};
-            const excluded = rev.excluded || {};
-            const channels = rev.revenueByChannel || {};
-
-            let monthRows = "";
-            (rev.monthlyRevenue || []).forEach(function (m) {
-                monthRows += "<tr><td>" + escapeHtml(m.month) + "</td><td>" + m.completedSales + "</td><td>" +
-                    m.booksSold + "</td><td><strong>" + money(m.revenue) + "</strong></td></tr>";
-            });
-
-            let bookRows = "";
-            (rev.topBooks || []).forEach(function (b) {
-                bookRows += "<tr><td>#" + b.bookId + "</td><td>" + escapeHtml(b.bookTitle) + "</td><td>" +
-                    b.booksSold + "</td><td><strong>" + money(b.revenue) + "</strong></td></tr>";
-            });
-
-            let channelRows = "";
-            Object.keys(channels).forEach(function (k) {
-                channelRows += "<tr><td>" + escapeHtml(k) + "</td><td><strong>" + money(channels[k]) + "</strong></td></tr>";
-            });
-
-            content.innerHTML =
-                '<div class="content-card"><form id="filterForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>From</label><input type="date" id="from" value="' + from + '"></div>' +
-                '<div class="form-group"><label>To</label><input type="date" id="to" value="' + to + '"></div>' +
-                '</div><div class="form-actions"><button type="submit" class="btn btn-primary">' +
-                '<i class="fas fa-filter"></i> Apply</button></div></form></div>' +
-                '<div class="stats-grid">' +
-                '  <div class="stat-card"><div class="stat-label">Total Revenue</div><div class="stat-value">' + money(rev.totalRevenue) + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Completed Sales</div><div class="stat-value">' + rev.completedSales + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Books Sold</div><div class="stat-value">' + rev.booksSold + '</div></div>' +
-                '  <div class="stat-card"><div class="stat-label">Average Sale</div><div class="stat-value">' + money(rev.averageSaleValue) + '</div></div>' +
-                '</div>' +
-                '<div class="content-card"><h2>Monthly Revenue</h2>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Month</th><th>Completed Sales</th>' +
-                "<th>Books Sold</th><th>Revenue</th></tr></thead><tbody>" +
-                (monthRows || '<tr><td colspan="4" class="empty-state">No completed sales in this period.</td></tr>') +
-                "</tbody></table></div></div>" +
-                '<div class="content-card"><h2>Top Books</h2>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Book</th><th>Title</th>' +
-                "<th>Books Sold</th><th>Revenue</th></tr></thead><tbody>" +
-                (bookRows || '<tr><td colspan="4" class="empty-state">No data.</td></tr>') +
-                "</tbody></table></div></div>" +
-                '<div class="content-card"><h2>Revenue by Channel</h2>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Channel</th><th>Revenue</th></tr></thead><tbody>' +
-                (channelRows || '<tr><td colspan="2" class="empty-state">No data.</td></tr>') +
-                "</tbody></table></div></div>" +
-                '<div class="content-card"><h2>Excluded from Revenue</h2>' +
-                '<p class="card-desc">Received from Epic 3 but not counted — only completed sales contribute to revenue and royalties.</p>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr><th>Status</th><th>Transactions</th><th>Amount</th></tr></thead><tbody>' +
-                '<tr><td><span class="badge badge-cancelled">CANCELLED</span></td><td>' + (excluded.cancelledCount || 0) + "</td><td>" + money(excluded.cancelledAmount || 0) + "</td></tr>" +
-                '<tr><td><span class="badge badge-returned">RETURNED</span></td><td>' + (excluded.returnedCount || 0) + "</td><td>" + money(excluded.returnedAmount || 0) + "</td></tr>" +
-                "</tbody></table></div></div>";
-
-            const filterMsg = document.createElement("div");
-            document.getElementById("filterForm").prepend(filterMsg);
-            linkDateRange("from", "to", { maxToday: true, onChange: function () {
-                const err = validateFilterRange(document.getElementById("from").value, document.getElementById("to").value);
-                setFieldError("to", err);
-            } });
-            document.getElementById("filterForm").onsubmit = function (e) {
-                e.preventDefault();
-                const f = document.getElementById("from").value, t = document.getElementById("to").value;
-                const err = validateFilterRange(f, t);
-                setFieldError("to", err);
-                filterMsg.innerHTML = err ? '<div class="alert alert-error">' + escapeHtml(err) + '</div>' : "";
-                if (err) return;
-                renderRevenue(f, t);
-            };
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
-    // ---- Books: the online-store catalogue (title/author accept Sinhala Unicode) ----
     async function renderBooks(editId) {
         pageTitle.textContent = "Books";
         content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
@@ -1358,325 +1249,24 @@
             { key: "description", label: "Description", maxlength: 255, full: true, lang: "si" }
         ]
     };
-    const CRUD_ANNOUNCEMENTS = {
-        title: "Announcements", singular: "Announcement", endpoint: "/api/announcements", idKey: "announcementId", nameKey: "title",
-        fields: [
-            { key: "title", label: "Title", required: true, maxlength: 200, full: true, lang: "si" },
-            { key: "content", label: "Content", required: true, full: true, lang: "si" }
-        ]
-    };
-
     function renderCategories() { return renderCrud(CRUD_CATEGORIES); }
     function renderGenres() { return renderCrud(CRUD_GENRES); }
-    function renderAnnouncements() { return renderCrud(CRUD_ANNOUNCEMENTS); }
 
-    async function renderSettings() {
-        pageTitle.textContent = "System Settings";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/settings");
-            const items = (res && res.data) || [];
-            let rows = "";
-            items.forEach(function (s) {
-                rows += "<tr><td>" + escapeHtml(s.settingKey) + "</td><td>" + escapeHtml(s.settingValue || "—") +
-                    "</td><td>" + escapeHtml(s.description || "—") + "</td></tr>";
-            });
-            content.innerHTML =
-                '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>Set / Update a Setting</h2>' +
-                '<p class="card-desc">Changes apply to future calculations only — never retroactively.</p>' +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>Key <span class="req">*</span></label>' +
-                '<input type="text" id="settingKey" maxlength="100" required placeholder="e.g. currency"></div>' +
-                '<div class="form-group"><label>Value</label><input type="text" id="settingValue" maxlength="500"></div>' +
-                '<div class="form-group full"><label>Description</label><input type="text" id="settingDescription" maxlength="255"></div>' +
-                '</div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-save"></i> Save</button></div></form></div>' +
-                '<div class="content-card"><h2>All Settings</h2>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                "<th>Key</th><th>Value</th><th>Description</th></tr></thead><tbody>" +
-                (rows || '<tr><td colspan="3" class="empty-state">No settings configured yet.</td></tr>') +
-                "</tbody></table></div></div>";
-
-            document.getElementById("createForm").onsubmit = async function (e) {
-                e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const key = document.getElementById("settingKey").value.trim();
-                if (!key) { msgEl.innerHTML = '<div class="alert alert-error">Key is required.</div>'; return; }
-                try {
-                    await api("/api/settings", {
-                        method: "PUT",
-                        body: JSON.stringify({
-                            settingKey: key,
-                            settingValue: document.getElementById("settingValue").value.trim() || null,
-                            description: document.getElementById("settingDescription").value.trim() || null
-                        })
-                    });
-                    navigate("settings");
-                } catch (err) {
-                    msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                }
-            };
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
-    async function renderRoyaltyAgreements() {
-        pageTitle.textContent = "Royalty Agreements";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const res = await api("/api/royalty-agreements");
-            const items = (res && res.data) || [];
-            let rows = "";
-            items.forEach(function (a) {
-                rows += "<tr><td>#" + a.royaltyAgreementId + "</td><td>" + escapeHtml(a.agreementNumber) +
-                    "</td><td>" + a.authorId + "</td><td>" + a.bookId + "</td><td>" + a.royaltyPercentage +
-                    "%</td><td>" + (a.effectiveDate || "—") + "</td><td>" + (a.expiryDate || "open") +
-                    '</td><td><span class="badge badge-' + (a.status || "").toLowerCase() + '">' +
-                    escapeHtml(a.status) + "</span></td><td>";
-                if (a.status === "DRAFT") {
-                    rows += '<button type="button" class="btn-icon btn-activate" data-id="' + a.royaltyAgreementId +
-                        '" title="Activate"><i class="fas fa-play"></i></button>';
-                } else if (a.status === "ACTIVE") {
-                    rows += '<button type="button" class="btn-icon btn-expire" data-id="' + a.royaltyAgreementId +
-                        '" title="Expire"><i class="fas fa-ban"></i></button>';
-                } else {
-                    rows += '<span class="muted">—</span>';
-                }
-                rows += "</td></tr>";
-            });
-            content.innerHTML =
-                '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>New Royalty Agreement</h2>' +
-                '<p class="card-desc">Created as DRAFT — activate it once ready. Author/Book ids reference ' +
-                'Epic 1/2 records (not owned here).</p>' +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group"><label>Author ID <span class="req">*</span></label>' +
-                '<input type="number" id="authorId" min="1" required></div>' +
-                '<div class="form-group"><label>Book ID <span class="req">*</span></label>' +
-                '<input type="number" id="bookId" min="1" required></div>' +
-                '<div class="form-group"><label>Royalty % <span class="req">*</span></label>' +
-                '<input type="number" id="royaltyPercentage" min="0.01" max="100" step="0.01" required></div>' +
-                '<div class="form-group"><label>Effective From <span class="req">*</span></label>' +
-                '<input type="date" id="effectiveDate" required></div>' +
-                '<div class="form-group"><label>Expiry (optional)</label><input type="date" id="expiryDate"></div>' +
-                '</div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-plus"></i> Create</button></div></form></div>' +
-                '<div class="content-card"><h2>All Agreements</h2><div id="listMessage"></div>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                "<th>ID</th><th>Number</th><th>Author</th><th>Book</th><th>Rate</th><th>From</th><th>To</th>" +
-                "<th>Status</th><th>Actions</th></tr></thead><tbody>" +
-                (rows || '<tr><td colspan="9" class="empty-state">No royalty agreements yet.</td></tr>') +
-                "</tbody></table></div></div>";
-
-            linkDateRange("effectiveDate", "expiryDate", { onChange: function () {
-                setFieldError("expiryDate", validateAgreementDates(
-                    document.getElementById("effectiveDate").value, document.getElementById("expiryDate").value) === null
-                    ? null : (document.getElementById("expiryDate").value ? "Expiry must be after the effective date." : null));
-            } });
-
-            document.getElementById("createForm").onsubmit = async function (e) {
-                e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const authorId = document.getElementById("authorId").value;
-                const bookId = document.getElementById("bookId").value;
-                const royaltyPercentage = document.getElementById("royaltyPercentage").value;
-                const effectiveDate = document.getElementById("effectiveDate").value;
-                const expiryDate = document.getElementById("expiryDate").value;
-                if (!authorId || !bookId || !royaltyPercentage || !effectiveDate) {
-                    msgEl.innerHTML = '<div class="alert alert-error">All required fields must be filled.</div>';
-                    return;
-                }
-                const pct = Number(royaltyPercentage);
-                if (!(pct > 0 && pct <= 100)) {
-                    setFieldError("royaltyPercentage", "Royalty % must be between 0.01 and 100.");
-                    return;
-                }
-                setFieldError("royaltyPercentage", null);
-                const dateErr = validateAgreementDates(effectiveDate, expiryDate);
-                setFieldError("expiryDate", dateErr);
-                if (dateErr) { msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(dateErr) + '</div>'; return; }
-                try {
-                    await api("/api/royalty-agreements", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            authorId: Number(authorId),
-                            bookId: Number(bookId),
-                            royaltyPercentage: Number(royaltyPercentage),
-                            effectiveDate: effectiveDate,
-                            expiryDate: expiryDate || null
-                        })
-                    });
-                    navigate("royalty-agreements");
-                } catch (err) {
-                    msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                }
-            };
-            content.querySelectorAll(".btn-activate").forEach(function (btn) {
-                btn.addEventListener("click", async function () {
-                    try {
-                        await api("/api/royalty-agreements/" + btn.getAttribute("data-id") + "/activate", { method: "POST" });
-                        navigate("royalty-agreements");
-                    } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                    }
-                });
-            });
-            content.querySelectorAll(".btn-expire").forEach(function (btn) {
-                btn.addEventListener("click", async function () {
-                    try {
-                        await api("/api/royalty-agreements/" + btn.getAttribute("data-id") + "/expire", { method: "POST" });
-                        navigate("royalty-agreements");
-                    } catch (err) {
-                        document.getElementById("listMessage").innerHTML =
-                            '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                    }
-                });
-            });
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
-
-    async function renderRoyaltyCalculations() {
-        pageTitle.textContent = "Royalty Calculations";
-        content.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
-        try {
-            const agreementsRes = await api("/api/royalty-agreements");
-            const agreements = ((agreementsRes && agreementsRes.data) || []).filter(function (a) {
-                return a.status === "ACTIVE";
-            });
-            const calcsRes = await api("/api/royalties");
-            const calcs = (calcsRes && calcsRes.data) || [];
-
-            let options = '<option value="">— Select an active agreement —</option>';
-            const bookByAgreement = {};
-            const agreementById = {};
-            agreements.forEach(function (a) {
-                bookByAgreement[a.royaltyAgreementId] = a.bookId;
-                agreementById[a.royaltyAgreementId] = a;
-                options += '<option value="' + a.royaltyAgreementId + '">' + escapeHtml(a.agreementNumber) +
-                    " (Author #" + a.authorId + ", Book #" + a.bookId + ", " + a.royaltyPercentage + "%)</option>";
-            });
-
-            let rows = "";
-            calcs.forEach(function (c) {
-                rows += "<tr><td>#" + c.calculationId + "</td><td>" + c.royaltyAgreementId + "</td><td>" +
-                    c.salesPeriodStart + " → " + c.salesPeriodEnd + "</td><td>" + c.booksSold + "</td><td>" +
-                    money(c.grossSales) + "</td><td>" + money(c.deductions) + "</td><td><strong>" + money(c.royaltyAmount) +
-                    '</strong></td><td><span class="badge badge-' + (c.status || "").toLowerCase() + '">' +
-                    escapeHtml(c.status) + "</span></td></tr>";
-            });
-
-            content.innerHTML =
-                '<div id="formMessage"></div>' +
-                '<div class="content-card"><h2>Calculate Royalty</h2>' +
-                (agreements.length
-                    ? '<p class="card-desc">Books sold and gross sales are taken from the <strong>completed</strong> ' +
-                      "sales received from Epic 3 for the agreement's book over the period.</p>"
-                    : '<div class="alert alert-error">No ACTIVE royalty agreements — activate one on the ' +
-                      "Royalty Agreements page first.</div>") +
-                '<form id="createForm" novalidate><div class="form-grid">' +
-                '<div class="form-group full"><label>Agreement <span class="req">*</span></label>' +
-                '<select id="agreementId" required>' + options + '</select></div>' +
-                '<div class="form-group"><label>Period Start <span class="req">*</span></label>' +
-                '<input type="date" id="periodStart" value="' + monthStartISO(1) + '" required></div>' +
-                '<div class="form-group"><label>Period End <span class="req">*</span></label>' +
-                '<input type="date" id="periodEnd" value="' + lastDayOfPrevMonthISO() + '" required></div>' +
-                '<div class="form-group"><label>Deductions</label>' +
-                '<input type="number" id="deductions" min="0" step="0.01" value="0"></div>' +
-                '<div class="form-group full"><div id="salesPreview" class="card-desc">Select an agreement and period to preview completed sales.</div></div>' +
-                '</div><div class="form-actions"><button type="submit" class="btn btn-primary" id="submitBtn">' +
-                '<i class="fas fa-calculator"></i> Calculate</button></div></form></div>' +
-                '<div class="content-card"><h2>All Calculations</h2>' +
-                '<div class="table-wrap"><table class="data-table"><thead><tr>' +
-                "<th>ID</th><th>Agreement</th><th>Period</th><th>Books Sold</th><th>Gross Sales</th>" +
-                "<th>Deductions</th><th>Royalty Amount</th><th>Status</th></tr></thead><tbody>" +
-                (rows || '<tr><td colspan="8" class="empty-state">No calculations yet.</td></tr>') +
-                "</tbody></table></div></div>";
-
-            async function previewSales() {
-                const el = document.getElementById("salesPreview");
-                const agreementId = document.getElementById("agreementId").value;
-                const periodStart = document.getElementById("periodStart").value;
-                const periodEnd = document.getElementById("periodEnd").value;
-                if (!agreementId || !periodStart || !periodEnd) {
-                    el.innerHTML = "Select an agreement and period to preview completed sales.";
-                    return;
-                }
-                const err = validateRoyaltyPeriod(periodStart, periodEnd, agreementById[agreementId]);
-                setFieldError("periodEnd", err);
-                if (err) { el.innerHTML = '<span style="color:#c53030">' + escapeHtml(err) + "</span>"; return; }
-                el.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up completed sales...';
-                try {
-                    const r = await api("/api/finance/sales/summary?bookId=" + bookByAgreement[agreementId] +
-                        "&from=" + periodStart + "&to=" + periodEnd);
-                    const sum = (r && r.data) || {};
-                    el.innerHTML = "Completed sales for Book #" + sum.bookId + " in this period: <strong>" +
-                        sum.completedSales + " sales</strong>, <strong>" + sum.booksSold + " books sold</strong>, gross <strong>" +
-                        money(sum.grossSales) + "</strong>" +
-                        (sum.booksSold === 0 ? ' <span class="badge badge-cancelled">nothing to calculate</span>' : "");
-                } catch (err) {
-                    el.innerHTML = '<span style="color:#c53030">' + escapeHtml(err.message) + "</span>";
-                }
-            }
-            ["agreementId", "periodStart", "periodEnd"].forEach(function (id) {
-                document.getElementById(id).addEventListener("change", previewSales);
-            });
-            linkDateRange("periodStart", "periodEnd", { maxToday: true });
-            // The period must sit inside the selected agreement's effective dates.
-            document.getElementById("agreementId").addEventListener("change", function () {
-                const a = agreementById[this.value];
-                const ps = document.getElementById("periodStart"), pe = document.getElementById("periodEnd");
-                ps.min = a ? a.effectiveDate : "";
-                pe.min = ps.value || ps.min;
-                if (a && a.expiryDate && a.expiryDate < todayISO()) { ps.max = a.expiryDate; pe.max = a.expiryDate; }
-                else { pe.max = todayISO(); ps.max = pe.value || todayISO(); }
-            });
-
-            document.getElementById("createForm").onsubmit = async function (e) {
-                e.preventDefault();
-                const msgEl = document.getElementById("formMessage");
-                const agreementId = document.getElementById("agreementId").value;
-                const periodStart = document.getElementById("periodStart").value;
-                const periodEnd = document.getElementById("periodEnd").value;
-                if (!agreementId || !periodStart || !periodEnd) {
-                    msgEl.innerHTML = '<div class="alert alert-error">All required fields must be filled.</div>';
-                    return;
-                }
-                const periodErr = validateRoyaltyPeriod(periodStart, periodEnd, agreementById[agreementId]);
-                setFieldError("periodEnd", periodErr);
-                if (periodErr) { msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(periodErr) + '</div>'; return; }
-                const ded = Number(document.getElementById("deductions").value || 0);
-                if (isNaN(ded) || ded < 0) {
-                    setFieldError("deductions", "Deductions cannot be negative.");
-                    return;
-                }
-                setFieldError("deductions", null);
-                try {
-                    await api("/api/royalties/calculate", {
-                        method: "POST",
-                        body: JSON.stringify({
-                            royaltyAgreementId: Number(agreementId),
-                            periodStart: periodStart,
-                            periodEnd: periodEnd,
-                            deductions: Number(document.getElementById("deductions").value || 0)
-                        })
-                    });
-                    navigate("royalty-calculations");
-                } catch (err) {
-                    msgEl.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-                }
-            };
-        } catch (err) {
-            content.innerHTML = '<div class="alert alert-error">' + escapeHtml(err.message) + '</div>';
-        }
-    }
+    // Shared helpers for the Epic 4 screens in js/epic4.js
+    window.RP = {
+        api: api, apiUpload: apiUpload, getToken: getToken, user: user,
+        content: content, pageTitle: pageTitle, navigate: navigate,
+        money: money, escapeHtml: escapeHtml, todayISO: todayISO, monthStartISO: monthStartISO,
+        lastDayOfPrevMonthISO: lastDayOfPrevMonthISO, parseISO: parseISO,
+        validateFilterRange: validateFilterRange, validateRoyaltyPeriod: validateRoyaltyPeriod,
+        validateAgreementDates: validateAgreementDates, setFieldError: setFieldError, linkDateRange: linkDateRange,
+        isAdmin: isAdminRole(user), isFinanceStaff: isFinanceStaff(user), isExecutive: isExecutive(user)
+    };
 
     // Default landing page by role
-    if (isAdminRole(user) || isFinanceRole(user)) {
+    if (isExecutive(user) && !isAdminRole(user)) {
+        navigate("analytics");
+    } else if (isAdminRole(user) || isFinanceRole(user)) {
         navigate("epic4-dashboard");
     } else if (isProductionStaff(user) && !isWarehouseStaff(user)) {
         navigate("dashboard");

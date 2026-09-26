@@ -21,7 +21,7 @@ public class RevenueSummaryResponse {
     private int booksSold;
     private BigDecimal averageSaleValue;
 
-    /** channel (CUSTOMER / BOOKSTORE) -> revenue */
+    /** channel (CUSTOMER / BOOKSTORE) -> net revenue */
     private Map<String, BigDecimal> revenueByChannel;
 
     private List<MonthlyRevenue> monthlyRevenue;
@@ -29,6 +29,10 @@ public class RevenueSummaryResponse {
 
     /** Transactions that were received but deliberately excluded from revenue. */
     private Excluded excluded;
+
+    /** Completed sales before discounts (qty x unit price); totalRevenue is net of discounts. */
+    private BigDecimal grossRevenue;
+    private BigDecimal totalDiscounts;
 
     @Data
     @AllArgsConstructor

@@ -26,6 +26,10 @@ public class RoyaltyPayment {
     @Column(name = "payment_reference", nullable = false, unique = true, length = 100)
     private String paymentReference;
 
+    // Bank transfer / cheque reference entered when the payment is made; unique
+    @Column(name = "transaction_reference", unique = true, length = 100)
+    private String transactionReference;
+
     @Column(name = "amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal amount;
 
@@ -35,7 +39,8 @@ public class RoyaltyPayment {
     @Column(name = "payment_date", nullable = false)
     private LocalDate paymentDate;
 
-    // PENDING -> APPROVED -> SCHEDULED -> PROCESSING -> PAID (or FAILED)
+    // APPROVED -> (SCHEDULED -> PROCESSING ->) PAID. Created APPROVED when the
+    // royalty calculation is approved; PAID payments are immutable.
     @Column(name = "payment_status", nullable = false, length = 30)
     private String paymentStatus = "PENDING";
 
@@ -50,6 +55,10 @@ public class RoyaltyPayment {
 
     @Column(name = "processed_by")
     private Long processedBy;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

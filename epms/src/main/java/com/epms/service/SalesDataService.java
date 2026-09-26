@@ -5,6 +5,7 @@ import com.epms.dto.response.SalesSummaryResponse;
 import com.epms.entity.SalesRecord;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,6 +29,21 @@ public interface SalesDataService {
     /** Completed-sales totals for one book in a period (royalty input). */
     SalesSummaryResponse getCompletedSalesForBook(Long bookId, LocalDate from, LocalDate to);
 
+    /** Completed sale lines for one book, oldest first (royalty calculation input). */
+    List<SalesRecord> getCompletedSaleLines(Long bookId, LocalDate from, LocalDate to);
+
+    /** Returned sale lines for one book, oldest first (shown on royalty statements). */
+    List<SalesRecord> getReturnedSaleLines(Long bookId, LocalDate from, LocalDate to);
+
     /** Revenue monitoring aggregate for the period (US38). */
-    RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to);
+    default RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to) {
+        return getRevenue(from, to, null, null);
+    }
+
+    /**
+     * Revenue for the period, optionally limited to one channel
+     * (CUSTOMER / BOOKSTORE) and/or a set of book ids (null = no filter).
+     * Net revenue = sale amount - discount.
+     */
+    RevenueSummaryResponse getRevenue(LocalDate from, LocalDate to, String channel, Collection<Long> bookIds);
 }

@@ -8,41 +8,35 @@ royalty management.
 ## Structure
 
 ```
-epms/    Spring Boot backend (Java 21, Spring Boot 3.5.6, MySQL, JWT auth)
+epms/    Spring Boot backend (Java 21, Spring Boot 3.5.6, MySQL + Flyway, JWT auth)
 docs/    Project documentation (epic spec, sprint 0 report, DB schema, status reports)
 ```
 
-## Running locally (no MySQL setup required)
+## Running locally
 
-The backend has a `dev` profile that uses an in-memory H2 database, so you don't need
-MySQL installed to try it out:
+Needs Java 21 and MySQL 8.
 
 ```bash
+mysql -u root -p < docs/epms-schema.sql     # base schema
 cd epms
-bash mvnw -q -Dspring-boot.run.profiles=dev spring-boot:run
+bash mvnw spring-boot:run                   # Flyway applies each epic's migrations
+mysql -u root -p epms < ../docs/demo-data.sql   # optional demo data (after the first start)
 ```
 
-> Use `bash mvnw`, not `./mvnw` — the wrapper script carries a macOS quarantine flag
-> that blocks direct execution.
+> Use `bash mvnw`, not `./mvnw`: the wrapper script carries a macOS quarantine flag.
+
+Credentials default to `root` / `12345`; override with `DB_URL`, `DB_USERNAME`,
+`DB_PASSWORD`.
 
 Then open:
+- Staff and author login: http://localhost:8080/admin-login.html
 - Swagger UI: http://localhost:8080/swagger-ui/index.html
-- Staff login page: http://localhost:8080/admin-login.html
 
-See `TESTING.md` for a runnable demo script and a walkthrough mapping each
-demoed behavior back to a Sprint 0 user story. See `progress.md` for what's
-done vs. still open on Epic 4.
-
-## Running against real MySQL
-
-1. Create the database using `docs/epms-schema.sql`.
-2. Update `epms/src/main/resources/application.properties` with your MySQL
-   credentials (or override via environment variables).
-3. Run without the `dev` profile:
-   ```bash
-   cd epms
-   bash mvnw spring-boot:run
-   ```
+Docs:
+- `TESTING.md`: demo accounts, demo script, walkthrough, automated tests
+- `progress.md`: Epic 4 status by user story, open decisions
+- `docs/API.md`: Epic 4 endpoints and roles
+- `docs/INTEGRATION_CONTRACT.md`: what Epic 4 needs from and gives to the other epics
 
 ## Architecture
 

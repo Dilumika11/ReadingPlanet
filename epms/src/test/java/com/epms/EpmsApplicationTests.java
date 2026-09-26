@@ -2,11 +2,12 @@ package com.epms;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
-// Boots against the real MySQL "epms" database (application.properties).
-@SpringBootTest(properties = {
-        "epms.uploads.dir=${java.io.tmpdir}/epms-test-uploads"
-})
+// Boots the whole application on a throwaway in-memory database
+// (src/test/resources/application-test.properties), never the real MySQL.
+@SpringBootTest
+@ActiveProfiles("test")
 class EpmsApplicationTests {
 
     @Test

@@ -792,3 +792,28 @@ label.btn-icon { cursor: pointer; }
     .content-card { padding: 1.25rem; border-radius: var(--radius-panel); }
     .brand-title-band h1 { font-size: 1.5rem; }
 }
+
+/* ===================== Epic 4 additions ===================== */
+.alert-info { background: var(--primary-soft); color: var(--primary); }
+.badge-statement_issued { background: #c3dafe; color: #434190; }
+.badge-carried_forward { background: #feebc8; color: #c05621; }
+.badge-paid { background: #c6f6d5; color: #276749; }
+.badge-issued { background: var(--primary-soft); color: var(--primary); }
+.badge-partially_paid { background: #feebc8; color: #c05621; }
+.badge-reviewed { background: #c3dafe; color: #434190; }
+.badge-rejected { background: #fed7d7; color: #c53030; }
+.badge-generated { background: var(--primary-soft); color: var(--primary); }
+.badge-processing { background: #c3dafe; color: #434190; }
+.badge-failed { background: #fed7d7; color: #c53030; }
+.badge-all { background: var(--band); color: var(--text-body); }
+.sub-heading { font-size: 1rem; margin: 1.25rem 0 .5rem; }
+.muted.small, .small { font-size: .78rem; }
+.invoice-line { border-bottom: 1px dashed #e2e8f0; padding-bottom: .5rem; margin-bottom: .5rem; }
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+.chart-grid > .content-card { margin-bottom: 1rem; min-width: 0; }
+.chart-box { position: relative; height: 280px; }
+tr.muted td { color: #718096; }
+@media print {
+    .brand-header, .brand-band, .brand-title-band, .admin-sidebar, .brand-footer, .no-print, .form-actions { display: none !important; }
+    .admin-layout, .admin-main, .admin-content { display: block; margin: 0; padding: 0; }
+}

@@ -33,6 +33,23 @@ public class Expense {
     @Column(name = "status", nullable = false, length = 30)
     private String status = "RECORDED";
 
+    @Column(name = "reviewed_by")
+    private Long reviewedBy;
+
+    @Column(name = "rejection_reason", length = 500)
+    private String rejectionReason;
+
+    // Stored file name of the uploaded receipt (PDF/JPG/PNG), if any
+    @Column(name = "receipt_file")
+    private String receiptFile;
+
+    @Column(name = "receipt_content_type", length = 100)
+    private String receiptContentType;
+
+    // Set when the expense was posted automatically, e.g. "ROYALTY_PAYMENT:12"
+    @Column(name = "source_reference", length = 60)
+    private String sourceReference;
+
     @Column(name = "approved_by")
     private Long approvedBy;
 

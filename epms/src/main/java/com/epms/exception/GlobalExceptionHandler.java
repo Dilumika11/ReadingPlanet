@@ -15,6 +15,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.multipart.MultipartException;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -91,8 +98,38 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public ResponseEntity<ApiResponse<Object>> handleUploadTooLarge(MaxUploadSizeExceededException ex) {
-        return new ResponseEntity<>(new ApiResponse<>(false, "File is too large — covers must be 5 MB or smaller", null),
+        return new ResponseEntity<>(new ApiResponse<>(false, "File is too large: uploads must be 5 MB or smaller", null),
                 HttpStatus.PAYLOAD_TOO_LARGE);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMultipart(MultipartException ex) {
+        return new ResponseEntity<>(new ApiResponse<>(false, "Upload a file using multipart/form-data", null),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    /** Thrown by services for ownership checks (e.g. an author opening another author's statement). */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAccessDenied(AccessDeniedException ex) {
+        return new ResponseEntity<>(new ApiResponse<>(false, ex.getMessage(), null), HttpStatus.FORBIDDEN);
+    }
+
+    /** Two users changed the same record at the same moment (@Version check). */
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ResponseEntity<ApiResponse<Object>> handleConcurrentUpdate(ObjectOptimisticLockingFailureException ex) {
+        return new ResponseEntity<>(new ApiResponse<>(false,
+                "This record was changed by someone else at the same time. Reload and try again.", null),
+                HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UnsupportedOperationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleUnsupported(UnsupportedOperationException ex) {
+        return new ResponseEntity<>(new ApiResponse<>(false, ex.getMessage(), null), HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiResponse<Object>> handleMethod(HttpRequestMethodNotSupportedException ex) {
+        return new ResponseEntity<>(new ApiResponse<>(false, ex.getMessage(), null), HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(Exception.class)
@@ -107,12 +144,17 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Object>> handleValidation(MethodArgumentNotValidException ex) {
 
-        String message = ex.getBindingResult()
-                .getFieldError()
-                .getDefaultMessage();
+        String message = ex.getBindingResult().getFieldError() != null
+                ? ex.getBindingResult().getFieldError().getDefaultMessage()
+                : "Invalid request";
+
+        // Every field error, so forms can mark each invalid input.
+        Map<String, String> fieldErrors = new LinkedHashMap<>();
+        ex.getBindingResult().getFieldErrors()
+                .forEach(fe -> fieldErrors.putIfAbsent(fe.getField(), fe.getDefaultMessage()));
 
         ApiResponse<Object> response =
-                new ApiResponse<>(false, message, null);
+                new ApiResponse<>(false, message, fieldErrors.isEmpty() ? null : Map.of("fieldErrors", fieldErrors));
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }

@@ -37,6 +37,30 @@ public class RoyaltyAgreement {
     @Column(name = "expiry_date")
     private LocalDate expiryDate;
 
+    // Rate used for BOOKSTORE (wholesale) sales; null = same as royaltyPercentage
+    @Column(name = "wholesale_royalty_percentage", precision = 5, scale = 2)
+    private BigDecimal wholesaleRoyaltyPercentage;
+
+    // NET_SALES (qty x unit price - discount) or LIST_PRICE (qty x book list price)
+    @Column(name = "basis", nullable = false, length = 20)
+    private String basis = "NET_SALES";
+
+    // Advance paid to the author up front, recouped from future royalties
+    @Column(name = "advance_amount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal advanceAmount = BigDecimal.ZERO;
+
+    // Running total of the advance already recouped by live calculations
+    @Column(name = "advance_recouped", nullable = false, precision = 12, scale = 2)
+    private BigDecimal advanceRecouped = BigDecimal.ZERO;
+
+    // QUARTERLY / BIANNUAL / ANNUAL
+    @Column(name = "payment_frequency", nullable = false, length = 20)
+    private String paymentFrequency = "QUARTERLY";
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     // DRAFT -> ACTIVE -> EXPIRED
     @Column(name = "status", nullable = false, length = 30)
     private String status = "DRAFT";

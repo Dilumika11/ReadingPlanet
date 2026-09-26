@@ -11,6 +11,8 @@ public enum Role {
     INVENTORY_STAFF,
     SALES_STAFF,
     FINANCE_STAFF,
+    // Read-only executive dashboards (Epic 4 analytics)
+    EXECUTIVE,
     CUSTOMER
 
 }

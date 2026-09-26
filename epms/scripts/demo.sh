@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 #
 # End-to-end demo/test script for Epic 4 (Administration, Finance & Royalty
-# Management). Run this against a live instance of the app to walk through
-# every implemented feature with visible pass/fail output.
+# Management). Walks through every feature with visible PASS/FAIL output.
 #
-# Usage:
-#   cd epms && bash mvnw -q -Dspring-boot.run.profiles=dev spring-boot:run &
-#   bash scripts/demo.sh
+# Needs a running app on a database loaded with docs/demo-data.sql:
+#   1. mysql -u root -p < docs/epms-schema.sql
+#   2. cd epms && bash mvnw spring-boot:run      (Flyway applies V400; leave it running)
+#   3. mysql -u root -p epms < docs/demo-data.sql
+#   4. bash epms/scripts/demo.sh
+#
+# Safe to re-run: each run picks a sales period that has not been calculated
+# yet for the demo agreement, and uses fresh names / references.
 #
 set -uo pipefail
 
@@ -14,7 +18,6 @@ BASE="${BASE_URL:-http://localhost:8080}"
 PASS=0
 FAIL=0
 
-# Pick a Python that actually runs (on Windows, "python3" may be a Store stub).
 PY=""
 for c in python3 python; do
   if "$c" -c "pass" >/dev/null 2>&1; then PY="$c"; break; fi
@@ -25,208 +28,139 @@ step() { printf "\n\033[1;34m== %s ==\033[0m\n" "$1"; }
 ok()   { PASS=$((PASS+1)); printf "  \033[1;32mPASS\033[0m %s\n" "$1"; }
 bad()  { FAIL=$((FAIL+1)); printf "  \033[1;31mFAIL\033[0m %s (got: %s)\n" "$1" "$2"; }
 
-expect_code() {
-  local desc="$1" method="$2" url="$3" data="${4:-}" auth="${5:-}"
-  local code
-  if [ -n "$data" ]; then
-    code=$(curl -s -o /tmp/demo_last_body -w "%{http_code}" -X "$method" "$BASE$url" \
-      -H "Content-Type: application/json" ${auth:+-H "$auth"} -d "$data")
-  else
-    code=$(curl -s -o /tmp/demo_last_body -w "%{http_code}" -X "$method" "$BASE$url" ${auth:+-H "$auth"})
-  fi
-  echo "$code"
+# call METHOD URL TOKEN [JSON] -> prints HTTP code, body saved in $BODY_FILE
+BODY_FILE=$(mktemp)
+call() {
+  local method="$1" url="$2" token="$3" data="${4:-}"
+  local args=(-s -o "$BODY_FILE" -w "%{http_code}" -X "$method" "$BASE$url")
+  [ -n "$token" ] && args+=(-H "Authorization: Bearer $token")
+  [ -n "$data" ] && args+=(-H "Content-Type: application/json" -d "$data")
+  curl "${args[@]}"
 }
+json() { "$PY" -c "import sys,json; d=json.load(open('$BODY_FILE'), parse_float=str); print($1)"; }
+expect() { # expect DESC EXPECTED_CODE ACTUAL_CODE
+  if [ "$2" = "$3" ]; then ok "$1 ($3)"; else bad "$1, expected $2" "$3 $(head -c 200 "$BODY_FILE")"; fi
+}
+login() {
+  curl -s -X POST "$BASE/api/auth/login" -H "Content-Type: application/json" \
+    -d "{\"email\":\"$1\",\"password\":\"Password@123\"}" \
+    | "$PY" -c "import sys,json; print(json.load(sys.stdin)['data']['token'])" 2>/dev/null
+}
+d() { "$PY" -c "import datetime as t; print($1)"; }
 
-# parse_float=str preserves "10000.00" instead of collapsing it to the
-# float 10000.0, so decimal amounts print exactly as the API returned them.
-json() { "$PY" -c "import sys,json; d=json.load(sys.stdin, parse_float=str); print(d$1)"; }
-
-# Use fresh, randomized names/ids each run so the script is safely
-# re-runnable against the same long-lived dev server without tripping
-# uniqueness constraints or the "one active agreement per author+book"
-# rule from a previous run's leftover data.
 RUN_ID=$RANDOM
-DEMO_AUTHOR_ID=$((RANDOM + 1000))
-# Book 1 is part of the dummy Epic 3 catalogue seeded by the dev profile, so it
-# has completed sales to calculate royalties from (see DemoSalesDataInitializer).
-DEMO_BOOK_ID=1
+TODAY=$(d "t.date.today()")
 
-# Royalty period = the previous calendar month (always inside the 12 months of
-# seeded sales, and never in the future).
-PERIOD_START=$("$PY" -c "import datetime as d; t=d.date.today().replace(day=1); print((t-d.timedelta(days=1)).replace(day=1))")
-PERIOD_END=$("$PY" -c "import datetime as d; t=d.date.today().replace(day=1); print(t-d.timedelta(days=1))")
+step "0. Log in as each role (accounts from docs/demo-data.sql)"
+ADMIN=$(login admin@readingplanet.lk); FIN=$(login finance@readingplanet.lk); EXEC=$(login exec@readingplanet.lk)
+AUTH1=$(login author1@readingplanet.lk); AUTH2=$(login author2@readingplanet.lk)
+for v in ADMIN FIN EXEC AUTH1 AUTH2; do
+  if [ -n "${!v}" ]; then ok "$v logged in"; else bad "$v login" "no token (is docs/demo-data.sql loaded?)"; fi
+done
+[ -n "$FIN" ] || { echo "Cannot continue without the demo accounts."; exit 1; }
 
-# ---------------------------------------------------------------------------
-step "0. Register + login a Finance Officer and an Admin"
-# ---------------------------------------------------------------------------
+step "1. Administration: categories, settings, announcements (US31 - US34)"
+expect "Public category list (no login)" 200 "$(call GET /api/categories "")"
+expect "Create category" 200 "$(call POST /api/categories "$ADMIN" "{\"categoryName\":\"Demo $RUN_ID\"}")"
+expect "Duplicate category name (any case) rejected" 409 "$(call POST /api/categories "$ADMIN" "{\"categoryName\":\"demo $RUN_ID\"}")"
+expect "Finance staff cannot create categories" 403 "$(call POST /api/categories "$FIN" "{\"categoryName\":\"X$RUN_ID\"}")"
+expect "Tax rate outside 0-100 rejected" 400 "$(call PUT /api/settings "$ADMIN" '{"settingKey":"taxRatePercent","settingValue":"150"}')"
+expect "Set tax rate to 18%" 200 "$(call PUT /api/settings "$ADMIN" '{"settingKey":"taxRatePercent","settingValue":"18"}')"
+expect "Settings change history (audit)" 200 "$(call GET /api/settings/history "$ADMIN")"
+expect "Public settings for other epics" 200 "$(call GET /api/settings/public "")"
+expect "Announcement to authors" 200 "$(call POST /api/announcements "$ADMIN" "{\"title\":\"Statements $RUN_ID\",\"content\":\"Statements issued\",\"audience\":\"AUTHOR\"}")"
+call GET /api/announcements/active "$AUTH1" >/dev/null
+if json "any(a['title']=='Statements $RUN_ID' for a in d['data'])" | grep -q True; then ok "Author sees the announcement"; else bad "Author sees the announcement" "missing"; fi
 
-curl -s -X POST "$BASE/api/auth/register" -H "Content-Type: application/json" -d '{
-  "username":"demo_finance","firstName":"Demo","lastName":"Finance",
-  "email":"demo_finance@readingplanet.test","password":"Passw0rd!","role":"FINANCE_STAFF"
-}' > /dev/null
+step "2. Revenue from completed sales only (US35)"
+expect "Revenue, last 12 months" 200 "$(call GET /api/finance/revenue "$FIN")"
+echo "     net revenue $(json "d['data']['totalRevenue']"), completed sales $(json "d['data']['completedSales']"), excluded cancelled $(json "d['data']['excluded']['cancelledCount']") / returned $(json "d['data']['excluded']['returnedCount']")"
+expect "Revenue filtered to bookstore (wholesale)" 200 "$(call GET "/api/finance/revenue?channel=BOOKSTORE" "$FIN")"
+expect "Period ending before it starts rejected" 400 "$(call GET "/api/finance/revenue?from=2026-05-01&to=2026-01-01" "$FIN")"
 
-curl -s -X POST "$BASE/api/auth/register" -H "Content-Type: application/json" -d '{
-  "username":"demo_admin","firstName":"Demo","lastName":"Admin",
-  "email":"demo_admin@readingplanet.test","password":"Passw0rd!","role":"ADMIN"
-}' > /dev/null
+step "3. Royalty agreements (US41)"
+expect "Agreement for a book of another author rejected" 400 "$(call POST /api/royalty-agreements "$FIN" '{"authorId":9001,"bookId":9003,"royaltyPercentage":10,"effectiveDate":"2026-01-01"}')"
+expect "Rate above 50% rejected" 400 "$(call POST /api/royalty-agreements "$FIN" '{"authorId":9001,"bookId":9002,"royaltyPercentage":60,"effectiveDate":"2026-01-01"}')"
+expect "Executive cannot create agreements" 403 "$(call POST /api/royalty-agreements "$EXEC" '{"authorId":9001,"bookId":9002,"royaltyPercentage":10,"effectiveDate":"2026-01-01"}')"
 
-FINANCE_TOKEN=$(curl -s -X POST "$BASE/api/auth/login" -H "Content-Type: application/json" \
-  -d '{"email":"demo_finance@readingplanet.test","password":"Passw0rd!"}' | json "['data']['token']")
-ADMIN_TOKEN=$(curl -s -X POST "$BASE/api/auth/login" -H "Content-Type: application/json" \
-  -d '{"email":"demo_admin@readingplanet.test","password":"Passw0rd!"}' | json "['data']['token']")
+step "4. Royalty calculation with preview and duplicate guard (US42, US43)"
+# Find a month (going back from last month) not yet calculated for RA-DEMO-001
+PERIOD=""
+for back in $(seq 1 11); do
+  S=$("$PY" -c "
+import datetime as t
+m=t.date.today().replace(day=1)
+for _ in range($back): m=(m-t.timedelta(days=1)).replace(day=1)
+e=(m.replace(day=28)+t.timedelta(days=4)).replace(day=1)-t.timedelta(days=1)
+print(m, e)")
+  set -- $S
+  code=$(call POST /api/royalties/preview "$FIN" "{\"royaltyAgreementId\":9001,\"periodStart\":\"$1\",\"periodEnd\":\"$2\"}")
+  if [ "$code" = "200" ]; then PERIOD="$1 $2"; break; fi
+done
+if [ -z "$PERIOD" ]; then bad "Find an uncalculated month" "every month already calculated (reload demo data)"; else
+  set -- $PERIOD; PS=$1; PE=$2
+  ok "Preview for $PS to $PE: gross royalty $(json "d['data']['calculation']['royaltyAmount']"), $(json "len(d['data']['lines'])") lines, nothing saved"
+  expect "Calculate and save" 200 "$(call POST /api/royalties/calculate "$FIN" "{\"royaltyAgreementId\":9001,\"periodStart\":\"$PS\",\"periodEnd\":\"$PE\"}")"
+  CALC=$(json "d['data']['calculationId']"); PAYABLE=$(json "d['data']['payableAmount']")
+  expect "Same period again rejected (duplicate)" 409 "$(call POST /api/royalties/calculate "$FIN" "{\"royaltyAgreementId\":9001,\"periodStart\":\"$PS\",\"periodEnd\":\"$PE\"}")"
+  expect "Overlapping period rejected" 409 "$(call POST /api/royalties/calculate "$FIN" "{\"royaltyAgreementId\":9001,\"periodStart\":\"$PE\",\"periodEnd\":\"$PE\"}")"
+  expect "Future period rejected" 400 "$(call POST /api/royalties/calculate "$FIN" "{\"royaltyAgreementId\":9001,\"periodStart\":\"$TODAY\",\"periodEnd\":\"2099-01-01\"}")"
 
-if [ -n "$FINANCE_TOKEN" ] && [ -n "$ADMIN_TOKEN" ]; then
-  ok "Register + login (JWT issued for both roles) — Shared Core auth, not this epic's scope, but required to test it"
-else
-  bad "Register/login" "no token returned"
-  echo "Aborting — cannot continue without auth."
-  exit 1
+  step "5. Statement, approval and payment (US44 - US46)"
+  expect "Statement not available before it is issued" 409 "$(call GET /api/royalties/$CALC/statement "$FIN")"
+  expect "Issue statement" 200 "$(call POST /api/royalties/$CALC/statement "$FIN")"
+  echo "     statement $(json "d['data']['statementNumber']")"
+  expect "Executive cannot approve" 403 "$(call POST /api/royalties/$CALC/approve "$EXEC")"
+  expect "Cannot pay before approval" 409 "$(call POST /api/royalties/$CALC/pay "$FIN" "{\"transactionReference\":\"BT-$RUN_ID\",\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"BANK_TRANSFER\",\"amount\":$PAYABLE}")"
+  expect "Approve" 200 "$(call POST /api/royalties/$CALC/approve "$FIN")"
+  STATUS=$(json "d['data']['status']")
+  if [ "$STATUS" = "APPROVED" ]; then
+    expect "Wrong amount rejected" 409 "$(call POST /api/royalties/$CALC/pay "$FIN" "{\"transactionReference\":\"BT-$RUN_ID\",\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"BANK_TRANSFER\",\"amount\":1}")"
+    expect "Record payment" 200 "$(call POST /api/royalties/$CALC/pay "$FIN" "{\"transactionReference\":\"BT-$RUN_ID\",\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"BANK_TRANSFER\",\"amount\":$PAYABLE}")"
+    expect "Paid record is immutable" 409 "$(call POST /api/royalties/$CALC/pay "$FIN" "{\"transactionReference\":\"BT2-$RUN_ID\",\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"BANK_TRANSFER\",\"amount\":$PAYABLE}")"
+  else
+    ok "Payable $PAYABLE is below the payment threshold, carried forward ($STATUS)"
+  fi
+
+  step "6. Author sees only their own royalties (US47)"
+  expect "Author 1 opens own statement" 200 "$(call GET /api/me/royalty/statements/$CALC "$AUTH1")"
+  expect "Author 2 cannot open author 1's statement" 403 "$(call GET /api/me/royalty/statements/$CALC "$AUTH2")"
+  expect "Author cannot use the finance API" 403 "$(call GET /api/royalties/$CALC/statement "$AUTH1")"
 fi
 
-FIN="Authorization: Bearer $FINANCE_TOKEN"
-ADM="Authorization: Bearer $ADMIN_TOKEN"
+step "7. Expenses, invoices and payments (US36 - US38)"
+expect "Record expense" 200 "$(call POST /api/finance/expenses "$FIN" "{\"category\":\"MARKETING\",\"amount\":2500,\"expenseDate\":\"$TODAY\",\"description\":\"Demo $RUN_ID\"}")"
+EXP=$(json "d['data']['expenseId']")
+expect "Invalid expense category rejected" 400 "$(call POST /api/finance/expenses "$FIN" "{\"category\":\"FOOD\",\"amount\":1,\"expenseDate\":\"$TODAY\"}")"
+expect "Approve expense" 200 "$(call POST /api/finance/expenses/$EXP/approve "$FIN")"
+expect "Approved expense cannot be edited" 409 "$(call PUT /api/finance/expenses/$EXP "$FIN" "{\"category\":\"MARKETING\",\"amount\":1,\"expenseDate\":\"$TODAY\"}")"
+expect "Create invoice" 200 "$(call POST /api/invoices "$FIN" '{"customerName":"Sarasavi Bookshop","lines":[{"description":"Kandy Rain","quantity":10,"unitPrice":1500}]}')"
+INV=$(json "d['data']['invoice']['invoiceId']"); TOTAL=$(json "d['data']['invoice']['totalAmount']")
+echo "     $(json "d['data']['invoice']['invoiceNumber']"), total $TOTAL incl. tax $(json "d['data']['invoice']['taxRate']")%"
+expect "Issue invoice" 200 "$(call POST /api/invoices/$INV/issue "$FIN")"
+expect "Issued invoice cannot be edited" 409 "$(call PUT /api/invoices/$INV "$FIN" '{"customerName":"X","lines":[{"description":"a","quantity":1,"unitPrice":1}]}')"
+expect "Payment above balance rejected" 409 "$(call POST /api/invoices/$INV/payments "$FIN" "{\"amount\":99999999,\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"CASH\",\"reference\":\"R-$RUN_ID\"}")"
+expect "Part payment" 200 "$(call POST /api/invoices/$INV/payments "$FIN" "{\"amount\":1000,\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"CASH\",\"reference\":\"R-$RUN_ID\"}")"
+echo "     status $(json "d['data']['invoice']['status']"), outstanding $(json "d['data']['invoice']['outstanding']")"
+expect "Duplicate payment reference rejected" 409 "$(call POST /api/invoices/$INV/payments "$FIN" "{\"amount\":1,\"paymentDate\":\"$TODAY\",\"paymentMethod\":\"CASH\",\"reference\":\"R-$RUN_ID\"}")"
 
-# ---------------------------------------------------------------------------
-step "1. Administration — Categories (US31)"
-# ---------------------------------------------------------------------------
+step "8. Financial reports and finalization (US39, US40)"
+FROM=$(d "(t.date.today().replace(day=1) - t.timedelta(days=330)).replace(day=1)")
+expect "Generate profit and loss" 200 "$(call POST "/api/reports/generate?reportType=PROFIT_AND_LOSS&periodStart=$FROM&periodEnd=$TODAY" "$FIN")"
+REP=$(json "d['data']['report']['reportId']")
+echo "     net revenue $(json "d['data']['figures']['netRevenue']"), profit $(json "d['data']['figures']['profit']")"
+expect "Finalize" 200 "$(call POST /api/reports/$REP/finalize "$FIN")"
+expect "Finalized report cannot be deleted" 409 "$(call DELETE /api/reports/$REP "$FIN")"
+expect "Finalized report cannot be regenerated" 409 "$(call POST /api/reports/$REP/regenerate "$FIN")"
+expect "Executive can download it" 200 "$(call GET /api/reports/$REP/download "$EXEC")"
 
-CODE=$(expect_code "create category" POST "/api/categories" "{\"categoryName\":\"Demo Fiction $RUN_ID\",\"description\":\"Created by demo script\"}" "$ADM")
-[ "$CODE" = "200" ] && ok "Create category -> 200" || bad "Create category" "$CODE"
-CATEGORY_ID=$(cat /tmp/demo_last_body | json "['data']['categoryId']")
+step "9. Executive analytics (US48 - US50)"
+for e in dashboard sales books authors royalties; do
+  expect "Analytics: $e" 200 "$(call GET /api/analytics/$e "$EXEC")"
+done
+expect "Authors cannot open analytics" 403 "$(call GET /api/analytics/dashboard "$AUTH1")"
 
-CODE=$(expect_code "duplicate category name rejected" POST "/api/categories" "{\"categoryName\":\"Demo Fiction $RUN_ID\"}" "$ADM")
-[ "$CODE" = "409" ] && ok "Duplicate category name -> 409 Conflict" || bad "Duplicate category rejection" "$CODE"
-
-CODE=$(expect_code "edit category" PUT "/api/categories/$CATEGORY_ID" "{\"categoryName\":\"Demo Fiction $RUN_ID (edited)\",\"description\":\"Edited by demo script\"}" "$ADM")
-[ "$CODE" = "200" ] && ok "Edit category -> 200" || bad "Edit category" "$CODE"
-
-CODE=$(expect_code "delete category" DELETE "/api/categories/$CATEGORY_ID" '' "$ADM")
-[ "$CODE" = "200" ] && ok "Delete category -> 200" || bad "Delete category" "$CODE"
-
-CODE=$(expect_code "delete category in use" DELETE "/api/categories/1" '' "$ADM")
-[ "$CODE" = "409" ] && ok "Delete a category that books still use -> 409 (protects the store catalogue)" || bad "Delete in-use category" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "2. Administration — Genres (US32), Settings (US33), Announcements (US34)"
-# ---------------------------------------------------------------------------
-
-CODE=$(expect_code "create genre" POST "/api/genres" "{\"genreName\":\"Demo Fantasy $RUN_ID\"}" "$ADM")
-[ "$CODE" = "200" ] && ok "Create genre -> 200" || bad "Create genre" "$CODE"
-
-CODE=$(expect_code "update setting" PUT "/api/settings" '{"settingKey":"currency","settingValue":"LKR"}' "$ADM")
-[ "$CODE" = "200" ] && ok "Upsert system setting -> 200" || bad "Upsert setting" "$CODE"
-
-CODE=$(expect_code "create announcement" POST "/api/announcements" '{"title":"Demo","content":"Sprint 0 demo run"}' "$ADM")
-[ "$CODE" = "200" ] && ok "Create announcement -> 200" || bad "Create announcement" "$CODE"
-
-CODE=$(expect_code "admin dashboard" GET "/api/admin/dashboard" '' "$ADM")
-[ "$CODE" = "200" ] && ok "Admin dashboard aggregate stats -> 200" || bad "Admin dashboard" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "3. Royalty Agreements (US44) — full CRUD + lifecycle"
-# ---------------------------------------------------------------------------
-
-CODE=$(expect_code "create agreement" POST "/api/royalty-agreements" \
-  "{\"authorId\":$DEMO_AUTHOR_ID,\"bookId\":$DEMO_BOOK_ID,\"royaltyPercentage\":10,\"effectiveDate\":\"2024-01-01\"}" "$FIN")
-[ "$CODE" = "200" ] && ok "Create royalty agreement (DRAFT) -> 200" || bad "Create agreement" "$CODE"
-AGREEMENT_ID=$(cat /tmp/demo_last_body | json "['data']['royaltyAgreementId']")
-
-CALC_BODY="{\"royaltyAgreementId\":$AGREEMENT_ID,\"periodStart\":\"$PERIOD_START\",\"periodEnd\":\"$PERIOD_END\",\"deductions\":0}"
-
-CODE=$(expect_code "calculate before activation is rejected" POST "/api/royalties/calculate" "$CALC_BODY" "$FIN")
-[ "$CODE" = "409" ] && ok "Calculate against a DRAFT agreement -> 409 (no active agreement)" || bad "Reject calc on DRAFT" "$CODE"
-
-CODE=$(expect_code "activate agreement" POST "/api/royalty-agreements/$AGREEMENT_ID/activate" '' "$FIN")
-[ "$CODE" = "200" ] && ok "Activate royalty agreement -> 200" || bad "Activate agreement" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "4. Royalty Calculation Engine (US45, US42, US43) — from completed sales"
-# ---------------------------------------------------------------------------
-
-# What Epic 4 received from Epic 3 for this book + period (only COMPLETED counts)
-CODE=$(expect_code "completed sales for book" GET "/api/finance/sales/summary?bookId=$DEMO_BOOK_ID&from=$PERIOD_START&to=$PERIOD_END" '' "$FIN")
-EXPECTED_SOLD=$(cat /tmp/demo_last_body | json "['data']['booksSold']")
-EXPECTED_GROSS=$(cat /tmp/demo_last_body | json "['data']['grossSales']")
-[ "$CODE" = "200" ] && ok "Completed sales for book $DEMO_BOOK_ID, $PERIOD_START..$PERIOD_END: $EXPECTED_SOLD books, gross $EXPECTED_GROSS" \
-  || bad "Sales summary" "$CODE"
-
-CODE=$(expect_code "calculate royalty" POST "/api/royalties/calculate" "$CALC_BODY" "$FIN")
-CHECK=$(cat /tmp/demo_last_body | "$PY" -c "
-import sys, json
-from decimal import Decimal, ROUND_HALF_UP
-d = json.load(sys.stdin, parse_float=str)['data']
-gross = Decimal(str(d['grossSales'])); amount = Decimal(str(d['royaltyAmount']))
-expected = (gross * Decimal('10') / Decimal('100')).quantize(Decimal('0.01'), ROUND_HALF_UP)
-ok = str(d['booksSold']) == '$EXPECTED_SOLD' and gross == Decimal('$EXPECTED_GROSS') and amount == expected
-print(('OK' if ok else 'MISMATCH') + ' sold=%s gross=%s royalty=%s expected=%s' % (d['booksSold'], gross, amount, expected))
-" 2>/dev/null || echo "MISMATCH (no body)")
-if [ "$CODE" = "200" ] && [[ "$CHECK" == OK* ]]; then
-  ok "Calculate royalty from completed sales x 10%: $CHECK (BigDecimal, verified exact)"
-else
-  bad "Royalty calculation" "code=$CODE $CHECK"
-fi
-CALCULATION_ID=$(cat /tmp/demo_last_body | json "['data']['calculationId']")
-
-CODE=$(expect_code "duplicate calculation rejected" POST "/api/royalties/calculate" "$CALC_BODY" "$FIN")
-[ "$CODE" = "409" ] && ok "Duplicate calculation for same agreement+period -> 409 (prevents double royalty payment)" \
-  || bad "Duplicate calculation rejection" "$CODE"
-
-CODE=$(expect_code "royalty statement" GET "/api/royalties/$CALCULATION_ID/statement" '' "$FIN")
-[ "$CODE" = "200" ] && ok "Retrieve royalty statement -> 200" || bad "Royalty statement" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "5. Expenses (part of Finance module)"
-# ---------------------------------------------------------------------------
-
-CODE=$(expect_code "record expense" POST "/api/finance/expenses" \
-  '{"category":"Printing","description":"Demo expense","amount":5000,"expenseDate":"2026-07-15"}' "$FIN")
-[ "$CODE" = "200" ] && ok "Record expense -> 200" || bad "Record expense" "$CODE"
-EXPENSE_ID=$(cat /tmp/demo_last_body | json "['data']['expenseId']")
-
-CODE=$(expect_code "approve expense" POST "/api/finance/expenses/$EXPENSE_ID/approve" '' "$FIN")
-[ "$CODE" = "200" ] && ok "Approve expense -> 200" || bad "Approve expense" "$CODE"
-
-CODE=$(expect_code "edit approved expense rejected" PUT "/api/finance/expenses/$EXPENSE_ID" \
-  '{"category":"Printing","description":"edited","amount":6000,"expenseDate":"2026-07-15"}' "$FIN")
-[ "$CODE" = "409" ] && ok "Edit an already-approved expense -> 409 (immutability enforced)" \
-  || bad "Reject edit of approved expense" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "6. Revenue Monitoring (US38) — from completed sales received from Epic 3"
-# ---------------------------------------------------------------------------
-
-CODE=$(expect_code "revenue last 12 months" GET "/api/finance/revenue" '' "$FIN")
-if [ "$CODE" = "200" ]; then
-  SUMMARY=$(cat /tmp/demo_last_body | "$PY" -c "
-import sys, json
-d = json.load(sys.stdin, parse_float=str)['data']
-x = d['excluded']
-print('total=%s completedSales=%s booksSold=%s months=%d cancelledExcluded=%s returnedExcluded=%s' % (
-    d['totalRevenue'], d['completedSales'], d['booksSold'], len(d['monthlyRevenue']), x['cancelledCount'], x['returnedCount']))")
-  ok "Revenue (trailing 12 months): $SUMMARY"
-else
-  bad "Revenue" "$CODE"
-fi
-
-CODE=$(expect_code "revenue for the royalty period" GET "/api/finance/revenue?from=$PERIOD_START&to=$PERIOD_END" '' "$FIN")
-[ "$CODE" = "200" ] && ok "Revenue filtered to $PERIOD_START..$PERIOD_END -> 200" || bad "Revenue (filtered)" "$CODE"
-
-CODE=$(expect_code "revenue with inverted period" GET "/api/finance/revenue?from=$PERIOD_END&to=$PERIOD_START" '' "$FIN")
-[ "$CODE" = "409" ] && ok "Revenue with end-before-start period -> 409" || bad "Revenue period validation" "$CODE"
-
-CODE=$(expect_code "raw sales feed" GET "/api/finance/sales?from=$PERIOD_START&to=$PERIOD_END&status=CANCELLED" '' "$FIN")
-[ "$CODE" = "200" ] && ok "Raw sales feed (cancelled only, for audit of what was excluded) -> 200" || bad "Sales feed" "$CODE"
-
-# ---------------------------------------------------------------------------
-step "7. What's still a TODO stub (expected 500 with a clear message, not a crash)"
-# ---------------------------------------------------------------------------
-
-CODE=$(expect_code "analytics dashboard (blocked on Epic 1/2/3)" GET "/api/analytics/dashboard" '' "$FIN")
-MSG=$(cat /tmp/demo_last_body | json "['message']" 2>/dev/null || echo "?")
-echo "  /api/analytics/dashboard -> HTTP $CODE : $MSG"
-
-# ---------------------------------------------------------------------------
 step "Summary"
-# ---------------------------------------------------------------------------
-echo "  Passed: $PASS   Failed: $FAIL"
-[ "$FAIL" -eq 0 ] && echo "  All demoed behaviors passed." || echo "  Some checks failed — see FAIL lines above."
+printf "  \033[1;32m%d passed\033[0m, \033[1;31m%d failed\033[0m\n" "$PASS" "$FAIL"
+rm -f "$BODY_FILE"
+[ "$FAIL" -eq 0 ]

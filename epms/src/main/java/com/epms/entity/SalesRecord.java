@@ -50,6 +50,10 @@ public class SalesRecord {
     @Column(name = "sale_amount", nullable = false, precision = 12, scale = 2)
     private BigDecimal saleAmount;
 
+    // Discount given on the line; net revenue = sale_amount - discount
+    @Column(name = "discount", nullable = false, precision = 12, scale = 2)
+    private BigDecimal discount = BigDecimal.ZERO;
+
     @Column(name = "sale_date", nullable = false)
     private LocalDate saleDate;
 
@@ -59,6 +63,12 @@ public class SalesRecord {
 
     @Column(name = "received_at", nullable = false, updatable = false)
     private LocalDateTime receivedAt;
+
+    /** Net amount of the line (sale amount less discount). */
+    @Transient
+    public BigDecimal getNetAmount() {
+        return saleAmount.subtract(discount == null ? BigDecimal.ZERO : discount);
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -22,6 +22,13 @@ public class AnnouncementController {
         return new ApiResponse<>(true, "Announcements retrieved", announcementService.getAll());
     }
 
+    /** Announcements currently visible to the logged-in user's role. */
+    @GetMapping("/active")
+    public ApiResponse<?> getActive(Authentication authentication) {
+        return new ApiResponse<>(true, "Active announcements retrieved",
+                announcementService.getActiveFor(currentUserService.getCurrentUser(authentication).getRole()));
+    }
+
     @PostMapping
     public ApiResponse<?> create(@Valid @RequestBody AnnouncementRequest request, Authentication authentication) {
         Long userId = currentUserService.getCurrentUserId(authentication);

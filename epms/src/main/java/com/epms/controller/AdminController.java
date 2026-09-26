@@ -39,10 +39,12 @@ public class AdminController {
         stats.put("activeRoyaltyAgreements", royaltyAgreementRepository.findByStatus("ACTIVE").size());
         stats.put("totalRoyaltyCalculations", royaltyCalculationRepository.count());
         stats.put("totalRoyaltiesCalculated", royaltyCalculationRepository.findAll().stream()
+                .filter(c -> !c.isCancelled())
                 .map(RoyaltyCalculation::getRoyaltyAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
-        stats.put("pendingExpenses", expenseRepository.findAll().stream()
-                .filter(e -> "RECORDED".equalsIgnoreCase(e.getStatus())).count());
+        stats.put("pendingExpenses", expenseRepository.countByStatus("RECORDED"));
+        stats.put("statementsAwaitingApproval", royaltyCalculationRepository.countByStatus(RoyaltyCalculation.STATEMENT_ISSUED));
+        stats.put("approvedRoyaltiesToPay", royaltyCalculationRepository.countByStatus(RoyaltyCalculation.APPROVED));
         // Revenue figures come from /api/finance/revenue (US38).
 
         return new ApiResponse<>(true, "Admin dashboard stats retrieved", stats);

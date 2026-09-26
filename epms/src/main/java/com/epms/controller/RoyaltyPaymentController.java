@@ -1,8 +1,10 @@
 package com.epms.controller;
 
+import com.epms.dto.request.RoyaltyPayRequest;
 import com.epms.dto.response.ApiResponse;
 import com.epms.security.service.CurrentUserService;
 import com.epms.service.RoyaltyPaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +44,9 @@ public class RoyaltyPaymentController {
     }
 
     @PostMapping("/{id}/mark-paid")
-    public ApiResponse<?> markPaid(@PathVariable Long id) {
-        return new ApiResponse<>(true, "Royalty payment marked paid", royaltyPaymentService.markPaid(id));
+    public ApiResponse<?> markPaid(@PathVariable Long id, @Valid @RequestBody RoyaltyPayRequest request,
+                                   Authentication authentication) {
+        Long userId = currentUserService.getCurrentUserId(authentication);
+        return new ApiResponse<>(true, "Royalty payment marked paid", royaltyPaymentService.markPaid(id, request, userId));
     }
 }

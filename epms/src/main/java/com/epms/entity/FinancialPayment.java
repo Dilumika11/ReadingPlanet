@@ -39,6 +39,13 @@ public class FinancialPayment {
     @Column(name = "status", nullable = false, length = 30)
     private String status = "PENDING";
 
+    // Invoice this payment settles (payment_type INVOICE)
+    @Column(name = "invoice_id")
+    private Long invoiceId;
+
+    @Column(name = "recorded_by")
+    private Long recordedBy;
+
     @Column(name = "description")
     private String description;
 

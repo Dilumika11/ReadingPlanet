@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/css/rethink-sans.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us – Reading Planet</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .page-title-band {
+            background: #123d73;
+            color: #fff;
+            padding: 2.5rem 1rem;
+            text-align: center;
+        }
+        .page-title-band h1 { margin: 0 0 .4rem; font-size: 2rem; }
+        .page-title-band .crumb { font-size: .85rem; opacity: .8; }
+        .page-title-band .crumb a { color: #fff; }
+
+        .contact-wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2.5rem 1rem 4rem;
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 800px) {
+            .contact-wrap { grid-template-columns: 1fr; }
+        }
+        .contact-card {
+            background: #fff;
+            border: 1px solid #d8e5f2;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 24px rgba(28,76,125,.08);
+        }
+        .contact-card h2 { margin: 0 0 1rem; color: #123d73; font-size: 1.25rem; }
+        .contact-info-list { list-style: none; margin: 0; padding: 0; }
+        .contact-info-list li {
+            display: flex; gap: .75rem; align-items: flex-start;
+            padding: .75rem 0; border-bottom: 1px solid #eef3f8;
+        }
+        .contact-info-list li:last-child { border-bottom: none; }
+        .contact-info-list i { color: #1a5f9e; width: 20px; text-align: center; margin-top: .2rem; }
+        .contact-info-list a { color: #165c9c; text-decoration: none; }
+        .contact-info-list a:hover { text-decoration: underline; }
+        .contact-info-list .label { display: block; font-size: .78rem; font-weight: 700; color: #6b7c8f; text-transform: uppercase; letter-spacing: .03em; margin-bottom: .15rem; }
+
+        .contact-field { margin-bottom: .9rem; }
+        .contact-field label { display: block; font-size: .85rem; font-weight: 600; margin: 0 0 .35rem; color: #334e68; }
+        .contact-field input, .contact-field textarea {
+            width: 100%; box-sizing: border-box; padding: .65rem .75rem;
+            border: 1px solid #c9d8e8; border-radius: 8px; font-size: 1rem; background: #fbfdff;
+        }
+        .contact-field textarea { min-height: 130px; resize: vertical; }
+        .contact-submit {
+            width: 100%; padding: .75rem 1rem; border: none; border-radius: 8px;
+            background: #1a5f9e; color: #fff; font-weight: 600; font-size: .95rem; cursor: pointer;
+        }
+        .contact-submit:hover { background: #154e82; }
+        .contact-hint { font-size: .8rem; color: #6b7c8f; margin-top: .6rem; }
+    </style>
+</head>
+<body>
+<div id="header-container"></div>
+
+<section class="page-title-band">
+    <h1>Contact Us</h1>
+    <p class="crumb"><a href="/">Home</a> / Contact</p>
+</section>
+
+<main class="contact-wrap">
+
+    <section class="contact-card">
+        <h2>Get in Touch</h2>
+        <ul class="contact-info-list">
+            <li>
+                <i class="fas fa-location-dot"></i>
+                <div>
+                    <span class="label">Address</span>
+                    1470/1F, Delgahawattha Road, Pannipitiya
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-envelope"></i>
+                <div>
+                    <span class="label">Email</span>
+                    <a href="mailto:hello@readingplanet.com">hello@readingplanet.com</a>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-phone-alt"></i>
+                <div>
+                    <span class="label">Phone</span>
+                    <a href="tel:+1234567890">+1 (234) 567-890</a>
+                </div>
+            </li>
+            <li>
+                <i class="fas fa-clock"></i>
+                <div>
+                    <span class="label">Open Hours</span>
+                    Mon – Fri: 9:00 AM – 6:00 PM
+                </div>
+            </li>
+        </ul>
+    </section>
+
+    <section class="contact-card">
+        <h2>Send Us a Message</h2>
+        <form id="contactForm">
+            <div class="contact-field">
+                <label for="contactName">Your name</label>
+                <input type="text" id="contactName" required autocomplete="name">
+            </div>
+            <div class="contact-field">
+                <label for="contactEmail">Your email</label>
+                <input type="email" id="contactEmail" required autocomplete="email">
+            </div>
+            <div class="contact-field">
+                <label for="contactSubject">Subject</label>
+                <input type="text" id="contactSubject" required>
+            </div>
+            <div class="contact-field">
+                <label for="contactMessage">Message</label>
+                <textarea id="contactMessage" required></textarea>
+            </div>
+            <button type="submit" class="contact-submit">Send Message</button>
+            <p class="contact-hint">This opens your email app with the message ready to send to
+                hello@readingplanet.com.</p>
+        </form>
+    </section>
+
+</main>
+
+<div id="footer-container"></div>
+<script src="/js/header.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/load-components.js"></script>
+<script>
+    (function () {
+        var form = document.getElementById("contactForm");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            var name = document.getElementById("contactName").value;
+            var email = document.getElementById("contactEmail").value;
+            var subject = document.getElementById("contactSubject").value;
+            var message = document.getElementById("contactMessage").value;
+            var body = "From: " + name + " (" + email + ")\n\n" + message;
+            window.location.href = "mailto:hello@readingplanet.com"
+                + "?subject=" + encodeURIComponent(subject)
+                + "&body=" + encodeURIComponent(body);
+        });
+    })();
+</script>
+</body>
+</html>

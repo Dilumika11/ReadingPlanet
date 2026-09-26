@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="/css/rethink-sans.css">
 
     <meta charset="UTF-8">
 
@@ -779,6 +780,35 @@
         body.author-login-page .login-switch { font-size: 12px; }
         body.author-login-page .author-portal-note { font-size: 11px; }
 
+        /* =====================================================
+           NOT-AN-AUTHOR BANNER
+        ===================================================== */
+
+        .role-switch-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 0 20px;
+            padding: 10px 14px;
+            border: 1px solid #d8e7f6;
+            border-radius: 8px;
+            background: #eef6ff;
+            color: #547391;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .role-switch-banner a {
+            color: #165c9c;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .role-switch-banner a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 
 </head>
@@ -799,6 +829,12 @@
 ========================================================= -->
 
 <main class="login-page-main">
+
+    <p class="role-switch-banner">
+        <i class="fas fa-shopping-bag"></i>
+        Not an author?
+        <a href="/customer-login.html">Login as a Customer</a>
+    </p>
 
     <div class="login-page-grid">
 

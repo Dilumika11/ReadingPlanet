@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="/css/rethink-sans.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Customer Login | Reading Planet</title>
@@ -66,18 +67,48 @@
     /* Never show author portal chrome on this page */
     body.customer-login-page .author-header-nav,
     body.customer-login-page .author-header-user { display: none !important; }
+
+    body.customer-login-page .role-gate {
+      background: #fff; border: 1px solid #d8e5f2; border-radius: 14px;
+      padding: 1.25rem 1.5rem; margin-bottom: 1.5rem;
+      box-shadow: 0 8px 24px rgba(28,76,125,.08);
+    }
+    body.customer-login-page .role-gate p {
+      margin: 0 0 .85rem; font-weight: 600; color: #123d73;
+    }
+    body.customer-login-page .role-gate-options { display: flex; gap: 1rem; flex-wrap: wrap; }
+    body.customer-login-page .role-gate-btn {
+      flex: 1 1 220px; display: flex; align-items: center; gap: .6rem;
+      padding: .75rem 1rem; border-radius: 10px; cursor: pointer;
+      font-weight: 600; font-size: .95rem; text-decoration: none;
+      border: 1px solid #c9d8e8; background: #f7fafd; color: #123d73;
+      transition: background .15s, border-color .15s;
+    }
+    body.customer-login-page .role-gate-btn:hover { background: #eaf1fa; border-color: #1a5f9e; }
+    body.customer-login-page .role-gate-btn.is-active {
+      background: #1a5f9e; color: #fff; border-color: #1a5f9e;
+    }
+    body.customer-login-page .role-gate-btn i { font-size: 1.1rem; }
   </style>
 </head>
 <body class="customer-login-page">
   <div id="header-container"></div>
 
   <main class="customer-wrap">
-    <h1>Customer Account</h1>
-    <p class="customer-sub">
-      Login or register as a <strong>customer</strong>.
-      Authors must use <a class="c-link" href="/getting-published.html">Getting Published</a> → Author login
-      (not this page).
-    </p>
+    <h1>Welcome to Reading Planet</h1>
+    <p class="customer-sub">First, tell us why you're here.</p>
+
+    <div class="role-gate">
+      <p>Are you shopping as a customer, or looking to publish as an author?</p>
+      <div class="role-gate-options">
+        <button type="button" class="role-gate-btn is-active" id="roleCustomerBtn">
+          <i class="fas fa-shopping-bag"></i> I'm a Customer
+        </button>
+        <a class="role-gate-btn" href="/author-login.html" id="roleAuthorBtn">
+          <i class="fas fa-feather-alt"></i> I want to publish as an Author
+        </a>
+      </div>
+    </div>
 
     <div class="customer-grid">
       <!-- LOGIN -->
@@ -141,5 +172,16 @@
   <script src="/js/load-components.js"></script>
   <script src="/js/cart-utils.js"></script>
   <script src="/js/customer-auth.js"></script>
+  <script>
+    (function () {
+      var btn = document.getElementById("roleCustomerBtn");
+      var card = document.getElementById("loginCard");
+      if (btn && card) {
+        btn.addEventListener("click", function () {
+          card.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

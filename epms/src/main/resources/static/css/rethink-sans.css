@@ -1,0 +1,9 @@
+/* Site-wide font override: Rethink Sans everywhere, replacing every other
+   typeface (Poppins, Georgia, Segoe UI, system-ui, etc.) used across pages. */
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap');
+
+/* Exclude Font Awesome icon elements (class contains "fa-", e.g. "fas fa-user")
+   so this override doesn't replace their icon glyph font and break the icons. */
+html, body, *:not([class*="fa-"]) {
+    font-family: 'Rethink Sans', sans-serif !important;
+}

@@ -37,7 +37,17 @@ public class PublicPageController {
         return "forward:/getting-published.html";
     }
 
-    @GetMapping({"/about", "/who-we-are", "/faqs", "/contact", "/careers", "/delivery", "/payment",
+    @GetMapping("/faqs")
+    public String faqs() {
+        return "forward:/faqs.html";
+    }
+
+    @GetMapping("/contact")
+    public String contact() {
+        return "forward:/contact.html";
+    }
+
+    @GetMapping({"/about", "/who-we-are", "/careers", "/delivery", "/payment",
             "/privacy", "/returns", "/shipping", "/sitemap", "/terms"})
     public String home() {
         return "redirect:/";

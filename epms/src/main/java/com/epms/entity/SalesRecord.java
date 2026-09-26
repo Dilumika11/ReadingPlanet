@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
  * Epic 4 does not own sales — this is the inbound copy of the operational
  * sales information described in docs/epic-4-spec.pdf section 52, kept so
  * revenue monitoring (US38) and royalty calculation (US45) have a stable,
- * read-only source. Until Epic 3 exists, the dev profile seeds this table
- * with dummy data (see config/DemoSalesDataInitializer).
+ * read-only source.
  */
 @Entity
 @Table(name = "sales_records")

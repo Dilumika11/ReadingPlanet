@@ -1,0 +1,2856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        My Submissions - Reading Planet
+    </title>
+
+
+    <!-- COMMON HOME PAGE STYLES -->
+
+    <link
+            rel="stylesheet"
+            href="/css/header.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/footer.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/author.css"
+    >
+
+
+    <!-- FONT AWESOME -->
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           GLOBAL
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            min-height: 100%;
+        }
+
+
+        body {
+            margin: 0;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            flex-direction: column;
+
+            font-family:
+                    "Segoe UI",
+                    Arial,
+                    sans-serif;
+
+            color: #173653;
+
+            background:
+                    radial-gradient(
+                            circle at 8% 12%,
+                            rgba(45,114,184,.07),
+                            transparent 24%
+                    ),
+                    linear-gradient(
+                            135deg,
+                            #eef5fb 0%,
+                            #f7fafd 52%,
+                            #edf4fa 100%
+                    );
+
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .submissions-main {
+
+            width:
+                    min(
+                            1480px,
+                            calc(100% - 70px)
+                    );
+
+            min-height:
+                    calc(100vh - 72px);
+
+            margin:
+                    0 auto;
+
+            padding:
+                    42px 0 78px;
+
+            flex: 1;
+
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .submissions-hero {
+
+            margin-bottom:
+                    30px;
+
+            padding:
+                    6px 2px;
+
+            display:
+                    flex;
+
+            align-items:
+                    flex-end;
+
+            justify-content:
+                    space-between;
+
+            gap:
+                    25px;
+
+        }
+
+
+        .submissions-eyebrow {
+
+            margin:
+                    0 0 8px;
+
+            color:
+                    #1d64a7;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    800;
+
+            letter-spacing:
+                    .12em;
+
+            text-transform:
+                    uppercase;
+
+        }
+
+
+        .submissions-hero h1 {
+
+            margin:
+                    0;
+
+            color:
+                    #123f75;
+
+            font-family:
+                    Georgia,
+                    "Times New Roman",
+                    serif;
+
+            font-size:
+                    43px;
+
+            line-height:
+                    1.08;
+
+        }
+
+
+        .submissions-hero p {
+
+            margin:
+                    10px 0 0;
+
+            color:
+                    #61758c;
+
+            font-size:
+                    14px;
+
+        }
+
+
+        .submit-new-btn {
+
+            min-height:
+                    45px;
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            gap:
+                    9px;
+
+            padding:
+                    12px 20px;
+
+            border:
+                    none;
+
+            border-radius:
+                    10px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #2d72b8,
+                            #16548f
+                    );
+
+            color:
+                    #ffffff;
+
+            text-decoration:
+                    none;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    700;
+
+            box-shadow:
+                    0 8px 18px
+                    rgba(25,86,150,.22);
+
+            transition:
+                    transform .2s ease,
+                    box-shadow .2s ease;
+
+        }
+
+
+        .submit-new-btn:hover {
+
+            color:
+                    #ffffff;
+
+            text-decoration:
+                    none;
+
+            transform:
+                    translateY(-2px);
+
+            box-shadow:
+                    0 11px 22px
+                    rgba(25,86,150,.27);
+
+        }
+
+
+        /* =====================================================
+           FILTER CARDS
+        ===================================================== */
+
+        .submission-filter-grid {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(
+                            4,
+                            minmax(0,1fr)
+                    );
+
+            gap:
+                    18px;
+
+            margin-bottom:
+                    30px;
+
+        }
+
+
+        .submission-filter {
+
+            min-height:
+                    128px;
+
+            padding:
+                    20px 22px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    16px;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    16px;
+
+            background:
+                    rgba(255,255,255,.96);
+
+            color:
+                    inherit;
+
+            text-decoration:
+                    none;
+
+            box-shadow:
+                    0
+                    8px
+                    22px
+                    rgba(30,75,140,.07);
+
+            transition:
+                    transform .2s ease,
+                    border-color .2s ease,
+                    box-shadow .2s ease;
+
+        }
+
+
+        .submission-filter:hover {
+
+            color:
+                    inherit;
+
+            text-decoration:
+                    none;
+
+            transform:
+                    translateY(-3px);
+
+            border-color:
+                    #bfd6eb;
+
+            box-shadow:
+                    0
+                    12px
+                    28px
+                    rgba(30,75,140,.11);
+
+        }
+
+
+        .submission-filter.active {
+
+            border:
+                    1.5px solid #2c73b8;
+
+            box-shadow:
+                    0 0 0 3px
+                    rgba(44,115,184,.07),
+                    0 10px 24px
+                    rgba(30,75,140,.09);
+
+        }
+
+
+        .submission-filter-icon {
+
+            width:
+                    53px;
+
+            height:
+                    53px;
+
+            flex:
+                    0 0 53px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    14px;
+
+            background:
+                    #e8f2fc;
+
+            color:
+                    #2069ab;
+
+            font-size:
+                    20px;
+
+        }
+
+
+        .submission-filter.review
+        .submission-filter-icon {
+
+            background:
+                    #edf5fc;
+
+            color:
+                    #2874b9;
+
+        }
+
+
+        .submission-filter.approved
+        .submission-filter-icon {
+
+            background:
+                    #e8f7ef;
+
+            color:
+                    #237d55;
+
+        }
+
+
+        .submission-filter.revision
+        .submission-filter-icon {
+
+            background:
+                    #fff0e7;
+
+            color:
+                    #d45c1b;
+
+        }
+
+
+        .submission-filter-label {
+
+            margin-bottom:
+                    7px;
+
+            color:
+                    #647991;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        .submission-filter-count {
+
+            color:
+                    #173f67;
+
+            font-size:
+                    31px;
+
+            line-height:
+                    1;
+
+            font-weight:
+                    800;
+
+        }
+
+
+        /* =====================================================
+           LIST CARD
+        ===================================================== */
+
+        .submission-list-card {
+
+            min-height:
+                    430px;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    18px;
+
+            background:
+                    rgba(255,255,255,.98);
+
+            overflow:
+                    hidden;
+
+            box-shadow:
+                    0
+                    10px
+                    28px
+                    rgba(30,75,140,.07);
+
+        }
+
+
+        .submission-list-header {
+
+            min-height:
+                    70px;
+
+            padding:
+                    18px 28px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    space-between;
+
+            gap:
+                    15px;
+
+            border-bottom:
+                    1px solid #e2eaf2;
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            #ffffff,
+                            #fbfdff
+                    );
+
+        }
+
+
+        .submission-list-header h2 {
+
+            margin:
+                    0;
+
+            color:
+                    #17477d;
+
+            font-size:
+                    20px;
+
+            font-weight:
+                    750;
+
+        }
+
+
+        .submission-list-header span {
+
+            color:
+                    #7a8da2;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    600;
+
+        }
+
+
+        #submissionsList {
+
+            padding:
+                    8px 28px 24px;
+
+        }
+
+
+        /* =====================================================
+           SUBMISSION ITEM
+        ===================================================== */
+
+        .submission-item {
+
+            min-height:
+                    116px;
+
+            padding:
+                    24px 16px;
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    minmax(320px,2fr)
+                    minmax(130px,1fr)
+                    minmax(130px,1fr)
+                    minmax(170px,1.2fr)
+                    auto;
+
+            align-items:
+                    center;
+
+            gap:
+                    22px;
+
+            border-bottom:
+                    1px solid #e8eef4;
+
+        }
+
+
+        .submission-item:last-child {
+
+            border-bottom:
+                    none;
+
+        }
+
+
+        .submission-title-area {
+
+            min-width:
+                    0;
+
+        }
+
+
+        .submission-code {
+
+            display:
+                    inline-block;
+
+            margin-bottom:
+                    7px;
+
+            color:
+                    #2371b5;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    800;
+
+            letter-spacing:
+                    .08em;
+
+        }
+
+
+        .submission-title {
+
+            color:
+                    #173f67;
+
+            font-size:
+                    16px;
+
+            font-weight:
+                    750;
+
+            line-height:
+                    1.35;
+
+            white-space:
+                    nowrap;
+
+            overflow:
+                    hidden;
+
+            text-overflow:
+                    ellipsis;
+
+        }
+
+
+        .submission-meta-label {
+
+            margin-bottom:
+                    6px;
+
+            color:
+                    #8a99aa;
+
+            font-size:
+                    10px;
+
+            text-transform:
+                    uppercase;
+
+            letter-spacing:
+                    .07em;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        .submission-meta-value {
+
+            color:
+                    #4e657d;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    500;
+
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status-badge {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    8px;
+
+            min-height:
+                    31px;
+
+            padding:
+                    7px 12px;
+
+            border-radius:
+                    999px;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    800;
+
+            white-space:
+                    nowrap;
+
+        }
+
+
+        .status-dot {
+
+            width:
+                    7px;
+
+            height:
+                    7px;
+
+            border-radius:
+                    50%;
+
+        }
+
+
+        .status-submitted {
+
+            background:
+                    #eaf3fb;
+
+            color:
+                    #2169a8;
+
+        }
+
+
+        .status-submitted
+        .status-dot {
+
+            background:
+                    #2877b9;
+
+        }
+
+
+        .status-review {
+
+            background:
+                    #fff5dd;
+
+            color:
+                    #936600;
+
+        }
+
+
+        .status-review
+        .status-dot {
+
+            background:
+                    #c4901b;
+
+        }
+
+
+        .status-approved {
+
+            background:
+                    #e8f7ef;
+
+            color:
+                    #23764f;
+
+        }
+
+
+        .status-approved
+        .status-dot {
+
+            background:
+                    #27805a;
+
+        }
+
+
+        .status-revision {
+
+            background:
+                    #fff0e7;
+
+            color:
+                    #bd4f18;
+
+        }
+
+
+        .status-revision
+        .status-dot {
+
+            background:
+                    #d45c1b;
+
+        }
+
+
+        /* =====================================================
+           VIEW BUTTON
+        ===================================================== */
+
+        .view-btn {
+
+            min-width:
+                    76px;
+
+            min-height:
+                    39px;
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            gap:
+                    7px;
+
+            padding:
+                    9px 13px;
+
+            border:
+                    1px solid #cfdeeb;
+
+            border-radius:
+                    9px;
+
+            background:
+                    #ffffff;
+
+            color:
+                    #2169a8;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    750;
+
+            cursor:
+                    pointer;
+
+            text-decoration:
+                    none;
+
+            transition:
+                    border-color .2s ease,
+                    background .2s ease,
+                    transform .2s ease;
+
+        }
+
+
+        .view-btn:hover {
+
+            border-color:
+                    #8fb6d7;
+
+            background:
+                    #f1f7fc;
+
+            color:
+                    #145da8;
+
+            text-decoration:
+                    none;
+
+            transform:
+                    translateY(-1px);
+
+        }
+
+
+        /* =====================================================
+           EMPTY STATE
+        ===================================================== */
+
+        .submission-empty {
+
+            min-height:
+                    300px;
+
+            padding:
+                    60px 25px;
+
+            display:
+                    flex;
+
+            flex-direction:
+                    column;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            text-align:
+                    center;
+
+        }
+
+
+        .submission-empty-icon {
+
+            width:
+                    72px;
+
+            height:
+                    72px;
+
+            margin:
+                    0 auto 17px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    50%;
+
+            background:
+                    #eef4f9;
+
+            color:
+                    #6f8aa4;
+
+            font-size:
+                    26px;
+
+        }
+
+
+        .submission-empty h3 {
+
+            margin:
+                    0 0 8px;
+
+            color:
+                    #294966;
+
+            font-size:
+                    18px;
+
+        }
+
+
+        .submission-empty p {
+
+            max-width:
+                    480px;
+
+            margin:
+                    0;
+
+            color:
+                    #8091a4;
+
+            font-size:
+                    13px;
+
+            line-height:
+                    1.6;
+
+        }
+
+
+        /* =====================================================
+           LOADING
+        ===================================================== */
+
+        .submission-loading {
+
+            min-height:
+                    300px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            color:
+                    #698099;
+
+            font-size:
+                    14px;
+
+        }
+
+
+        .submission-loading i {
+
+            margin-right:
+                    9px;
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1180px) {
+
+            .submissions-main {
+
+                width:
+                        calc(100% - 44px);
+
+            }
+
+
+            .submission-item {
+
+                grid-template-columns:
+                        minmax(250px,1.7fr)
+                        1fr
+                        1fr
+                        1.2fr
+                        auto;
+
+                gap:
+                        15px;
+
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .submission-filter-grid {
+
+                grid-template-columns:
+                        repeat(2,minmax(0,1fr));
+
+            }
+
+
+            .submission-item {
+
+                grid-template-columns:
+                        minmax(240px,1.8fr)
+                        1fr
+                        1fr;
+
+            }
+
+
+            .submission-title-area {
+
+                grid-column:
+                        1 / -1;
+
+            }
+
+
+            .submission-item
+            .view-btn {
+
+                margin-left:
+                        auto;
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .submissions-main {
+
+                width:
+                        calc(100% - 24px);
+
+                padding:
+                        26px
+                        0
+                        45px;
+
+            }
+
+
+            .submissions-hero {
+
+                align-items:
+                        flex-start;
+
+                flex-direction:
+                        column;
+
+            }
+
+
+            .submissions-hero h1 {
+
+                font-size:
+                        32px;
+
+            }
+
+
+            .submission-filter-grid {
+
+                grid-template-columns:
+                        1fr 1fr;
+
+                gap:
+                        12px;
+
+            }
+
+
+            .submission-filter {
+
+                min-height:
+                        105px;
+
+                padding:
+                        15px;
+
+                gap:
+                        10px;
+
+            }
+
+
+            .submission-filter-icon {
+
+                width:
+                        42px;
+
+                height:
+                        42px;
+
+                flex-basis:
+                        42px;
+
+                font-size:
+                        17px;
+
+            }
+
+
+            .submission-filter-label {
+
+                font-size:
+                        10px;
+
+            }
+
+
+            .submission-filter-count {
+
+                font-size:
+                        25px;
+
+            }
+
+
+            .submission-list-header {
+
+                padding:
+                        17px 18px;
+
+            }
+
+
+            #submissionsList {
+
+                padding:
+                        5px 17px 16px;
+
+            }
+
+
+            .submission-item {
+
+                grid-template-columns:
+                        1fr 1fr;
+
+                min-height:
+                        0;
+
+                padding:
+                        20px 6px;
+
+                gap:
+                        16px;
+
+            }
+
+
+            .submission-title-area {
+
+                grid-column:
+                        1 / -1;
+
+            }
+
+
+            .submission-item
+            .view-btn {
+
+                margin-left:
+                        0;
+
+                width:
+                        100%;
+
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .submission-filter-grid {
+
+                grid-template-columns:
+                        1fr;
+
+            }
+
+
+            .submission-item {
+
+                grid-template-columns:
+                        1fr;
+
+            }
+
+
+            .submission-title-area {
+
+                grid-column:
+                        auto;
+
+            }
+
+
+            .submit-new-btn {
+
+                width:
+                        100%;
+
+            }
+
+        }
+
+    
+        .submission-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .delete-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 1px solid #c62828;
+            background: #fff;
+            color: #c62828;
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c62828;
+            color: #fff;
+        }
+
+        .submission-search {
+            margin: 0 0 24px;
+            padding: 18px 20px;
+            border: 1px solid #d8e6f2;
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 6px 18px rgba(30,75,140,.06);
+        }
+        .submission-search-label {
+            display: block;
+            margin-bottom: 9px;
+            color: #173f67;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .submission-search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 46px;
+            padding: 0 14px;
+            border: 1px solid #cbdceb;
+            border-radius: 9px;
+            background: #fbfdff;
+        }
+        .submission-search-box:focus-within {
+            border-color: #2d72b8;
+            box-shadow: 0 0 0 3px rgba(45,114,184,.10);
+        }
+        .submission-search-box i { color: #2d72b8; font-size: 16px; }
+        .submission-search-box input {
+            width: 100%;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: #173f67;
+            font: inherit;
+            font-size: 14px;
+        }
+        .search-result-info {
+            margin-top: 8px;
+            color: #71859a;
+            font-size: 12px;
+        }
+        .submission-actions {
+            display: flex; align-items: center; justify-content: flex-end;
+            gap: 8px; flex-wrap: wrap;
+        }
+        .view-comments-btn, .delete-btn {
+            min-height: 39px; padding: 9px 12px; border-radius: 9px;
+            display: inline-flex; align-items: center; justify-content: center;
+            gap: 7px; font-size: 12px; font-weight: 700; cursor: pointer;
+            text-decoration: none;
+        }
+        .view-comments-btn { border: 1px solid #c9ddec; background: #eef6fd; color: #1e67a6; }
+        .view-comments-btn:hover { background: #e2f0fb; color: #145da8; text-decoration: none; }
+        .delete-btn { border: 1px solid #d06a6a; background: #fff; color: #b43f3f; }
+        .delete-btn:hover { background: #b43f3f; color: #fff; }
+        .submission-title { font-size: 17px; }
+        .submission-meta-label { font-size: 11px; }
+        .submission-meta-value { font-size: 14px; }
+        .status-badge { font-size: 11px; }
+        @media (max-width: 900px) { .submission-actions { justify-content: flex-start; } }
+
+    </style>
+
+</head>
+
+
+<body class="author-page">
+
+
+<!-- =====================================================
+     COMMON HOME HEADER
+===================================================== -->
+
+<div id="header-container"></div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="submissions-main">
+
+
+    <!-- =================================================
+         HERO
+    ================================================= -->
+
+    <section class="submissions-hero">
+
+        <div>
+
+            <p class="submissions-eyebrow">
+                Author workspace
+            </p>
+
+
+            <h1>
+                My Submissions
+            </h1>
+
+
+            <p>
+                Track the current stage of your manuscript submissions.
+            </p>
+
+        </div>
+
+
+        <a
+                href="/author/submit-manuscript.html"
+                class="submit-new-btn"
+        >
+
+            <i class="fas fa-plus"></i>
+
+            New Submission
+
+        </a>
+
+    </section>
+
+
+    <!-- =================================================
+         FILTER CARDS
+    ================================================= -->
+
+    <section
+            class="submission-filter-grid"
+            aria-label="Submission status filters"
+    >
+
+
+        <!-- ALL -->
+
+        <a
+                href="/author/my-submissions.html"
+                class="submission-filter"
+                data-status=""
+        >
+
+            <div class="submission-filter-icon">
+
+                <i class="fas fa-layer-group"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="submission-filter-label">
+                    All Submissions
+                </div>
+
+
+                <div
+                        class="submission-filter-count"
+                        id="filterTotal"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- UNDER REVIEW -->
+
+        <a
+                href="/author/my-submissions.html?status=UNDER_REVIEW"
+                class="submission-filter review"
+                data-status="UNDER_REVIEW"
+        >
+
+            <div class="submission-filter-icon">
+
+                <i class="fas fa-hourglass-half"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="submission-filter-label">
+                    Under Review
+                </div>
+
+
+                <div
+                        class="submission-filter-count"
+                        id="filterUnderReview"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- APPROVED -->
+
+        <a
+                href="/author/my-submissions.html?status=APPROVED"
+                class="submission-filter approved"
+                data-status="APPROVED"
+        >
+
+            <div class="submission-filter-icon">
+
+                <i class="fas fa-circle-check"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="submission-filter-label">
+                    Approved
+                </div>
+
+
+                <div
+                        class="submission-filter-count"
+                        id="filterApproved"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- REVISION REQUIRED -->
+
+        <a
+                href="/author/my-submissions.html?status=REVISION_REQUIRED"
+                class="submission-filter revision"
+                data-status="REVISION_REQUIRED"
+        >
+
+            <div class="submission-filter-icon">
+
+                <i class="fas fa-pen-to-square"></i>
+
+            </div>
+
+
+            <div>
+
+                <div class="submission-filter-label">
+                    Revision Required
+                </div>
+
+
+                <div
+                        class="submission-filter-count"
+                        id="filterRevision"
+                >
+                    —
+                </div>
+
+            </div>
+
+        </a>
+
+    </section>
+
+
+    <!-- =================================================
+         SUBMISSIONS LIST
+    ================================================= -->
+
+    <!-- =================================================
+         SEARCH
+    ================================================= -->
+
+    <section class="submission-search" aria-label="Search manuscripts">
+
+        <label class="submission-search-label" for="submissionSearchInput">
+            Search Manuscripts
+        </label>
+
+        <div class="submission-search-box">
+            <i class="fas fa-magnifying-glass"></i>
+
+            <input
+                    type="search"
+                    id="submissionSearchInput"
+                    placeholder="Search by manuscript title or manuscript code..."
+                    autocomplete="off"
+                    aria-label="Search manuscripts by title or manuscript code"
+            >
+        </div>
+
+        <div class="search-result-info" id="searchResultInfo">
+            Showing all submissions
+        </div>
+
+    </section>
+
+
+    <section class="submission-list-card">
+
+
+        <div class="submission-list-header">
+
+            <h2 id="listTitle">
+                All Submissions
+            </h2>
+
+
+            <span id="listCount">
+                Loading...
+            </span>
+
+        </div>
+
+
+        <div id="submissionsList">
+
+            <div class="submission-loading">
+
+                <i class="fas fa-spinner fa-spin"></i>
+
+                Loading your submissions...
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+</main>
+
+
+<!-- =====================================================
+     COMMON HOME FOOTER
+===================================================== -->
+
+<div id="footer-container"></div>
+
+
+<!-- =====================================================
+     COMMON COMPONENT SCRIPTS
+===================================================== -->
+
+<script src="/js/author-api.js"></script>
+<script src="/js/footer.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+
+<script>
+
+    "use strict";
+
+
+    /* =========================================================
+       AUTH
+    ========================================================= */
+
+    function getToken() {
+
+        return localStorage.getItem(
+                "rp_token"
+            ) ||
+            sessionStorage.getItem(
+                "rp_token"
+            );
+
+    }
+
+
+    function getUser() {
+
+        const raw =
+            localStorage.getItem(
+                "rp_user"
+            ) ||
+            sessionStorage.getItem(
+                "rp_user"
+            );
+
+
+        if (!raw) {
+
+            return null;
+
+        }
+
+
+        try {
+
+            return JSON.parse(
+                raw
+            );
+
+        } catch (error) {
+
+            return null;
+
+        }
+
+    }
+
+
+    function clearSession() {
+
+        localStorage.removeItem(
+            "rp_token"
+        );
+
+        localStorage.removeItem(
+            "rp_user"
+        );
+
+        sessionStorage.removeItem(
+            "rp_token"
+        );
+
+        sessionStorage.removeItem(
+            "rp_user"
+        );
+
+    }
+
+
+    function resolveRole(user) {
+
+        if (!user) {
+
+            return null;
+
+        }
+
+
+        if (user.role) {
+
+            return String(
+                user.role
+            ).toUpperCase();
+
+        }
+
+
+        if (
+            user.roles &&
+            user.roles.length
+        ) {
+
+            return String(
+                user.roles[0]
+            ).toUpperCase();
+
+        }
+
+
+        return null;
+
+    }
+
+
+    const token =
+        getToken();
+
+
+    const user =
+        getUser();
+
+
+    if (
+        !token ||
+        !user ||
+        resolveRole(user) !== "AUTHOR"
+    ) {
+
+        clearSession();
+
+        window.location.replace(
+            "/author-login.html"
+        );
+
+    }
+
+
+    /* =========================================================
+       ELEMENTS
+    ========================================================= */
+
+    const submissionsList =
+        document.getElementById(
+            "submissionsList"
+        );
+
+
+    const listTitle =
+        document.getElementById(
+            "listTitle"
+        );
+
+
+    const listCount =
+        document.getElementById(
+            "listCount"
+        );
+
+
+    const filterTotal =
+        document.getElementById(
+            "filterTotal"
+        );
+
+
+    const filterUnderReview =
+        document.getElementById(
+            "filterUnderReview"
+        );
+
+
+    const filterApproved =
+        document.getElementById(
+            "filterApproved"
+        );
+
+
+    const filterRevision =
+        document.getElementById(
+            "filterRevision"
+        );
+
+
+    /* =========================================================
+       URL STATUS
+    ========================================================= */
+
+    const urlParams =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const selectedStatus =
+        (
+            urlParams.get("status") ||
+            ""
+        ).trim().toUpperCase();
+
+
+    /* =========================================================
+       TITLE
+    ========================================================= */
+
+    const titleMap = {
+        "": "All Submissions",
+        "UNDER_REVIEW": "Under Review",
+        "APPROVED": "Approved",
+        "REVISION_REQUIRED": "Revision Required",
+        "REVISION_REQUESTED": "Revision Required",
+        "RESUBMITTED": "Resubmitted"
+
+    };
+
+
+    listTitle.textContent =
+        titleMap[selectedStatus] ||
+        "All Submissions";
+
+
+    /* =========================================================
+       ACTIVE FILTER
+    ========================================================= */
+
+    document
+        .querySelectorAll(
+            ".submission-filter"
+        )
+        .forEach(
+            function (filter) {
+
+                const status =
+                    (
+                        filter.dataset.status ||
+                        ""
+                    ).toUpperCase();
+
+
+                if (
+                    status ===
+                    selectedStatus
+                ) {
+
+                    filter.classList.add(
+                        "active"
+                    );
+
+                } else {
+
+                    filter.classList.remove(
+                        "active"
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* =========================================================
+       STATUS CLASS
+    ========================================================= */
+
+    function getStatusClass(status) {
+
+        switch (String(status || "").toUpperCase()) {
+
+            case "UNDER_REVIEW":
+            case "ASSIGNED":
+                return "status-review";
+
+            case "APPROVED":
+            case "EDITORIALLY_ACCEPTED":
+            case "ACCEPTED":
+            case "IN_DESIGN":
+            case "AWAITING_AUTHOR_APPROVAL":
+            case "DESIGN_APPROVED":
+            case "QC_PASSED":
+            case "READY_FOR_PRINTING":
+            case "PUBLISHED":
+                return "status-approved";
+
+            case "REVISION_REQUIRED":
+            case "REVISION_REQUESTED":
+                return "status-revision";
+
+            case "REVISED_SUBMITTED":
+            case "RESUBMITTED":
+                return "status-review";
+
+            case "REJECTED":
+                return "status-revision";
+
+            case "SUBMITTED":
+            default:
+                return "status-submitted";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       STATUS LABEL
+    ========================================================= */
+
+    function getStatusLabel(status) {
+
+        switch (String(status || "").toUpperCase()) {
+
+            case "UNDER_REVIEW":
+            case "ASSIGNED":
+                return "Under Review";
+
+            case "APPROVED":
+                return "Approved";
+
+            case "EDITORIALLY_ACCEPTED":
+                return "Editorially Accepted";
+
+            case "REVISION_REQUIRED":
+            case "REVISION_REQUESTED":
+                return "Revision Required";
+
+            case "REVISED_SUBMITTED":
+            case "RESUBMITTED":
+                return "Resubmitted";
+
+            case "REJECTED":
+                return "Rejected";
+
+            case "SUBMITTED":
+                return "Submitted";
+
+            default:
+                return String(status || "Submitted").replace(/_/g, " ").toLowerCase()
+                    .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+
+        }
+
+    }
+
+
+    /* =========================================================
+       DATE FORMAT
+    ========================================================= */
+
+    function formatDate(value) {
+
+        if (!value) {
+
+            return "—";
+
+        }
+
+
+        const date =
+            new Date(value);
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return value;
+
+        }
+
+
+        return date.toLocaleDateString(
+            "en-GB",
+            {
+                day:
+                    "2-digit",
+
+                month:
+                    "short",
+
+                year:
+                    "numeric"
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(value) {
+
+        return String(
+            value ?? ""
+        )
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
+
+    }
+
+
+    /* =========================================================
+       LOAD SUMMARY
+    ========================================================= */
+
+    async function loadSummary() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/manuscripts/summary",
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token
+                            }
+                    }
+                );
+
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                clearSession();
+
+                window.location.replace(
+                    "/author-login.html"
+                );
+
+                return;
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load manuscript summary."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            const summary =
+                result.data ||
+                result;
+
+
+            if (filterTotal) {
+
+                filterTotal.textContent =
+                    summary.total ??
+                    summary.all ??
+                    0;
+
+            }
+
+
+            if (filterUnderReview) {
+
+                filterUnderReview.textContent =
+                    summary.underReview ??
+                    summary.UNDER_REVIEW ??
+                    0;
+
+            }
+
+
+            if (filterApproved) {
+
+                filterApproved.textContent =
+                    summary.approved ??
+                    summary.APPROVED ??
+                    0;
+
+            }
+
+
+            if (filterRevision) {
+
+                filterRevision.textContent =
+                    summary.revisionRequired ??
+                    summary.REVISION_REQUIRED ??
+                    0;
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Summary loading error:",
+                error
+            );
+
+
+            if (filterTotal) {
+
+                filterTotal.textContent =
+                    "0";
+
+            }
+
+            if (filterUnderReview) {
+
+                filterUnderReview.textContent =
+                    "0";
+
+            }
+
+            if (filterApproved) {
+
+                filterApproved.textContent =
+                    "0";
+
+            }
+
+            if (filterRevision) {
+
+                filterRevision.textContent =
+                    "0";
+
+            }
+
+        }
+
+    }
+
+
+    /* =========================================================
+       LOAD SUBMISSIONS
+    ========================================================= */
+
+    async function loadSubmissions() {
+
+        if (!submissionsList) {
+
+            return;
+
+        }
+
+
+        submissionsList.innerHTML = `
+
+            <div class="submission-loading">
+
+                <i class="fas fa-spinner fa-spin"></i>
+
+                Loading your submissions...
+
+            </div>
+
+        `;
+
+
+        try {
+
+            let url =
+                "/api/manuscripts/my-submissions";
+
+
+            if (selectedStatus) {
+
+                url +=
+                    "?status=" +
+                    encodeURIComponent(
+                        selectedStatus
+                    );
+
+            }
+
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token,
+
+                                "Content-Type":
+                                    "application/json"
+                            }
+                    }
+                );
+
+
+            if (
+                response.status === 401 ||
+                response.status === 403
+            ) {
+
+                clearSession();
+
+                window.location.replace(
+                    "/author-login.html"
+                );
+
+                return;
+
+            }
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to load submissions."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            const submissions =
+                Array.isArray(result)
+                    ? result
+                    : (
+                        Array.isArray(result.data)
+                            ? result.data
+                            : []
+                    );
+
+
+            allLoadedSubmissions = submissions;
+            applySearch();
+
+
+        } catch (error) {
+
+            console.error(
+                "Submission loading error:",
+                error
+            );
+
+
+            submissionsList.innerHTML = `
+
+                <div class="submission-empty">
+
+                    <div class="submission-empty-icon">
+
+                        <i class="fas fa-triangle-exclamation"></i>
+
+                    </div>
+
+
+                    <h3>
+                        Unable to load submissions
+                    </h3>
+
+
+                    <p>
+                        ${escapeHtml(
+                error.message ||
+                "Please try again later."
+            )}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            listCount.textContent =
+                "0 submissions";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       RENDER SUBMISSIONS
+    ========================================================= */
+
+    function renderSubmissions(
+        submissions
+    ) {
+
+        if (!Array.isArray(submissions)) {
+
+            submissions = [];
+
+        }
+
+
+        if (listCount) {
+
+            listCount.textContent =
+                submissions.length +
+                (
+                    submissions.length === 1
+                        ? " submission"
+                        : " submissions"
+                );
+
+        }
+
+
+        if (
+            submissions.length ===
+            0
+        ) {
+
+            submissionsList.innerHTML = `
+
+                <div class="submission-empty">
+
+                    <div class="submission-empty-icon">
+
+                        <i class="fas fa-file-lines"></i>
+
+                    </div>
+
+
+                    <h3>
+                        No submissions found
+                    </h3>
+
+
+                    <p>
+                        There are no manuscripts in this category yet.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        submissionsList.innerHTML =
+            submissions
+                .map(
+                    function (submission) {
+
+                        const manuscriptId =
+                            submission.manuscriptId;
+
+
+                        const title =
+                            submission.title ||
+                            "Untitled Manuscript";
+
+
+                        const code =
+                            submission.manuscriptCode ||
+                            "MS-" +
+                            String(
+                                manuscriptId ||
+                                ""
+                            ).padStart(
+                                6,
+                                "0"
+                            );
+
+
+                        const status =
+                            String(
+                                submission.status ||
+                                "SUBMITTED"
+                            ).toUpperCase();
+
+
+                        const statusClass =
+                            getStatusClass(
+                                status
+                            );
+
+
+                        const statusLabel =
+                            getStatusLabel(
+                                status
+                            );
+
+
+                        const submissionDate =
+                            submission.submittedAt ||
+                            submission.createdAt;
+
+
+                        const genre =
+                            submission.genreName ||
+                            submission.genre ||
+                            "—";
+
+
+                        const language =
+                            submission.language ||
+                            "—";
+
+
+                        return `
+
+                            <article
+                                class="submission-item"
+                            >
+
+                                <div
+                                    class="submission-title-area"
+                                >
+
+                                    <span
+                                        class="submission-code"
+                                    >
+                                        ${escapeHtml(
+                            code
+                        )}
+                                    </span>
+
+
+                                    <div
+                                        class="submission-title"
+                                        title="${escapeHtml(
+                            title
+                        )}"
+                                    >
+                                        ${escapeHtml(
+                            title
+                        )}
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div
+                                        class="submission-meta-label"
+                                    >
+                                        Submitted
+                                    </div>
+
+
+                                    <div
+                                        class="submission-meta-value"
+                                    >
+                                        ${escapeHtml(
+                            formatDate(
+                                submissionDate
+                            )
+                        )}
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div
+                                        class="submission-meta-label"
+                                    >
+                                        Genre
+                                    </div>
+
+
+                                    <div
+                                        class="submission-meta-value"
+                                    >
+                                        ${escapeHtml(
+                            genre
+                        )}
+                                    </div>
+
+                                </div>
+
+
+                                <div>
+
+                                    <div
+                                        class="submission-meta-label"
+                                    >
+                                        Current Status
+                                    </div>
+
+
+                                    <span
+                                        class="status-badge ${statusClass}"
+                                    >
+
+                                        <span
+                                            class="status-dot"
+                                        ></span>
+
+                                        ${escapeHtml(
+                            statusLabel
+                        )}
+
+                                    </span>
+
+                                </div>
+
+
+                                <div class="submission-actions">
+
+                                    <a
+                                        class="view-btn"
+                                        href="/author/my-submission-details.html?id=${encodeURIComponent(
+                            manuscriptId
+                        )}"
+                                    >
+
+                                        <i
+                                            class="fas fa-eye"
+                                        ></i>
+
+                                        View
+
+                                    </a>
+
+                                    ${["UNDER_REVIEW", "ASSIGNED", "REVISION_REQUIRED", "REVISION_REQUESTED", "RESUBMITTED", "REVISED_SUBMITTED"].includes(String(submission.status || "").toUpperCase()) ? `
+                                        <a
+                                            class="view-comments-btn"
+                                            href="/author/my-submission-details.html?id=${encodeURIComponent(manuscriptId)}#comments"
+                                        >
+                                            <i class="fas fa-comments"></i>
+                                            Comments
+                                        </a>
+                                    ` : ""}
+
+                                    ${String(submission.status || "").toUpperCase() === "SUBMITTED" ? `
+                                        <button
+                                            type="button"
+                                            class="delete-btn"
+                                            data-manuscript-id="${manuscriptId}"
+                                            data-manuscript-title="${escapeHtml(submission.title || "this manuscript")}"
+                                        >
+                                            <i class="fas fa-trash-alt"></i>
+                                            Delete
+                                        </button>
+                                    ` : ""}
+
+                                </div>
+
+                            </article>
+
+                        `;
+
+                    }
+                )
+                .join("");
+
+    }
+
+
+    /* =========================================================
+       SEARCH
+    ========================================================= */
+
+    const searchInput = document.getElementById("submissionSearchInput");
+    const searchResultInfo = document.getElementById("searchResultInfo");
+    let allLoadedSubmissions = [];
+
+    function applySearch() {
+        const query = (searchInput ? searchInput.value : "").trim().toLowerCase();
+        const filtered = allLoadedSubmissions.filter(function (submission) {
+            const title = String(submission.title || "").toLowerCase();
+            const code = String(submission.manuscriptCode || "").toLowerCase();
+            return !query || title.includes(query) || code.includes(query);
+        });
+        renderSubmissions(filtered);
+        if (searchResultInfo) {
+            searchResultInfo.textContent = query
+                ? `Showing ${filtered.length} result${filtered.length === 1 ? "" : "s"} for "${query}"`
+                : "Showing all submissions";
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", applySearch);
+    }
+
+    /* =========================================================
+       LOAD DATA
+    ========================================================= */
+
+    loadSummary();
+
+    loadSubmissions();
+
+
+    /* =========================================================
+       DELETE MANUSCRIPT
+    ========================================================= */
+
+    document.addEventListener(
+        "click",
+        async function (event) {
+
+            const deleteButton =
+                event.target.closest(".delete-btn");
+
+            if (!deleteButton) {
+                return;
+            }
+
+            const manuscriptId =
+                deleteButton.dataset.manuscriptId;
+
+            const manuscriptTitle =
+                deleteButton.dataset.manuscriptTitle ||
+                "this manuscript";
+
+            const confirmed = window.confirm(
+                `Are you sure you want to delete "${manuscriptTitle}"?\n\nThis action cannot be undone.`
+            );
+
+            if (!confirmed) {
+                return;
+            }
+
+            const token =
+                localStorage.getItem("rp_token") ||
+                sessionStorage.getItem("rp_token");
+
+            if (!token) {
+                window.location.href = "/author-login.html";
+                return;
+            }
+
+            deleteButton.disabled = true;
+            deleteButton.innerHTML =
+                '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+            try {
+
+                const response = await fetch(
+                    `/api/manuscripts/${encodeURIComponent(manuscriptId)}`,
+                    {
+                        method: "DELETE",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        }
+                    }
+                );
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.message ||
+                        "Unable to delete manuscript."
+                    );
+                }
+
+                alert(
+                    result.message ||
+                    "Manuscript deleted successfully."
+                );
+
+                await loadSummary();
+                await loadSubmissions();
+
+            } catch (error) {
+
+                console.error("Delete manuscript error:", error);
+
+                alert(
+                    error.message ||
+                    "Unable to delete manuscript."
+                );
+
+                deleteButton.disabled = false;
+                deleteButton.innerHTML =
+                    '<i class="fas fa-trash-alt"></i> Delete';
+            }
+        }
+    );
+
+
+    /* =========================================================
+       LOGOUT SUPPORT
+    ========================================================= */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const logoutButton =
+                event.target.closest(
+                    "#logoutBtn"
+                );
+
+
+            if (!logoutButton) {
+
+                return;
+
+            }
+
+
+            clearSession();
+
+
+            window.location.href =
+                "/author-login.html";
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

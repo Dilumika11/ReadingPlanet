@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Version History – Reading Planet</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/author.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .vh-main { width:min(1180px,calc(100% - 40px)); min-height:calc(100vh - 66px); margin:0 auto; padding:34px 0 60px; }
+        .vh-hero { background:linear-gradient(135deg,#f4f8fd,#fff); border:1px solid #dbe7f3; border-radius:18px; padding:28px 32px; margin-bottom:22px; }
+        .vh-kicker { color:#2468a9; font-size:12px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; }
+        .vh-hero h1 { margin:7px 0 8px; color:#0d4278; font-family:Georgia,serif; font-size:32px; }
+        .vh-hero p { margin:0; color:#60738b; }
+        .vh-list { display:grid; gap:14px; }
+        .vh-card { background:#fff; border:1px solid #dbe7f3; border-radius:16px; padding:20px 22px; display:flex; align-items:center; justify-content:space-between; gap:18px; box-shadow:0 5px 18px rgba(31,72,112,.06); }
+        .vh-code { color:#1765a7; font-size:12px; font-weight:800; margin-bottom:5px; }
+        .vh-title { color:#0c3764; font-size:19px; font-weight:800; margin-bottom:7px; }
+        .vh-meta { display:flex; flex-wrap:wrap; gap:14px; color:#6c7f94; font-size:13px; }
+        .vh-count { display:inline-flex; align-items:center; gap:7px; margin-top:10px; color:#315b82; font-size:13px; font-weight:700; }
+        .vh-btn { display:inline-flex; align-items:center; gap:8px; padding:11px 16px; border-radius:9px; background:#1768ad; color:#fff; text-decoration:none; font-weight:700; white-space:nowrap; }
+        .vh-btn:hover { color:#fff; background:#0f5896; }
+        .vh-loading,.vh-empty,.vh-error { background:#fff; border:1px solid #dbe7f3; border-radius:16px; padding:40px 24px; text-align:center; color:#6b7f95; }
+        .vh-loading i { color:#1768ad; }
+        @media(max-width:700px){ .vh-main{width:min(100% - 24px,1180px)} .vh-card{align-items:flex-start; flex-direction:column}.vh-btn{width:100%;justify-content:center} }
+    </style>
+</head>
+<body>
+<div id="header-container"></div>
+<main class="vh-main">
+    <section class="vh-hero">
+        <div class="vh-kicker">Author Workspace</div>
+        <h1>Version History</h1>
+        <p>Select a manuscript to view its original submission and subsequent revised versions.</p>
+    </section>
+    <section id="versionHistoryList" class="vh-list">
+        <div class="vh-loading"><i class="fas fa-spinner fa-spin"></i><p>Loading your manuscripts...</p></div>
+    </section>
+</main>
+<div id="footer-container"></div>
+<script src="/js/author-api.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/load-components.js"></script>
+<script>
+(function(){
+    'use strict';
+    const list=document.getElementById('versionHistoryList');
+    const token=localStorage.getItem('rp_token')||sessionStorage.getItem('rp_token');
+    if(!token){ window.location.href='/author-login.html'; return; }
+
+    function esc(value){
+        return String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+    function date(value){
+        if(!value) return '—';
+        const d=new Date(value); return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+    }
+    async function load(){
+        try{
+            const response=await fetch('/api/manuscripts/my-submissions',{headers:{Authorization:'Bearer '+token,Accept:'application/json'}});
+            if(response.status===401||response.status===403){window.location.href='/author-login.html';return;}
+            const result=await response.json();
+            if(!response.ok||!result.success) throw new Error(result.message||'Unable to load manuscripts.');
+            const manuscripts=result.data||[];
+            if(!manuscripts.length){
+                list.innerHTML='<div class="vh-empty"><i class="fas fa-clock-rotate-left"></i><h3>No manuscripts found</h3><p>Your version history will appear here after you submit a manuscript.</p></div>';
+                return;
+            }
+            const rows=await Promise.all(manuscripts.map(async m=>{
+                let count=0;
+                try{
+                    const r=await fetch('/api/manuscripts/'+encodeURIComponent(m.manuscriptId)+'/files',{headers:{Authorization:'Bearer '+token,Accept:'application/json'}});
+                    const j=await r.json();
+                    if(r.ok&&j.success){
+                        const seen=new Set();
+                        (j.data||[]).forEach(f=>seen.add(Number(f.fileVersion||1)));
+                        count=seen.size;
+                    }
+                }catch(e){ console.warn('Version count failed',e); }
+                return {m,count};
+            }));
+            list.innerHTML=rows.map(({m,count})=>`
+                <article class="vh-card">
+                    <div>
+                        <div class="vh-code">${esc(m.manuscriptCode||'Manuscript')}</div>
+                        <div class="vh-title">${esc(m.title||'Untitled Manuscript')}</div>
+                        <div class="vh-meta"><span><i class="far fa-calendar"></i> Submitted ${esc(date(m.submittedAt))}</span><span><i class="fas fa-circle-info"></i> ${esc(m.status||'—')}</span></div>
+                        <div class="vh-count"><i class="fas fa-layer-group"></i> ${count} version${count===1?'':'s'} available</div>
+                    </div>
+                    <a class="vh-btn" href="/author/my-submission-details.html?id=${encodeURIComponent(m.manuscriptId)}#versionHistory"><i class="fas fa-history"></i> View History</a>
+                </article>`).join('');
+        }catch(error){
+            console.error(error);
+            list.innerHTML='<div class="vh-error"><i class="fas fa-triangle-exclamation"></i><h3>Unable to load version history</h3><p>'+esc(error.message||'Please try again.')+'</p></div>';
+        }
+    }
+    load();
+})();
+</script>
+</body>
+</html>

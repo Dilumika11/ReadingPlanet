@@ -1,0 +1,277 @@
+
+.account-page {
+  background: #eef4fa;
+  min-height: 60vh;
+  padding: 2rem 1rem 3rem;
+}
+.account-shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 1.25rem;
+}
+@media (max-width: 800px) {
+  .account-shell { grid-template-columns: 1fr; }
+}
+.account-sidebar {
+  background: #fff;
+  border: 1px solid #d8e5f2;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 8px 24px rgba(28,76,125,.06);
+  height: fit-content;
+}
+.account-sidebar h1 {
+  margin: 0 0 1rem;
+  font-size: 1.25rem;
+  color: #123d73;
+  font-family: Georgia, serif;
+}
+.account-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 0.7rem 0.75rem;
+  border-radius: 8px;
+  color: #334e68;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.35rem;
+}
+.account-nav:hover { background: #eef5fc; color: #123d73; }
+.account-nav.active { background: #1a5f9e; color: #fff; }
+.account-content {
+  background: #fff;
+  border: 1px solid #d8e5f2;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(28,76,125,.06);
+  min-height: 320px;
+}
+.account-panel { display: none; }
+.account-panel.active { display: block; }
+.account-content h2 {
+  margin: 0 0 0.35rem;
+  color: #123d73;
+  font-size: 1.2rem;
+}
+.muted { color: #6b7c8f; margin: 0 0 1.25rem; font-size: 0.92rem; }
+.account-form label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334e68;
+  margin: 0 0 0.3rem;
+}
+.account-form input {
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #c9d8e8;
+  border-radius: 8px;
+  margin-bottom: 0.85rem;
+  font-size: 1rem;
+}
+.account-form input[readonly] {
+  background: #f4f7fb;
+  color: #5a6f85;
+}
+.btn-account {
+  background: #1a5f9e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.25rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-account:hover { background: #154e82; }
+.account-msg {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+.account-msg.error { background: #fde8e8; color: #9b1c1c; }
+.account-msg.success { background: #e6f6ed; color: #0f6b3c; }
+.account-table-wrap { overflow-x: auto; }
+.account-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.account-table th, .account-table td {
+  border: 1px solid #e2eef8;
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+}
+.account-table th { background: #f0f6fc; color: #123d73; }
+.empty { color: #6b7c8f; padding: 1rem 0; }
+
+
+/* Order tracking */
+.track-steps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: #8a9bb0;
+}
+.track-step.done {
+  color: #0f6b3c;
+  font-weight: 600;
+}
+.track-step.current {
+  color: #1a5f9e;
+  font-weight: 700;
+  text-decoration: underline;
+}
+.track-sep {
+  color: #c5d4e4;
+  margin: 0 0.15rem;
+}
+.track-line.cancelled {
+  color: #9b1c1c;
+  font-weight: 600;
+}
+
+
+/* ---- Order cards & delivery tracking ---- */
+.order-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1rem;
+  background: #fff;
+}
+.order-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.order-head-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.order-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 0.15rem;
+}
+.order-total {
+  font-weight: 600;
+  margin: 0.6rem 0 0.25rem;
+}
+.order-track-wrap {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e5e7eb;
+}
+.track-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.order-track {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0;
+  align-items: flex-start;
+}
+.order-track .track-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 4.5rem;
+  position: relative;
+  text-align: center;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+.order-track .track-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  left: calc(50% + 10px);
+  right: calc(-50% + 10px);
+  height: 2px;
+  background: #e5e7eb;
+  z-index: 0;
+}
+.order-track .track-step.done:not(:last-child)::after,
+.order-track .track-step.current:not(:last-child)::after {
+  background: #10b981;
+}
+.order-track .track-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  border: 2px solid #d1d5db;
+  margin-bottom: 0.35rem;
+  z-index: 1;
+  position: relative;
+}
+.order-track .track-step.done .track-dot {
+  background: #10b981;
+  border-color: #059669;
+}
+.order-track .track-step.current .track-dot {
+  background: #3b82f6;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+.order-track .track-step.done .track-label,
+.order-track .track-step.current .track-label {
+  color: #111827;
+  font-weight: 600;
+}
+.order-track.cancelled-track {
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-confirmed { background: #dbeafe; color: #1e40af; }
+.status-packed { background: #e0e7ff; color: #3730a3; }
+.status-dispatched { background: #d1fae5; color: #065f46; }
+.status-delivered { background: #a7f3d0; color: #064e3b; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+.status-other { background: #f3f4f6; color: #374151; }
+.btn-cancel-order {
+  background: #fff;
+  border: 1px solid #fca5a5;
+  color: #b91c1c;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.btn-cancel-order:hover {
+  background: #fef2f2;
+}

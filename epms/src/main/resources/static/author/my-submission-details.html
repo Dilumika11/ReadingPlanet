@@ -1,0 +1,3745 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Manuscript Details | Reading Planet
+    </title>
+
+
+    <!-- COMMON HOME PAGE STYLES -->
+
+    <link
+            rel="stylesheet"
+            href="/css/header.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/footer.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/author.css"
+    >
+
+
+    <!-- FONT AWESOME -->
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            min-height: 100%;
+        }
+
+
+        body {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            font-family:
+                    "Segoe UI",
+                    Tahoma,
+                    Geneva,
+                    Verdana,
+                    sans-serif;
+
+            background:
+                    radial-gradient(
+                            circle at 8% 12%,
+                            rgba(45,114,184,.06),
+                            transparent 24%
+                    ),
+                    linear-gradient(
+                            135deg,
+                            #eef5fb 0%,
+                            #f7fafd 52%,
+                            #edf4fa 100%
+                    );
+
+            color:
+                    #1e293b;
+
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .details-main {
+
+            width:
+                    min(
+                            1180px,
+                            calc(100% - 40px)
+                    );
+
+            margin:
+                    42px auto
+                    65px;
+
+        }
+
+
+        /* =====================================================
+           BACK LINK
+        ===================================================== */
+
+        .back-link {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    8px;
+
+            margin-bottom:
+                    18px;
+
+            color:
+                    #145da8;
+
+            font-size:
+                    14px;
+
+            font-weight:
+                    600;
+
+            text-decoration:
+                    none;
+
+        }
+
+
+        .back-link:hover {
+
+            color:
+                    #0d477f;
+
+            text-decoration:
+                    none;
+
+        }
+
+
+        /* =====================================================
+           PAGE HEADER
+        ===================================================== */
+
+        .details-heading {
+
+            margin-bottom:
+                    26px;
+
+        }
+
+
+        .details-heading h1 {
+
+            margin:
+                    0 0 8px;
+
+            color:
+                    #123f6d;
+
+            font-family:
+                    Georgia,
+                    "Times New Roman",
+                    serif;
+
+            font-size:
+                    34px;
+
+        }
+
+
+        .details-heading p {
+
+            margin:
+                    0;
+
+            color:
+                    #64748b;
+
+            font-size:
+                    14px;
+
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        #pageError {
+
+            display:
+                    none;
+
+            margin-bottom:
+                    20px;
+
+            padding:
+                    15px 17px;
+
+            background:
+                    #fff1f1;
+
+            border:
+                    1px solid #ffd3d3;
+
+            border-radius:
+                    10px;
+
+            color:
+                    #a63a3a;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    600;
+
+        }
+
+
+        /* =====================================================
+           MANUSCRIPT CARD
+        ===================================================== */
+
+        .manuscript-card {
+
+            background:
+                    #ffffff;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    18px;
+
+            box-shadow:
+                    0
+                    8px
+                    28px
+                    rgba(15,55,95,.07);
+
+            overflow:
+                    hidden;
+
+            margin-bottom:
+                    26px;
+
+        }
+
+
+        .manuscript-card-header {
+
+            padding:
+                    24px 28px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #edf5fd 0%,
+                            #f8fbff 100%
+                    );
+
+            border-bottom:
+                    1px solid #e2eaf3;
+
+            display:
+                    flex;
+
+            justify-content:
+                    space-between;
+
+            align-items:
+                    flex-start;
+
+            gap:
+                    20px;
+
+        }
+
+
+        .manuscript-title-area {
+
+            min-width:
+                    0;
+
+        }
+
+
+        .manuscript-title-area h2 {
+
+            margin:
+                    0 0 8px;
+
+            color:
+                    #123f6d;
+
+            font-size:
+                    24px;
+
+            line-height:
+                    1.35;
+
+        }
+
+
+        .manuscript-code {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    7px;
+
+            color:
+                    #5d748c;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    600;
+
+        }
+
+
+        /* =====================================================
+           STATUS
+        ===================================================== */
+
+        .status-badge {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            gap:
+                    7px;
+
+            min-width:
+                    130px;
+
+            padding:
+                    9px 15px;
+
+            border-radius:
+                    999px;
+
+            font-size:
+                    13px;
+
+            font-weight:
+                    700;
+
+            white-space:
+                    nowrap;
+
+        }
+
+
+        .status-submitted {
+
+            background:
+                    #eaf3ff;
+
+            color:
+                    #145da8;
+
+        }
+
+
+        .status-under-review {
+
+            background:
+                    #fff5dd;
+
+            color:
+                    #996900;
+
+        }
+
+
+        .status-approved {
+
+            background:
+                    #e7f8ef;
+
+            color:
+                    #16734b;
+
+        }
+
+
+        .status-revision-required {
+
+            background:
+                    #fff0f0;
+
+            color:
+                    #b84242;
+
+        }
+
+
+        .status-default {
+
+            background:
+                    #eef2f7;
+
+            color:
+                    #526174;
+
+        }
+
+
+        /* =====================================================
+           SUMMARY GRID
+        ===================================================== */
+
+        .summary-grid {
+
+            padding:
+                    25px 28px;
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(
+                            4,
+                            minmax(0,1fr)
+                    );
+
+            gap:
+                    18px;
+
+        }
+
+
+        .summary-item {
+
+            padding:
+                    18px;
+
+            background:
+                    #f8fafc;
+
+            border:
+                    1px solid #e8eef5;
+
+            border-radius:
+                    13px;
+
+        }
+
+
+        .summary-item-label {
+
+            display:
+                    block;
+
+            margin-bottom:
+                    7px;
+
+            color:
+                    #7a8b9d;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    700;
+
+            text-transform:
+                    uppercase;
+
+            letter-spacing:
+                    .04em;
+
+        }
+
+
+        .summary-item-value {
+
+            display:
+                    block;
+
+            color:
+                    #1e3f61;
+
+            font-size:
+                    16px;
+
+            font-weight:
+                    700;
+
+            word-break:
+                    break-word;
+
+        }
+
+
+        /* =====================================================
+           VERSION HISTORY – US7
+        ===================================================== */
+
+        .version-history-card {
+
+            background: #ffffff;
+
+            border: 1px solid #dce7f2;
+
+            border-radius: 18px;
+
+            box-shadow: 0 8px 28px rgba(15,55,95,.07);
+
+            overflow: hidden;
+
+            margin-bottom: 28px;
+
+        }
+
+        .version-history-header {
+
+            padding: 24px 28px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            border-bottom: 1px solid #e8eef5;
+
+        }
+
+        .version-history-header h2 {
+
+            margin: 0 0 6px;
+
+            color: #123f6d;
+
+            font-size: 21px;
+
+        }
+
+        .version-history-header p {
+
+            margin: 0;
+
+            color: #718096;
+
+            font-size: 13px;
+
+        }
+
+        .version-history-count {
+
+            min-width: 38px;
+
+            height: 38px;
+
+            padding: 0 11px;
+
+            border-radius: 12px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #eaf3ff;
+
+            color: #1665a9;
+
+            font-weight: 700;
+
+        }
+
+        .version-history-list {
+
+            padding: 22px 28px 26px;
+
+            display: grid;
+
+            gap: 14px;
+
+        }
+
+        .version-item {
+
+            position: relative;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 18px;
+
+            padding: 18px 18px 18px 20px;
+
+            border: 1px solid #dce7f2;
+
+            border-radius: 14px;
+
+            background: #fbfdff;
+
+        }
+
+        .version-left {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            min-width: 0;
+
+        }
+
+        .version-badge {
+
+            flex: 0 0 auto;
+
+            width: 48px;
+
+            height: 48px;
+
+            border-radius: 13px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background: #eaf3ff;
+
+            color: #1767ab;
+
+            font-weight: 800;
+
+            font-size: 12px;
+
+        }
+
+        .version-info {
+
+            min-width: 0;
+
+        }
+
+        .version-title {
+
+            display: block;
+
+            color: #173f68;
+
+            font-weight: 700;
+
+            margin-bottom: 5px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+
+            white-space: nowrap;
+
+        }
+
+        .version-meta {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 8px 14px;
+
+            color: #718096;
+
+            font-size: 12px;
+
+        }
+
+        .version-status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            color: #2563a6;
+
+            font-weight: 600;
+
+        }
+
+        .version-actions {
+
+            flex: 0 0 auto;
+
+            display: flex;
+
+            gap: 8px;
+
+        }
+
+        .version-action {
+
+            border: 0;
+
+            border-radius: 9px;
+
+            padding: 9px 12px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+
+            font-size: 12px;
+
+        }
+
+        .version-action.view {
+            background: #eaf3ff;
+            color: #1767ab;
+        }
+
+        .version-action.download {
+            background: #1767ab;
+            color: #ffffff;
+        }
+
+        @media (max-width: 700px) {
+            .version-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .version-actions {
+                width: 100%;
+            }
+
+            .version-action {
+                flex: 1;
+            }
+        }
+
+
+        /* =====================================================
+           FILES CARD
+        ===================================================== */
+
+        .files-card {
+
+            background:
+                    #ffffff;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    18px;
+
+            box-shadow:
+                    0
+                    8px
+                    28px
+                    rgba(15,55,95,.07);
+
+            overflow:
+                    hidden;
+
+        }
+
+
+        .files-header {
+
+            padding:
+                    24px 28px;
+
+            display:
+                    flex;
+
+            justify-content:
+                    space-between;
+
+            align-items:
+                    center;
+
+            gap:
+                    15px;
+
+            border-bottom:
+                    1px solid #e8eef5;
+
+        }
+
+
+        .files-header-left h2 {
+
+            margin:
+                    0 0 6px;
+
+            color:
+                    #123f6d;
+
+            font-size:
+                    21px;
+
+        }
+
+
+        .files-header-left p {
+
+            margin:
+                    0;
+
+            color:
+                    #718096;
+
+            font-size:
+                    13px;
+
+        }
+
+
+        .file-count {
+
+            min-width:
+                    38px;
+
+            height:
+                    38px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    10px;
+
+            background:
+                    #eaf3ff;
+
+            color:
+                    #145da8;
+
+            font-size:
+                    14px;
+
+            font-weight:
+                    800;
+
+        }
+
+
+        /* =====================================================
+           FILE LIST
+        ===================================================== */
+
+        .files-list {
+
+            padding:
+                    12px 20px 22px;
+
+        }
+
+
+        .file-item {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    space-between;
+
+            gap:
+                    20px;
+
+            padding:
+                    18px 8px;
+
+            border-bottom:
+                    1px solid #edf2f7;
+
+        }
+
+
+        .file-item:last-child {
+
+            border-bottom:
+                    none;
+
+        }
+
+
+        .file-left {
+
+            min-width:
+                    0;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    15px;
+
+        }
+
+
+        .file-icon {
+
+            width:
+                    46px;
+
+            height:
+                    46px;
+
+            flex:
+                    0 0 46px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    12px;
+
+            background:
+                    #edf5fd;
+
+            color:
+                    #145da8;
+
+            font-size:
+                    19px;
+
+        }
+
+
+        .file-info {
+
+            min-width:
+                    0;
+
+        }
+
+
+        .file-name {
+
+            display:
+                    block;
+
+            margin-bottom:
+                    5px;
+
+            color:
+                    #243b53;
+
+            font-size:
+                    14px;
+
+            font-weight:
+                    700;
+
+            white-space:
+                    nowrap;
+
+            overflow:
+                    hidden;
+
+            text-overflow:
+                    ellipsis;
+
+        }
+
+
+        .file-meta {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            flex-wrap:
+                    wrap;
+
+            gap:
+                    10px;
+
+            color:
+                    #7b8794;
+
+            font-size:
+                    12px;
+
+        }
+
+
+        .file-version {
+
+            padding:
+                    4px 8px;
+
+            border-radius:
+                    6px;
+
+            background:
+                    #f1f5f9;
+
+            color:
+                    #64748b;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        /* =====================================================
+           FILE BUTTONS
+        ===================================================== */
+
+        .file-actions {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    9px;
+
+            flex-shrink:
+                    0;
+
+        }
+
+
+        .file-btn {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            gap:
+                    7px;
+
+            min-height:
+                    39px;
+
+            padding:
+                    9px 13px;
+
+            border:
+                    none;
+
+            border-radius:
+                    8px;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+
+            text-decoration:
+                    none;
+
+            cursor:
+                    pointer;
+
+            transition:
+                    transform .2s ease,
+                    background .2s ease;
+
+        }
+
+
+        .file-btn:hover {
+
+            transform:
+                    translateY(-1px);
+
+            text-decoration:
+                    none;
+
+        }
+
+
+        .view-btn {
+
+            background:
+                    #edf5fd;
+
+            color:
+                    #145da8;
+
+        }
+
+
+        .view-btn:hover {
+
+            background:
+                    #dfeefc;
+
+            color:
+                    #145da8;
+
+        }
+
+
+        .download-btn {
+
+            background:
+                    #145da8;
+
+            color:
+                    #ffffff;
+
+            box-shadow:
+                    0
+                    5px
+                    14px
+                    rgba(20,93,168,.18);
+
+        }
+
+
+        .download-btn:hover {
+
+            background:
+                    #0f4f91;
+
+            color:
+                    #ffffff;
+
+        }
+
+
+        /* =====================================================
+           STATE BOX
+        ===================================================== */
+
+        .state-box {
+
+            padding:
+                    48px 24px;
+
+            text-align:
+                    center;
+
+            color:
+                    #728197;
+
+        }
+
+
+        .state-box i {
+
+            display:
+                    block;
+
+            margin-bottom:
+                    14px;
+
+            font-size:
+                    35px;
+
+            color:
+                    #9bb3c9;
+
+        }
+
+
+        .state-box h3 {
+
+            margin:
+                    0 0 7px;
+
+            color:
+                    #3f5872;
+
+            font-size:
+                    17px;
+
+        }
+
+
+        .state-box p {
+
+            margin:
+                    0;
+
+            font-size:
+                    13px;
+
+        }
+
+
+        .error-state i {
+
+            color:
+                    #c85d5d;
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .summary-grid {
+
+                grid-template-columns:
+                        repeat(
+                                2,
+                                minmax(0,1fr)
+                        );
+
+            }
+
+        }
+
+
+        @media (max-width: 700px) {
+
+            .details-main {
+
+                width:
+                        calc(100% - 24px);
+
+                margin-top:
+                        25px;
+
+            }
+
+
+            .manuscript-card-header {
+
+                flex-direction:
+                        column;
+
+            }
+
+
+            .summary-grid {
+
+                grid-template-columns:
+                        1fr;
+
+                padding:
+                        18px;
+
+            }
+
+
+            .file-item {
+
+                align-items:
+                        flex-start;
+
+                flex-direction:
+                        column;
+
+            }
+
+
+            .file-actions {
+
+                width:
+                        100%;
+
+            }
+
+
+            .file-btn {
+
+                flex:
+                        1;
+
+            }
+
+
+            .details-heading h1 {
+
+                font-size:
+                        28px;
+
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .manuscript-title-area h2 {
+
+                font-size:
+                        20px;
+
+            }
+
+        }
+
+
+
+
+        /* =====================================================
+           REVISION UPLOAD – US6
+        ===================================================== */
+
+        .revision-card {
+            display: none;
+            background: #ffffff;
+            border: 1px solid #dce7f2;
+            border-radius: 18px;
+            box-shadow: 0 8px 28px rgba(15,55,95,.07);
+            overflow: hidden;
+            margin-bottom: 26px;
+        }
+
+        .revision-header {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, #fff8e8 0%, #fffdf7 100%);
+            border-bottom: 1px solid #f0dfb0;
+        }
+
+        .revision-header h2 {
+            margin: 0 0 6px;
+            color: #7a5410;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 23px;
+        }
+
+        .revision-header p {
+            margin: 0;
+            color: #756a56;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .revision-form {
+            padding: 24px 28px;
+        }
+
+        .revision-file-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .revision-file-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px dashed #b8cbe0;
+            border-radius: 10px;
+            background: #f8fbff;
+        }
+
+        .revision-help {
+            margin: 8px 0 16px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .revision-message {
+            display: none;
+            margin-bottom: 15px;
+            padding: 11px 13px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .revision-message.success {
+            display: block;
+            background: #ecfdf3;
+            border: 1px solid #b7ebc9;
+            color: #167344;
+        }
+
+        .revision-message.error {
+            display: block;
+            background: #fff1f1;
+            border: 1px solid #ffd3d3;
+            color: #a63a3a;
+        }
+
+        .revision-submit-btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 18px;
+            background: #145da8;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .revision-submit-btn:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+        }
+
+        /* =====================================================
+           EDITOR / REVIEWER COMMENTS – US5
+        ===================================================== */
+
+        .comments-card {
+            background: #ffffff;
+            border: 1px solid #dce7f2;
+            border-radius: 18px;
+            box-shadow: 0 8px 28px rgba(15,55,95,.07);
+            overflow: hidden;
+            margin-bottom: 26px;
+        }
+
+        .comments-header {
+            padding: 24px 28px;
+            background: linear-gradient(135deg, #edf5fd 0%, #f8fbff 100%);
+            border-bottom: 1px solid #dce7f2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .comments-header h2 {
+            margin: 0 0 5px;
+            color: #123f6d;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 23px;
+        }
+
+        .comments-header p {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .comments-count {
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: 50px;
+            background: #145da8;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .comments-list {
+            padding: 24px 28px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .comment-item {
+            border: 1px solid #dce7f2;
+            border-radius: 14px;
+            padding: 20px;
+            background: #fbfdff;
+        }
+
+        .comment-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 13px;
+            flex-wrap: wrap;
+        }
+
+        .comment-round {
+            color: #123f6d;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .comment-decision {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 12px;
+            border-radius: 50px;
+            background: #fff3cd;
+            color: #856404;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .comment-decision.approved {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .comment-decision.revision-required {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .comment-decision.rejected {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .comment-text {
+            margin: 0 0 12px;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .comment-date {
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .comments-empty {
+            text-align: center;
+            padding: 24px;
+            color: #64748b;
+        }
+
+        .comments-empty i {
+            font-size: 28px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .comments-empty h3 {
+            margin: 0 0 6px;
+            color: #334155;
+            font-size: 16px;
+        }
+
+        .comments-empty p {
+            margin: 0;
+            font-size: 13px;
+        }
+    </style>
+
+</head>
+
+
+<body class="author-body author-page">
+
+
+<!-- =====================================================
+     COMMON HOME HEADER
+===================================================== -->
+
+<div id="header-container"></div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="details-main">
+
+
+    <!-- BACK -->
+
+    <a
+            href="/author/my-submissions.html"
+            class="back-link"
+    >
+
+        <i class="fas fa-arrow-left"></i>
+
+        Back to My Submissions
+
+    </a>
+
+
+    <!-- HEADING -->
+
+    <section class="details-heading">
+
+        <h1>
+            Manuscript Details
+        </h1>
+
+        <p>
+            View your submission information and uploaded manuscript files.
+        </p>
+
+    </section>
+
+
+    <!-- ERROR -->
+
+    <div id="pageError"></div>
+
+
+    <!-- =================================================
+         MANUSCRIPT SUMMARY
+    ================================================= -->
+
+    <section class="manuscript-card">
+
+
+        <div class="manuscript-card-header">
+
+
+            <div class="manuscript-title-area">
+
+                <h2 id="manuscriptTitle">
+                    Loading manuscript...
+                </h2>
+
+
+                <span
+                        class="manuscript-code"
+                        id="manuscriptCode"
+                >
+
+                    <i class="fas fa-file-lines"></i>
+
+                    Loading...
+
+                </span>
+
+            </div>
+
+
+            <span
+                    class="status-badge status-default"
+                    id="manuscriptStatus"
+            >
+
+                <i class="fas fa-circle-notch fa-spin"></i>
+
+                Loading
+
+            </span>
+
+        </div>
+
+
+        <div class="summary-grid">
+
+
+            <!-- SUBMISSION DATE -->
+
+            <div class="summary-item">
+
+                <span class="summary-item-label">
+                    Submission Date
+                </span>
+
+
+                <span
+                        class="summary-item-value"
+                        id="submittedDate"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- WORD COUNT -->
+
+            <div class="summary-item">
+
+                <span class="summary-item-label">
+                    Word Count
+                </span>
+
+
+                <span
+                        class="summary-item-value"
+                        id="wordCount"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- MANUSCRIPT ID -->
+
+            <div class="summary-item">
+
+                <span class="summary-item-label">
+                    Manuscript ID
+                </span>
+
+
+                <span
+                        class="summary-item-value"
+                        id="manuscriptId"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+            <!-- FILE COUNT -->
+
+            <div class="summary-item">
+
+                <span class="summary-item-label">
+                    Uploaded Files
+                </span>
+
+
+                <span
+                        class="summary-item-value"
+                        id="uploadedFileCount"
+                >
+                    -
+                </span>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =================================================
+         REVISED MANUSCRIPT UPLOAD – US6
+    ================================================= -->
+
+    <section id="revisionCard" class="revision-card">
+
+        <div class="revision-header">
+            <h2>Upload Revised Manuscript</h2>
+            <p>
+                Your manuscript requires revision. Upload the updated manuscript
+                to respond to the editorial feedback. The previous file will remain
+                unchanged as part of the submission history.
+            </p>
+        </div>
+
+        <form id="revisionForm" class="revision-form">
+            <label class="revision-file-label" for="revisionFile">
+                Revised Manuscript <span aria-hidden="true">*</span>
+            </label>
+
+            <input
+                    id="revisionFile"
+                    class="revision-file-input"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    required
+            >
+
+            <p class="revision-help">
+                Supported formats: PDF, DOC and DOCX. Maximum file size: 20MB.
+            </p>
+
+            <div id="revisionMessage" class="revision-message"></div>
+
+            <button
+                    id="revisionSubmitBtn"
+                    class="revision-submit-btn"
+                    type="submit"
+            >
+                <i class="fas fa-upload"></i>
+                Upload Revised Manuscript
+            </button>
+        </form>
+
+    </section>
+
+    <!-- =================================================
+         EDITOR / REVIEWER COMMENTS – US5
+    ================================================= -->
+
+    <section id="comments" class="comments-card">
+
+        <div class="comments-header">
+
+            <div>
+                <h2>
+                    Editor / Reviewer Comments
+                </h2>
+
+                <p>
+                    Review comments and decisions related to this manuscript.
+                </p>
+            </div>
+
+            <span class="comments-count" id="commentsCount">
+                0
+            </span>
+
+        </div>
+
+        <div id="commentsList" class="comments-list">
+
+            <div class="state-box" id="commentsLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>Loading comments</h3>
+                <p>Please wait while we load the editor and reviewer comments.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         VERSION HISTORY – US7
+    ================================================= -->
+
+    <section id="versionHistory" class="version-history-card">
+
+        <div class="version-history-header">
+
+            <div>
+                <h2>Version History</h2>
+                <p>Track the different versions of your manuscript across submissions and revisions.</p>
+            </div>
+
+            <div class="version-history-count" id="versionHistoryCount">
+                0
+            </div>
+
+        </div>
+
+        <div class="version-history-list" id="versionHistoryList">
+
+            <div class="state-box" id="versionHistoryLoading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <h3>Loading version history</h3>
+                <p>Please wait while we load your manuscript versions.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =================================================
+         FILES
+    ================================================= -->
+
+    <section class="files-card">
+
+
+        <div class="files-header">
+
+            <div class="files-header-left">
+
+                <h2>
+                    Uploaded Files
+                </h2>
+
+
+                <p>
+                    View or download the files attached to this manuscript.
+                </p>
+
+            </div>
+
+
+            <div
+                    class="file-count"
+                    id="fileCount"
+            >
+                0
+            </div>
+
+        </div>
+
+
+        <div
+                class="files-list"
+                id="filesList"
+        >
+
+
+            <div
+                    class="state-box"
+                    id="filesLoading"
+            >
+
+                <i class="fas fa-spinner fa-spin"></i>
+
+                <h3>
+                    Loading files
+                </h3>
+
+                <p>
+                    Please wait while we load your manuscript files.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+</main>
+
+
+<!-- =====================================================
+     COMMON HOME FOOTER
+===================================================== -->
+
+<div id="footer-container"></div>
+
+
+<!-- =====================================================
+     COMMON COMPONENT SCRIPTS
+===================================================== -->
+
+<script src="/js/author-api.js"></script>
+<script src="/js/footer.js"></script>
+
+<script src="/js/header.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+
+<script>
+
+    "use strict";
+
+
+    /* =====================================================
+       AUTHENTICATION
+    ===================================================== */
+
+    const token =
+        localStorage.getItem(
+            "rp_token"
+        ) ||
+        sessionStorage.getItem(
+            "rp_token"
+        );
+
+
+    if (!token) {
+
+        window.location.href =
+            "/author-login.html";
+
+    }
+
+
+    /* =====================================================
+       MANUSCRIPT ID
+    ===================================================== */
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    const manuscriptId =
+        params.get(
+            "manuscriptId"
+        ) ||
+        params.get(
+            "id"
+        );
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const pageError =
+        document.getElementById(
+            "pageError"
+        );
+
+
+    const manuscriptTitle =
+        document.getElementById(
+            "manuscriptTitle"
+        );
+
+
+    const manuscriptCode =
+        document.getElementById(
+            "manuscriptCode"
+        );
+
+
+    const manuscriptStatus =
+        document.getElementById(
+            "manuscriptStatus"
+        );
+
+
+    const submittedDate =
+        document.getElementById(
+            "submittedDate"
+        );
+
+
+    const wordCount =
+        document.getElementById(
+            "wordCount"
+        );
+
+
+    const manuscriptIdElement =
+        document.getElementById(
+            "manuscriptId"
+        );
+
+
+    const uploadedFileCount =
+        document.getElementById(
+            "uploadedFileCount"
+        );
+
+
+    const revisionCard =
+        document.getElementById("revisionCard");
+
+    const revisionForm =
+        document.getElementById("revisionForm");
+
+    const revisionFile =
+        document.getElementById("revisionFile");
+
+    const revisionSubmitBtn =
+        document.getElementById("revisionSubmitBtn");
+
+    const revisionMessage =
+        document.getElementById("revisionMessage");
+
+
+    const fileCount =
+        document.getElementById(
+            "fileCount"
+        );
+
+
+    const filesList =
+        document.getElementById(
+            "filesList"
+        );
+
+
+    const versionHistoryList =
+        document.getElementById(
+            "versionHistoryList"
+        );
+
+
+    const versionHistoryCount =
+        document.getElementById(
+            "versionHistoryCount"
+        );
+
+
+    /* =====================================================
+       VALIDATE MANUSCRIPT ID
+    ===================================================== */
+
+    if (!manuscriptId) {
+
+        showPageError(
+            "No manuscript was selected."
+        );
+
+
+        filesList.innerHTML = `
+
+            <div class="state-box error-state">
+
+                <i class="fas fa-triangle-exclamation"></i>
+
+                <h3>
+                    Manuscript not selected
+                </h3>
+
+                <p>
+                    Please return to My Submissions and select a manuscript.
+                </p>
+
+            </div>
+
+        `;
+
+    } else {
+
+        loadManuscriptDetails();
+
+    }
+
+
+    /* =====================================================
+       LOAD MANUSCRIPT DETAILS
+    ===================================================== */
+
+    async function loadManuscriptDetails() {
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/manuscripts/my-submissions",
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token
+                            }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    clearSession();
+
+                    window.location.href =
+                        "/author-login.html";
+
+                    return;
+
+                }
+
+
+                throw new Error(
+                    "Unable to load manuscript details."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if (!result.success) {
+
+                throw new Error(
+                    result.message ||
+                    "Unable to load manuscript details."
+                );
+
+            }
+
+
+            const manuscripts =
+                result.data ||
+                [];
+
+
+            const manuscript =
+                manuscripts.find(
+                    item =>
+                        String(
+                            item.manuscriptId
+                        ) ===
+                        String(
+                            manuscriptId
+                        )
+                );
+
+
+            if (!manuscript) {
+
+                throw new Error(
+                    "Manuscript not found or access denied."
+                );
+
+            }
+
+
+            renderManuscript(
+                manuscript
+            );
+
+            renderRevisionSection(manuscript.status);
+
+
+            await loadFiles();
+
+            await loadComments();
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            showPageError(
+                error.message ||
+                "Unable to load manuscript details."
+            );
+
+
+            manuscriptTitle.textContent =
+                "Unable to load manuscript";
+
+
+            filesList.innerHTML = `
+
+                <div class="state-box error-state">
+
+                    <i class="fas fa-circle-exclamation"></i>
+
+                    <h3>
+                        Something went wrong
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                error.message ||
+                "Unable to load manuscript files."
+            )}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       RENDER MANUSCRIPT
+    ===================================================== */
+
+    function renderManuscript(
+        manuscript
+    ) {
+
+        manuscriptTitle.textContent =
+            manuscript.title ||
+            "Untitled Manuscript";
+
+
+        manuscriptCode.innerHTML = `
+
+            <i class="fas fa-file-lines"></i>
+
+            ${escapeHtml(
+            manuscript.manuscriptCode ||
+            "-"
+        )}
+
+        `;
+
+
+        submittedDate.textContent =
+            formatDate(
+                manuscript.submittedAt
+            );
+
+
+        wordCount.textContent =
+            formatNumber(
+                manuscript.wordCount
+            );
+
+
+        manuscriptIdElement.textContent =
+            manuscript.manuscriptId ||
+            "-";
+
+
+        setStatus(
+            manuscript.status
+        );
+
+    }
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
+    function setStatus(status) {
+
+        const cleanStatus =
+            String(status || "")
+                .trim()
+                .toUpperCase();
+
+        manuscriptStatus.className = "status-badge";
+
+        let icon = "fa-circle";
+        let label =
+            cleanStatus.replaceAll("_", " ");
+
+        if (cleanStatus === "SUBMITTED") {
+            manuscriptStatus.classList.add("status-submitted");
+            icon = "fa-paper-plane";
+            label = "Submitted";
+        }
+        else if (
+            cleanStatus === "UNDER_REVIEW" ||
+            cleanStatus === "ASSIGNED"
+        ) {
+            manuscriptStatus.classList.add("status-under-review");
+            icon = "fa-hourglass-half";
+            label = "Under Review";
+        }
+        else if (
+            cleanStatus === "APPROVED" ||
+            cleanStatus === "EDITORIALLY_ACCEPTED" ||
+            RpAuthorApi.acceptedStages.indexOf(cleanStatus) !== -1
+        ) {
+            manuscriptStatus.classList.add("status-approved");
+            icon = "fa-circle-check";
+            label = cleanStatus === "EDITORIALLY_ACCEPTED"
+                ? "Editorially Accepted"
+                : cleanStatus === "APPROVED"
+                    ? "Approved"
+                    : cleanStatus.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        }
+        else if (
+            cleanStatus === "REVISED_SUBMITTED" ||
+            cleanStatus === "RESUBMITTED"
+        ) {
+            manuscriptStatus.classList.add("status-under-review");
+            icon = "fa-rotate";
+            label = "Resubmitted – Awaiting Editor";
+        }
+        else if (
+            cleanStatus === "REVISION_REQUIRED" ||
+            cleanStatus === "REVISION_REQUESTED"
+        ) {
+            manuscriptStatus.classList.add("status-revision-required");
+            icon = "fa-rotate";
+            label = "Revision Required";
+        }
+        else if (cleanStatus === "REJECTED") {
+            manuscriptStatus.classList.add("status-revision-required");
+            icon = "fa-circle-xmark";
+            label = "Rejected";
+        }
+        else {
+            manuscriptStatus.classList.add("status-default");
+        }
+
+        manuscriptStatus.innerHTML = `
+            <i class="fas ${icon}"></i>
+            ${escapeHtml(label || "Unknown")}
+        `;
+
+    }
+
+
+    /* =====================================================
+       LOAD FILES
+    ===================================================== */
+
+    async function loadFiles() {
+
+        try {
+
+            const response =
+                await fetch(
+                    `/api/manuscripts/${encodeURIComponent(
+                        manuscriptId
+                    )}/files`,
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token
+                            }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                if (
+                    response.status === 401 ||
+                    response.status === 403
+                ) {
+
+                    clearSession();
+
+                    window.location.href =
+                        "/author-login.html";
+
+                    return;
+
+                }
+
+
+                throw new Error(
+                    "Unable to load manuscript files."
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            if (!result.success) {
+
+                throw new Error(
+                    result.message ||
+                    "Unable to load manuscript files."
+                );
+
+            }
+
+
+            const files =
+                result.data ||
+                [];
+
+
+            renderFiles(
+                files
+            );
+
+            renderVersionHistory(
+                files
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            filesList.innerHTML = `
+
+                <div class="state-box error-state">
+
+                    <i class="fas fa-circle-exclamation"></i>
+
+                    <h3>
+                        Unable to load files
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                error.message ||
+                "Please try again later."
+            )}
+                    </p>
+
+                </div>
+
+            `;
+
+
+            fileCount.textContent =
+                "0";
+
+
+            uploadedFileCount.textContent =
+                "0";
+
+        }
+
+    }
+
+
+    /* =====================================================
+       RENDER FILES
+    ===================================================== */
+
+    function renderFiles(
+        files
+    ) {
+
+        fileCount.textContent =
+            files.length;
+
+
+        uploadedFileCount.textContent =
+            files.length;
+
+
+        if (!files.length) {
+
+            filesList.innerHTML = `
+
+                <div class="state-box">
+
+                    <i class="fas fa-folder-open"></i>
+
+                    <h3>
+                        No files found
+                    </h3>
+
+                    <p>
+                        There are no files attached to this manuscript.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        filesList.innerHTML =
+            files
+                .map(
+                    file =>
+                        createFileItem(
+                            file
+                        )
+                )
+                .join("");
+
+    }
+
+
+    /* =====================================================
+       VERSION HISTORY – US7
+    ===================================================== */
+
+    function renderVersionHistory(files) {
+
+        if (!versionHistoryList || !versionHistoryCount) {
+            return;
+        }
+
+        // A manuscript version is represented by its fileVersion.
+        // Supporting files keep the same initial version, so only the
+        // first file encountered for each version is used as the
+        // representative manuscript version.
+        const versions = [];
+        const seenVersions = new Set();
+
+        const sortedFiles = [...files].sort((a, b) => {
+            const av = Number(a.fileVersion || 1);
+            const bv = Number(b.fileVersion || 1);
+            if (av !== bv) return av - bv;
+
+            return new Date(a.uploadedAt || 0) - new Date(b.uploadedAt || 0);
+        });
+
+        sortedFiles.forEach(file => {
+            const version = Number(file.fileVersion || 1);
+
+            if (!seenVersions.has(version)) {
+                seenVersions.add(version);
+                versions.push(file);
+            }
+        });
+
+        versionHistoryCount.textContent = String(versions.length);
+
+        if (!versions.length) {
+            versionHistoryList.innerHTML = `
+                <div class="state-box">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <h3>No version history found</h3>
+                    <p>Your manuscript versions will appear here after submission or revision.</p>
+                </div>
+            `;
+            return;
+        }
+
+        versionHistoryList.innerHTML = versions.map((file, index) => {
+            const fileId = file.manuscriptFileId;
+            const fileName = file.fileName || "Unnamed manuscript";
+            const fileType = file.fileType || "";
+            const version = Number(file.fileVersion || 1);
+            const uploadedAt = formatDate(file.uploadedAt);
+            const fileSize = formatFileSize(file.fileSize);
+            const downloadUrl =
+                `/api/manuscripts/${encodeURIComponent(manuscriptId)}/files/${encodeURIComponent(fileId)}/download`;
+
+            const title = version === 1
+                ? "Original Submission"
+                : "Revised Submission";
+
+            return `
+                <div class="version-item">
+                    <div class="version-left">
+                        <div class="version-badge">
+                            V${escapeHtml(String(version))}
+                        </div>
+
+                        <div class="version-info">
+                            <span class="version-title" title="${escapeHtml(fileName)}">
+                                ${escapeHtml(title)}
+                            </span>
+
+                            <div class="version-meta">
+                                <span>
+                                    <i class="far fa-file"></i>
+                                    ${escapeHtml(fileName)}
+                                </span>
+                                <span>
+                                    <i class="far fa-calendar"></i>
+                                    ${escapeHtml(uploadedAt)}
+                                </span>
+                                <span>
+                                    <i class="fas fa-database"></i>
+                                    ${escapeHtml(fileSize)}
+                                </span>
+                                <span class="version-status">
+                                    <i class="fas fa-circle-check"></i>
+                                    ${version === 1 ? "Initial version" : "Revision uploaded"}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="version-actions">
+                        <button
+                            type="button"
+                            class="version-action view"
+                            onclick="viewFile('${escapeJs(downloadUrl)}', '${escapeJs(fileType)}')"
+                        >
+                            <i class="fas fa-eye"></i> View
+                        </button>
+
+                        <button
+                            type="button"
+                            class="version-action download"
+                            onclick="downloadFile('${escapeJs(downloadUrl)}', '${escapeJs(fileName)}')"
+                        >
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+
+    /* =====================================================
+       CREATE FILE ITEM
+    ===================================================== */
+
+    function createFileItem(
+        file
+    ) {
+
+        const fileId =
+            file.manuscriptFileId;
+
+
+        const fileName =
+            file.fileName ||
+            "Unnamed file";
+
+
+        const fileType =
+            file.fileType ||
+            "";
+
+
+        const fileVersion =
+            file.fileVersion ||
+            1;
+
+
+        const fileSize =
+            formatFileSize(
+                file.fileSize
+            );
+
+
+        const uploadedAt =
+            formatDate(
+                file.uploadedAt
+            );
+
+
+        const downloadUrl =
+            `/api/manuscripts/${encodeURIComponent(
+                manuscriptId
+            )}/files/${encodeURIComponent(
+                fileId
+            )}/download`;
+
+
+        const icon =
+            getFileIcon(
+                fileName
+            );
+
+
+        return `
+
+            <div class="file-item">
+
+
+                <div class="file-left">
+
+
+                    <div class="file-icon">
+
+                        <i class="fas ${icon}"></i>
+
+                    </div>
+
+
+                    <div class="file-info">
+
+
+                        <span
+                                class="file-name"
+                                title="${escapeHtml(
+            fileName
+        )}"
+                        >
+
+                            ${escapeHtml(
+            fileName
+        )}
+
+                        </span>
+
+
+                        <div class="file-meta">
+
+                            <span>
+                                ${escapeHtml(
+            fileSize
+        )}
+                            </span>
+
+
+                            <span>
+                                ${escapeHtml(
+            uploadedAt
+        )}
+                            </span>
+
+
+                            <span class="file-version">
+                                Version ${escapeHtml(
+            String(
+                fileVersion
+            )
+        )}
+                            </span>
+
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+
+                <div class="file-actions">
+
+
+                    <button
+                            type="button"
+                            class="file-btn view-btn"
+                            onclick="viewFile(
+                                '${escapeJs(
+            downloadUrl
+        )}',
+                                '${escapeJs(
+            fileType
+        )}'
+                            )"
+                    >
+
+                        <i class="fas fa-eye"></i>
+
+                        View
+
+                    </button>
+
+
+                    <button
+                            type="button"
+                            class="file-btn download-btn"
+                            onclick="downloadFile(
+                                '${escapeJs(
+            downloadUrl
+        )}',
+                                '${escapeJs(
+            fileName
+        )}'
+                            )"
+                    >
+
+                        <i class="fas fa-download"></i>
+
+                        Download
+
+                    </button>
+
+
+                </div>
+
+
+            </div>
+
+        `;
+
+    }
+
+
+
+
+    /* =====================================================
+       US6 REVISION UPLOAD
+    ===================================================== */
+
+    function renderRevisionSection(status) {
+        if (!revisionCard) {
+            return;
+        }
+        const cleanStatus = String(status || "").trim().toUpperCase();
+        // Epic 2: REVISION_REQUESTED | legacy Epic 1: REVISION_REQUIRED
+        if (cleanStatus === "REVISION_REQUESTED" || cleanStatus === "REVISION_REQUIRED") {
+            revisionCard.style.display = "block";
+        } else {
+            revisionCard.style.display = "none";
+        }
+    }
+
+
+    if (revisionForm) {
+
+        revisionForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            if (!revisionFile || !revisionFile.files.length) {
+                showRevisionMessage("Please select the revised manuscript file.", "error");
+                return;
+            }
+
+            const file = revisionFile.files[0];
+            const fileName = String(file.name || "").toLowerCase();
+            const supported =
+                fileName.endsWith(".pdf") ||
+                fileName.endsWith(".doc") ||
+                fileName.endsWith(".docx");
+
+            if (!supported) {
+                showRevisionMessage("Only PDF, DOC and DOCX files are supported.", "error");
+                return;
+            }
+
+            if (file.size > 20 * 1024 * 1024) {
+                showRevisionMessage("Revised manuscript file size must not exceed 20MB.", "error");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            if (revisionSubmitBtn) {
+                revisionSubmitBtn.disabled = true;
+                revisionSubmitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            }
+
+            try {
+                const response = await fetch(
+                    `/api/manuscripts/${encodeURIComponent(manuscriptId)}/revision`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Authorization": "Bearer " + token
+                        },
+                        body: formData
+                    }
+                );
+
+                if (response.status === 401 || response.status === 403) {
+                    clearSession();
+                    window.location.href = "/author-login.html";
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(
+                        result.message ||
+                        "Unable to upload revised manuscript."
+                    );
+                }
+
+                showRevisionMessage(
+                    "Revised manuscript uploaded successfully. It has been sent back to your assigned editor for review.",
+                    "success"
+                );
+
+                revisionForm.reset();
+
+                // Refresh the existing page data without changing the other
+                // submission features.
+                await loadManuscriptDetails();
+
+            } catch (error) {
+                console.error("Revision upload error:", error);
+                showRevisionMessage(
+                    error.message || "Unable to upload revised manuscript.",
+                    "error"
+                );
+
+            } finally {
+                if (revisionSubmitBtn) {
+                    revisionSubmitBtn.disabled = false;
+                    revisionSubmitBtn.innerHTML = '<i class="fas fa-upload"></i> Upload Revised Manuscript';
+                }
+            }
+        });
+    }
+
+
+    function showRevisionMessage(message, type) {
+        if (!revisionMessage) {
+            return;
+        }
+
+        revisionMessage.textContent = message;
+        revisionMessage.className = "revision-message " + (type || "");
+    }
+
+
+    /* =====================================================
+       LOAD EDITOR / REVIEWER COMMENTS – US5
+    ===================================================== */
+
+    async function loadComments() {
+
+        const commentsList =
+            document.getElementById("commentsList");
+
+        const commentsCount =
+            document.getElementById("commentsCount");
+
+        if (!commentsList || !manuscriptId) {
+            return;
+        }
+
+        try {
+
+            const response = await fetch(
+                `/api/editorial-reviews/manuscript/${encodeURIComponent(manuscriptId)}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Authorization": "Bearer " + token
+                    }
+                }
+            );
+
+            if (response.status === 401 || response.status === 403) {
+                clearSession();
+                window.location.href = "/author-login.html";
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error("Unable to load editor/reviewer comments.");
+            }
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(
+                    result.message ||
+                    "Unable to load editor/reviewer comments."
+                );
+            }
+
+            const reviews = result.data || [];
+
+            if (commentsCount) {
+                commentsCount.textContent = reviews.length;
+            }
+
+            if (!reviews.length) {
+
+                commentsList.innerHTML = `
+                    <div class="comments-empty">
+                        <i class="fas fa-comments"></i>
+                        <h3>No comments yet</h3>
+                        <p>No editor or reviewer comments have been added for this manuscript yet.</p>
+                    </div>
+                `;
+
+                return;
+            }
+
+            commentsList.innerHTML = reviews
+                .map(renderComment)
+                .join("");
+
+        } catch (error) {
+
+            console.error("Error loading comments:", error);
+
+            commentsList.innerHTML = `
+                <div class="state-box error-state">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <h3>Unable to load comments</h3>
+                    <p>${escapeHtml(
+                error.message ||
+                "Unable to load editor/reviewer comments."
+            )}</p>
+                </div>
+            `;
+
+        }
+    }
+
+
+    /* =====================================================
+       RENDER COMMENT
+    ===================================================== */
+
+    function renderComment(review) {
+
+        const round = review.reviewRound || 1;
+
+        const decision = String(
+            review.decision ||
+            "COMMENT"
+        ).trim().toUpperCase();
+
+        const decisionLabel = decision.replaceAll("_", " ");
+
+        const decisionClass =
+            decision === "APPROVED" ||
+            decision === "ACCEPT" ||
+            decision === "EDITORIALLY_ACCEPTED"
+                ? "approved"
+                : decision === "REJECTED" || decision === "REJECT"
+                    ? "rejected"
+                    : decision === "REVISION_REQUIRED" ||
+                    decision === "REQUEST_REVISION" ||
+                    decision === "REVISION_REQUESTED"
+                        ? "revision-required"
+                        : "";
+
+        const comments =
+            review.reviewComments ||
+            review.comments ||
+            "No comments provided.";
+
+        const reviewedAt =
+            review.reviewedAt
+                ? formatDateTime(review.reviewedAt)
+                : "Date not available";
+
+        const deadlineRaw =
+            review.responseDeadline ||
+            review.deadline ||
+            null;
+
+        const deadlineText = deadlineRaw
+            ? formatDateOnly(deadlineRaw)
+            : null;
+
+        const deadlineHtml = deadlineText
+            ? `<div class="comment-date" style="margin-top:6px;">
+                    <i class="far fa-calendar-xmark"></i>
+                    Response deadline: <strong>${escapeHtml(deadlineText)}</strong>
+               </div>`
+            : "";
+
+        return `
+            <article class="comment-item">
+                <div class="comment-item-header">
+                    <span class="comment-round">
+                        <i class="fas fa-user-pen"></i>
+                        Review Round ${escapeHtml(String(round))}
+                    </span>
+
+                    <span class="comment-decision ${decisionClass}">
+                        ${escapeHtml(decisionLabel)}
+                    </span>
+                </div>
+
+                <p class="comment-text">${escapeHtml(comments)}</p>
+
+                <div class="comment-date">
+                    <i class="far fa-clock"></i>
+                    Reviewed: ${escapeHtml(reviewedAt)}
+                </div>
+                ${deadlineHtml}
+            </article>
+        `;
+    }
+
+
+    /* =====================================================
+       DATE + TIME
+    ===================================================== */
+
+
+    function formatDateOnly(value) {
+        if (!value) return "";
+        try {
+            const d = new Date(value);
+            if (isNaN(d.getTime())) {
+                // already yyyy-MM-dd
+                return String(value).substring(0, 10);
+            }
+            return d.toLocaleDateString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "2-digit"
+            });
+        } catch (e) {
+            return String(value).substring(0, 10);
+        }
+    }
+
+    function formatDateTime(value) {
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    }
+
+
+    /* =====================================================
+       VIEW FILE
+    ===================================================== */
+
+    async function viewFile(
+        url,
+        fileType
+    ) {
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token
+                            }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to open file."
+                );
+
+            }
+
+
+            const blob =
+                await response.blob();
+
+
+            const blobUrl =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            window.open(
+                blobUrl,
+                "_blank"
+            );
+
+
+            setTimeout(
+                () => {
+
+                    URL.revokeObjectURL(
+                        blobUrl
+                    );
+
+                },
+                60000
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            showPageError(
+                error.message ||
+                "Unable to open file."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       DOWNLOAD FILE
+    ===================================================== */
+
+    async function downloadFile(
+        url,
+        fileName
+    ) {
+
+        try {
+
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method:
+                            "GET",
+
+                        headers:
+                            {
+                                "Authorization":
+                                    "Bearer " +
+                                    token
+                            }
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Unable to download file."
+                );
+
+            }
+
+
+            const blob =
+                await response.blob();
+
+
+            const blobUrl =
+                URL.createObjectURL(
+                    blob
+                );
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.href =
+                blobUrl;
+
+
+            link.download =
+                fileName ||
+                "manuscript-file";
+
+
+            document.body.appendChild(
+                link
+            );
+
+
+            link.click();
+
+
+            link.remove();
+
+
+            URL.revokeObjectURL(
+                blobUrl
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            showPageError(
+                error.message ||
+                "Unable to download file."
+            );
+
+        }
+
+    }
+
+
+    /* =====================================================
+       FILE ICON
+    ===================================================== */
+
+    function getFileIcon(
+        fileName
+    ) {
+
+        const name =
+            String(
+                fileName ||
+                ""
+            ).toLowerCase();
+
+
+        if (
+            name.endsWith(
+                ".pdf"
+            )
+        ) {
+
+            return "fa-file-pdf";
+
+        }
+
+
+        if (
+            name.endsWith(
+                ".docx"
+            ) ||
+            name.endsWith(
+                ".doc"
+            )
+        ) {
+
+            return "fa-file-word";
+
+        }
+
+
+        return "fa-file";
+
+    }
+
+
+    /* =====================================================
+       FILE SIZE
+    ===================================================== */
+
+    function formatFileSize(
+        bytes
+    ) {
+
+        if (
+            bytes === null ||
+            bytes === undefined ||
+            Number.isNaN(
+                Number(bytes)
+            )
+        ) {
+
+            return "Unknown size";
+
+        }
+
+
+        const value =
+            Number(
+                bytes
+            );
+
+
+        if (
+            value < 1024
+        ) {
+
+            return (
+                value +
+                " B"
+            );
+
+        }
+
+
+        if (
+            value <
+            1024 * 1024
+        ) {
+
+            return (
+                (
+                    value /
+                    1024
+                ).toFixed(1) +
+                " KB"
+            );
+
+        }
+
+
+        if (
+            value <
+            1024 *
+            1024 *
+            1024
+        ) {
+
+            return (
+                (
+                    value /
+                    (1024 * 1024)
+                ).toFixed(1) +
+                " MB"
+            );
+
+        }
+
+
+        return (
+            (
+                value /
+                (1024 * 1024 * 1024)
+            ).toFixed(1) +
+            " GB"
+        );
+
+    }
+
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    function formatDate(
+        value
+    ) {
+
+        if (!value) {
+
+            return "-";
+
+        }
+
+
+        const date =
+            new Date(
+                value
+            );
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return String(
+                value
+            );
+
+        }
+
+
+        return date.toLocaleDateString(
+            "en-GB",
+            {
+                day:
+                    "2-digit",
+
+                month:
+                    "short",
+
+                year:
+                    "numeric"
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       NUMBER
+    ===================================================== */
+
+    function formatNumber(
+        value
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+
+            return "-";
+
+        }
+
+
+        return Number(
+            value
+        ).toLocaleString(
+            "en-US"
+        );
+
+    }
+
+
+    /* =====================================================
+       PAGE ERROR
+    ===================================================== */
+
+    function showPageError(
+        message
+    ) {
+
+        pageError.style.display =
+            "block";
+
+
+        pageError.textContent =
+            message;
+
+    }
+
+
+    /* =====================================================
+       HTML ESCAPE
+    ===================================================== */
+
+    function escapeHtml(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+            .replaceAll(
+                "&",
+                "&amp;"
+            )
+            .replaceAll(
+                "<",
+                "&lt;"
+            )
+            .replaceAll(
+                ">",
+                "&gt;"
+            )
+            .replaceAll(
+                '"',
+                "&quot;"
+            )
+            .replaceAll(
+                "'",
+                "&#039;"
+            );
+
+    }
+
+
+    /* =====================================================
+       JS STRING ESCAPE
+    ===================================================== */
+
+    function escapeJs(
+        value
+    ) {
+
+        return String(
+            value ?? ""
+        )
+            .replaceAll(
+                "\\",
+                "\\\\"
+            )
+            .replaceAll(
+                "'",
+                "\\'"
+            )
+            .replaceAll(
+                "\n",
+                "\\n"
+            )
+            .replaceAll(
+                "\r",
+                "\\r"
+            );
+
+    }
+
+
+    /* =====================================================
+       SESSION CLEAR
+    ===================================================== */
+
+    function clearSession() {
+
+        localStorage.removeItem(
+            "rp_token"
+        );
+
+        localStorage.removeItem(
+            "rp_user"
+        );
+
+        sessionStorage.removeItem(
+            "rp_token"
+        );
+
+        sessionStorage.removeItem(
+            "rp_user"
+        );
+
+    }
+
+
+    /* =====================================================
+       COMMON HEADER LOGOUT
+    ===================================================== */
+
+    document.addEventListener(
+        "click",
+        function (event) {
+
+            const logoutButton =
+                event.target.closest(
+                    "#logoutBtn"
+                );
+
+
+            if (!logoutButton) {
+
+                return;
+
+            }
+
+
+            clearSession();
+
+
+            window.location.href =
+                "/author-login.html";
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

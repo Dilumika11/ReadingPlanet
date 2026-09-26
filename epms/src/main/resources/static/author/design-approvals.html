@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Approvals | Reading Planet</title>
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/author.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background:
+                    radial-gradient(circle at 8% 12%, rgba(45,114,184,.06), transparent 24%),
+                    linear-gradient(135deg, #eef5fb 0%, #f7fafd 52%, #edf4fa 100%);
+            color: #1e293b;
+        }
+        .da-main {
+            width: min(1100px, calc(100% - 40px));
+            margin: 42px auto 65px;
+        }
+        .da-heading h1 {
+            margin: 0 0 8px;
+            color: #123f6d;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 32px;
+        }
+        .da-heading p { margin: 0 0 24px; color: #64748b; font-size: 14px; }
+        .da-card {
+            background: #fff;
+            border: 1px solid #dce7f2;
+            border-radius: 18px;
+            box-shadow: 0 8px 28px rgba(15,55,95,.07);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .da-card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #edf5fd 0%, #f8fbff 100%);
+            border-bottom: 1px solid #e2eaf3;
+        }
+        .da-card-header h2 {
+            margin: 0 0 4px;
+            color: #123f6d;
+            font-size: 20px;
+        }
+        .da-card-header p { margin: 0; color: #64748b; font-size: 13px; }
+        .da-body { padding: 20px 24px; }
+        .da-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+        .da-empty i { font-size: 36px; color: #9bb3c9; margin-bottom: 12px; display: block; }
+        .design-item {
+            border: 1px solid #e2eaf3;
+            border-radius: 14px;
+            padding: 18px;
+            margin-bottom: 14px;
+            background: #fbfdff;
+        }
+        .design-item:last-child { margin-bottom: 0; }
+        .design-title {
+            color: #123f6d;
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        .design-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 16px;
+            color: #64748b;
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            background: #fff5dd;
+            color: #996900;
+        }
+        .design-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-secondary { background: #edf5fd; color: #145da8; }
+        .btn-approve { background: #16734b; color: #fff; }
+        .btn-reject { background: #b84242; color: #fff; }
+        .btn:disabled { opacity: .6; cursor: not-allowed; }
+        .decision-panel {
+            display: none;
+            margin-top: 12px;
+            padding: 14px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2eaf3;
+        }
+        .decision-panel.open { display: block; }
+        .decision-panel label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #334155;
+        }
+        .decision-panel textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            resize: vertical;
+        }
+        .decision-panel .hint {
+            margin: 6px 0 12px;
+            font-size: 12px;
+            color: #64748b;
+        }
+        .msg {
+            display: none;
+            margin-bottom: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .msg.success { display: block; background: #ecfdf3; border: 1px solid #b7ebc9; color: #167344; }
+        .msg.error { display: block; background: #fff1f1; border: 1px solid #ffd3d3; color: #a63a3a; }
+        .history-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 13px;
+        }
+        .history-row:last-child { border-bottom: none; }
+        .status-approved { color: #16734b; font-weight: 700; }
+        .status-rejected { color: #b84242; font-weight: 700; }
+        @media (max-width: 600px) {
+            .da-main { width: calc(100% - 24px); }
+            .design-actions { flex-direction: column; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body class="author-body author-page">
+
+<div id="header-container"></div>
+
+<main class="da-main">
+    <section class="da-heading">
+        <h1>Design Approvals</h1>
+        <p>
+            Preview book designs submitted by the design team. Approve to send the book to production,
+            or reject with comments so the designer can revise.
+        </p>
+    </section>
+
+    <div id="pageMessage" class="msg"></div>
+
+    <section class="da-card">
+        <div class="da-card-header">
+            <h2><i class="fas fa-palette"></i> Waiting for your decision</h2>
+            <p>Designs the design team has sent to you for approval.</p>
+        </div>
+        <div class="da-body" id="pendingList">
+            <div class="da-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading…</p></div>
+        </div>
+    </section>
+
+    <section class="da-card">
+        <div class="da-card-header">
+            <h2><i class="fas fa-clock-rotate-left"></i> Your decision history</h2>
+            <p>Previous approve / reject decisions on your designs.</p>
+        </div>
+        <div class="da-body" id="historyList">
+            <div class="da-empty"><i class="fas fa-spinner fa-spin"></i><p>Loading…</p></div>
+        </div>
+    </section>
+</main>
+
+<div id="footer-container"></div>
+<script src="/js/author-api.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/header.js"></script>
+<script src="/js/load-components.js"></script>
+<script>
+    (function () {
+        "use strict";
+
+        const token =
+            localStorage.getItem("rp_token") ||
+            sessionStorage.getItem("rp_token");
+
+        if (!token) {
+            window.location.href = "/author-login.html";
+            return;
+        }
+
+        const API = "/api/author/designs";
+        const pendingList = document.getElementById("pendingList");
+        const historyList = document.getElementById("historyList");
+        const pageMessage = document.getElementById("pageMessage");
+
+        function escapeHtml(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function showMsg(text, type) {
+            pageMessage.textContent = text;
+            pageMessage.className = "msg " + (type || "");
+            if (type) {
+                pageMessage.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        }
+
+        function clearSession() {
+            localStorage.removeItem("rp_token");
+            localStorage.removeItem("rp_user");
+            sessionStorage.removeItem("rp_token");
+            sessionStorage.removeItem("rp_user");
+        }
+
+        async function api(path, options) {
+            const opts = options || {};
+            const headers = Object.assign({}, opts.headers || {}, {
+                Authorization: "Bearer " + token
+            });
+            if (opts.body && !(opts.body instanceof FormData)) {
+                headers["Content-Type"] = "application/json";
+            }
+            const res = await fetch(API + path, Object.assign({}, opts, { headers: headers }));
+            if (res.status === 401 || res.status === 403) {
+                clearSession();
+                window.location.href = "/author-login.html";
+                throw new Error("Session expired");
+            }
+            if (res.headers.get("content-type") && res.headers.get("content-type").indexOf("application/json") !== -1) {
+                const json = await res.json();
+                if (!res.ok || json.success === false) {
+                    throw new Error(json.message || "Request failed");
+                }
+                return json;
+            }
+            if (!res.ok) {
+                throw new Error("Request failed");
+            }
+            return res;
+        }
+
+        async function downloadFile(path, filename) {
+            try {
+                const res = await fetch(API + path, {
+                    headers: { Authorization: "Bearer " + token }
+                });
+                if (res.status === 401 || res.status === 403) {
+                    clearSession();
+                    window.location.href = "/author-login.html";
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error("Unable to download file");
+                }
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename || "design-file";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                showMsg(err.message || "Download failed", "error");
+            }
+        }
+
+        function renderPending(list) {
+            if (!list || !list.length) {
+                pendingList.innerHTML =
+                    '<div class="da-empty"><i class="fas fa-check-circle"></i>' +
+                    "<h3>No designs waiting</h3>" +
+                    "<p>When a designer submits a design for your book, it will appear here.</p></div>";
+                return;
+            }
+
+            pendingList.innerHTML = list.map(function (d) {
+                const id = d.designId;
+                return (
+                    '<article class="design-item" data-id="' + id + '">' +
+                    '  <div class="design-title">' + escapeHtml(d.manuscriptTitle || "Untitled") + "</div>" +
+                    '  <div class="design-meta">' +
+                    "    <span><i class=\"fas fa-hashtag\"></i> " + escapeHtml(d.manuscriptCode || "") + "</span>" +
+                    "    <span>Version v" + escapeHtml(String(d.designVersion || 1)) + "</span>" +
+                    '    <span class="badge">' + escapeHtml(d.designStatus || "PENDING_AUTHOR_APPROVAL") + "</span>" +
+                    (d.designerName ? "    <span>Designer: " + escapeHtml(d.designerName) + "</span>" : "") +
+                    "  </div>" +
+                    (d.designNotes
+                        ? '<p style="font-size:13px;color:#475569;margin:0 0 12px;"><strong>Designer notes:</strong> ' +
+                        escapeHtml(d.designNotes) + "</p>"
+                        : "") +
+                    '  <div class="design-actions">' +
+                    '    <button type="button" class="btn btn-secondary btn-dl" data-kind="manuscript-pdf" data-id="' + id + '" data-name="' + escapeHtml(d.manuscriptPdfFileName || ("manuscript-" + id + ".pdf")) + '">' +
+                    '      <i class="fas fa-download"></i> Final manuscript PDF</button>' +
+                    '    <button type="button" class="btn btn-secondary btn-dl" data-kind="cover" data-id="' + id + '" data-name="' + escapeHtml(d.coverFileName || ("cover-" + id)) + '">' +
+                    '      <i class="fas fa-download"></i> Cover design</button>' +
+                    '    <button type="button" class="btn btn-secondary btn-dl" data-kind="layout" data-id="' + id + '" data-name="' + escapeHtml(d.layoutFileName || ("layout-" + id)) + '">' +
+                    '      <i class="fas fa-download"></i> Interior layout</button>' +
+                    '    <button type="button" class="btn btn-approve btn-open-decision" data-decision="APPROVE" data-id="' + id + '">' +
+                    '      <i class="fas fa-check"></i> Approve</button>' +
+                    '    <button type="button" class="btn btn-reject btn-open-decision" data-decision="REJECT" data-id="' + id + '">' +
+                    '      <i class="fas fa-times"></i> Reject</button>' +
+                    "  </div>" +
+                    '  <div class="decision-panel" id="panel-' + id + '">' +
+                    '    <div id="panelMsg-' + id + '" class="msg"></div>' +
+                    '    <label for="comments-' + id + '">Comments <span id="req-' + id + '" style="display:none;color:#b84242;">*</span></label>' +
+                    '    <textarea id="comments-' + id + '" placeholder="Optional for approve. Required when rejecting."></textarea>' +
+                    '    <p class="hint" id="hint-' + id + '">Confirm your decision below.</p>' +
+                    '    <button type="button" class="btn btn-approve btn-confirm" data-id="' + id + '">' +
+                    '      <i class="fas fa-paper-plane"></i> Confirm decision</button>' +
+                    "  </div>" +
+                    "</article>"
+                );
+            }).join("");
+
+            pendingList.querySelectorAll(".btn-dl").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const id = btn.getAttribute("data-id");
+                    const kind = btn.getAttribute("data-kind");
+                    const filename = btn.getAttribute("data-name") || (kind + "-" + id);
+                    let path;
+                    if (kind === "cover") {
+                        path = "/" + id + "/download/cover";
+                    } else if (kind === "layout") {
+                        path = "/" + id + "/download/layout";
+                    } else {
+                        path = "/" + id + "/download/manuscript-pdf";
+                    }
+                    downloadFile(path, filename);
+                });
+            });
+
+            pendingList.querySelectorAll(".btn-open-decision").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    const id = btn.getAttribute("data-id");
+                    const decision = btn.getAttribute("data-decision");
+                    const panel = document.getElementById("panel-" + id);
+                    const req = document.getElementById("req-" + id);
+                    const hint = document.getElementById("hint-" + id);
+                    const confirmBtn = panel.querySelector(".btn-confirm");
+                    panel.classList.add("open");
+                    confirmBtn.setAttribute("data-decision", decision);
+                    if (decision === "REJECT") {
+                        req.style.display = "inline";
+                        hint.textContent = "Comments are required when rejecting.";
+                        confirmBtn.className = "btn btn-reject btn-confirm";
+                        confirmBtn.innerHTML = '<i class="fas fa-times"></i> Confirm reject';
+                    } else {
+                        req.style.display = "none";
+                        hint.textContent = "You can add optional comments when approving.";
+                        confirmBtn.className = "btn btn-approve btn-confirm";
+                        confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm approve';
+                    }
+                });
+            });
+
+            pendingList.querySelectorAll(".btn-confirm").forEach(function (btn) {
+                btn.addEventListener("click", async function () {
+                    const id = btn.getAttribute("data-id");
+                    const decision = btn.getAttribute("data-decision");
+                    const comments = (document.getElementById("comments-" + id).value || "").trim();
+                    const msgEl = document.getElementById("panelMsg-" + id);
+
+                    if (decision === "REJECT" && !comments) {
+                        msgEl.textContent = "Comments are required when rejecting.";
+                        msgEl.className = "msg error";
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    try {
+                        const body = { decision: decision, comments: comments || null };
+                        const result = await api("/" + id + "/decision", {
+                            method: "POST",
+                            body: JSON.stringify(body)
+                        });
+                        showMsg(result.message || "Decision recorded.", "success");
+                        await loadAll();
+                    } catch (err) {
+                        msgEl.textContent = err.message || "Unable to submit decision.";
+                        msgEl.className = "msg error";
+                        btn.disabled = false;
+                    }
+                });
+            });
+        }
+
+        function renderHistory(list) {
+            if (!list || !list.length) {
+                historyList.innerHTML =
+                    '<div class="da-empty"><i class="fas fa-inbox"></i>' +
+                    "<p>No previous decisions yet.</p></div>";
+                return;
+            }
+
+            historyList.innerHTML = list.map(function (h) {
+                const status = String(h.approvalStatus || "").toUpperCase();
+                const cls = status === "APPROVED" ? "status-approved" : "status-rejected";
+                const when = h.reviewedAt
+                    ? String(h.reviewedAt).replace("T", " ").substring(0, 16)
+                    : "—";
+                return (
+                    '<div class="history-row">' +
+                    "  <div>" +
+                    "    <strong>" + escapeHtml(h.manuscriptTitle || h.manuscriptCode || "Design #" + (h.designId || "")) + "</strong>" +
+                    "    <div style=\"color:#64748b;margin-top:4px;\">" +
+                    escapeHtml(h.comments || "No comments") +
+                    "    </div>" +
+                    "  </div>" +
+                    "  <div style=\"text-align:right;\">" +
+                    '    <div class="' + cls + '">' + escapeHtml(status) + "</div>" +
+                    '    <div style="color:#94a3b8;font-size:12px;margin-top:4px;">' + escapeHtml(when) + "</div>" +
+                    "  </div>" +
+                    "</div>"
+                );
+            }).join("");
+        }
+
+        async function loadAll() {
+            try {
+                const pending = await api("/pending");
+                renderPending(pending.data || []);
+            } catch (err) {
+                pendingList.innerHTML =
+                    '<div class="da-empty"><p>' + escapeHtml(err.message) + "</p></div>";
+            }
+            try {
+                const history = await api("/history");
+                renderHistory(history.data || []);
+            } catch (err) {
+                historyList.innerHTML =
+                    '<div class="da-empty"><p>' + escapeHtml(err.message) + "</p></div>";
+            }
+        }
+
+        document.addEventListener("click", function (event) {
+            if (event.target.closest("#logoutBtn")) {
+                clearSession();
+                window.location.href = "/author-login.html";
+            }
+        });
+
+        loadAll();
+    })();
+</script>
+</body>
+</html>

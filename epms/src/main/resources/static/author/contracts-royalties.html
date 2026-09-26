@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contracts & Royalties | Reading Planet</title>
+    <link rel="stylesheet" href="/css/author.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body { background:#f4f8fc; }
+        .cr-wrap { max-width:1180px; margin:0 auto; padding:34px 24px 70px; }
+        .cr-back { display:inline-flex; gap:8px; align-items:center; color:#175b9e; text-decoration:none; font-weight:700; margin-bottom:22px; }
+        .cr-hero { background:linear-gradient(135deg,#eaf4ff,#fff); border:1px solid #d7e5f2; border-radius:22px; padding:30px; margin-bottom:22px; }
+        .cr-kicker { text-transform:uppercase; letter-spacing:1.4px; font-size:12px; font-weight:800; color:#1c65a8; }
+        .cr-hero h1 { margin:8px 0 8px; color:#123f6f; font-family:Georgia,serif; font-size:36px; }
+        .cr-hero p { margin:0; color:#58718d; }
+        .cr-grid { display:grid; grid-template-columns:1.25fr .95fr; gap:22px; }
+        .cr-card { background:#fff; border:1px solid #dbe7f2; border-radius:18px; padding:24px; box-shadow:0 7px 22px rgba(29,78,121,.06); }
+        .cr-card h2 { margin:0 0 5px; color:#123f6f; font-family:Georgia,serif; font-size:23px; }
+        .cr-sub { color:#71859a; font-size:14px; margin:0 0 20px; }
+        .agreement { border:1px solid #dbe7f2; border-radius:15px; padding:20px; margin-bottom:16px; }
+        .agreement-head { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+        .agreement-title { font-size:17px; font-weight:800; color:#174c80; }
+        .agreement-meta { color:#6b7f93; font-size:13px; margin-top:5px; }
+        .badge { display:inline-flex; align-items:center; padding:7px 11px; border-radius:999px; font-size:12px; font-weight:800; background:#fff3cf; color:#936800; white-space:nowrap; }
+        .badge.signed { background:#e1f6eb; color:#147c50; }
+        .terms { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:18px 0; }
+        .term { background:#f7fafc; border-radius:12px; padding:13px; }
+        .term span { display:block; color:#7a8da0; font-size:11px; text-transform:uppercase; letter-spacing:.7px; margin-bottom:4px; }
+        .term strong { color:#173f67; }
+        .btn { border:0; border-radius:10px; padding:11px 16px; font-weight:800; cursor:pointer; }
+        .btn-primary { background:#1768ae; color:white; }
+        .btn-secondary { background:#edf4fb; color:#175b9e; }
+        .sign-row { display:flex; align-items:center; gap:10px; padding:12px 0 3px; color:#4c657d; font-size:14px; }
+        .sign-row input { width:17px; height:17px; }
+        .bank-form { display:grid; gap:13px; }
+        .field label { display:block; font-size:12px; font-weight:800; color:#4f6880; margin-bottom:6px; }
+        .field input { width:100%; box-sizing:border-box; padding:12px 13px; border:1px solid #cbdbea; border-radius:10px; outline:none; }
+        .field input:focus { border-color:#1768ae; box-shadow:0 0 0 3px rgba(23,104,174,.08); }
+        .notice { border-radius:12px; padding:12px 14px; margin-bottom:15px; font-size:14px; display:none; }
+        .notice.success { display:block; background:#e8f8ef; color:#126c45; }
+        .notice.error { display:block; background:#fff0f0; color:#a52a2a; }
+        .finance-note { margin-top:16px; background:#f3f8fd; border-left:4px solid #2a75b8; padding:13px 15px; border-radius:9px; color:#526c84; font-size:13px; line-height:1.5; }
+        .notification { padding:13px 0; border-bottom:1px solid #e4edf5; }
+        .notification:last-child { border-bottom:0; }
+        .notification strong { color:#1b4e7d; display:block; margin-bottom:4px; }
+        .notification p { margin:0; color:#61778d; font-size:13px; }
+        .empty { color:#7c8fa1; padding:15px 0; }
+        @media(max-width:850px){ .cr-grid{grid-template-columns:1fr;} .terms{grid-template-columns:1fr;} .agreement-head{flex-direction:column;} }
+    </style>
+</head>
+<body>
+<div class="cr-wrap">
+    <a class="cr-back" href="/author/dashboard.html"><i class="fas fa-arrow-left"></i> Back to Author Dashboard</a>
+
+    <section class="cr-hero">
+        <div class="cr-kicker">Author Workspace</div>
+        <h1>Contracts &amp; Royalties</h1>
+        <p>View publisher-issued agreements, accept your contract, manage bank details, and review royalty information.</p>
+        <p><a href="/author/royalties.html"><i class="fas fa-file-invoice-dollar"></i> View royalty statements and payments</a></p>
+    </section>
+
+    <div id="notice" class="notice"></div>
+
+    <div class="cr-grid">
+        <section class="cr-card">
+            <h2>Contracts &amp; Royalty Agreements</h2>
+            <p class="cr-sub">Agreements are issued by the publishing side. You only review and accept the agreement.</p>
+            <div id="agreements"><div class="empty">Loading agreements...</div></div>
+        </section>
+
+        <section class="cr-card">
+            <h2>Bank Details</h2>
+            <p class="cr-sub">Keep your payment details up to date for royalty processing.</p>
+            <form id="bankForm" class="bank-form">
+                <div class="field"><label>Account Name</label><input id="accountName" maxlength="150" required></div>
+                <div class="field"><label>Bank Name</label><input id="bankName" maxlength="150" required></div>
+                <div class="field"><label>Account Number</label><input id="accountNumber" maxlength="100" required></div>
+                <div class="field"><label>Branch</label><input id="branch" maxlength="150"></div>
+                <button class="btn btn-primary" type="submit"><i class="fas fa-save"></i> Save Bank Details</button>
+            </form>
+            <div class="finance-note"><i class="fas fa-bell"></i> When you update these details, a notification is recorded for Finance so the latest information can be reviewed for royalty processing.</div>
+        </section>
+    </div>
+
+    <section class="cr-card" style="margin-top:22px;">
+        <h2>Finance Notifications</h2>
+        <p class="cr-sub">Notifications related to your contract and payment information.</p>
+        <div id="notifications"><div class="empty">Loading notifications...</div></div>
+    </section>
+</div>
+<script src="/js/author-api.js"></script>
+<script src="/js/author-contracts-royalties.js"></script>
+</body>
+</html>

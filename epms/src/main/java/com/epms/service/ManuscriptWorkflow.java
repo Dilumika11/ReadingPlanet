@@ -28,6 +28,7 @@ public class ManuscriptWorkflow {
     private final ManuscriptRepository manuscriptRepository;
     private final ManuscriptStatusHistoryRepository historyRepository;
     private final AuthorRepository authorRepository;
+    private final com.epms.repository.DesignAssignmentRepository assignmentRepository;
 
     public Manuscript get(Long id) {
         return manuscriptRepository.findById(id)
@@ -60,7 +61,7 @@ public class ManuscriptWorkflow {
     /**
      * Read access: the author sees their own; the chief editor sees every
      * submitted manuscript; an editor sees the ones assigned to them;
-     * designers and production see accepted ones; admin sees all (read only).
+     * the assigned designer and production see accepted ones; admin sees all (read only).
      */
     public void requireReadable(User user, Manuscript m) {
         if (!canRead(user, m)) {
@@ -76,7 +77,10 @@ public class ManuscriptWorkflow {
                     .map(a -> a.getAuthorId().equals(m.getAuthorId())).orElse(false);
             case CHIEF_EDITOR -> !ManuscriptStatus.DRAFT.equals(m.getStatus());
             case EDITOR -> user.getUserId().equals(m.getAssignedEditorId());
-            case DESIGNER, PRODUCTION_MANAGER -> ManuscriptStatus.PRODUCTION.contains(m.getStatus());
+            case DESIGNER -> ManuscriptStatus.PRODUCTION.contains(m.getStatus())
+                    && assignmentRepository.findByManuscriptIdOrderByAssignedAtDesc(m.getManuscriptId()).stream()
+                    .anyMatch(a -> a.getDesignerId().equals(user.getUserId()) && !"CANCELLED".equals(a.getAssignmentStatus()));
+            case PRODUCTION_MANAGER -> ManuscriptStatus.PRODUCTION.contains(m.getStatus());
             default -> false;
         };
     }

@@ -57,6 +57,10 @@ public class RoyaltyAgreement {
     @Column(name = "payment_frequency", nullable = false, length = 20)
     private String paymentFrequency = "QUARTERLY";
 
+    // When the author accepted the terms in the author portal
+    @Column(name = "author_signed_at")
+    private LocalDateTime authorSignedAt;
+
     @Version
     @Column(name = "version", nullable = false)
     private Long version = 0L;

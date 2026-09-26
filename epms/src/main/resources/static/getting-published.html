@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Getting Published | Reading Planet</title>
+
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/footer.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        .gp-page {
+            min-height: calc(100vh - 160px);
+            background: linear-gradient(135deg, #f4f9ff 0%, #ffffff 55%, #eef6ff 100%);
+            padding: 52px 20px 70px;
+        }
+
+        .gp-container {
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        .gp-hero {
+            text-align: center;
+            margin-bottom: 34px;
+        }
+
+        .gp-eyebrow {
+            margin: 0 0 8px;
+            color: #2167a9;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .gp-hero h1 {
+            margin: 0;
+            color: #123f73;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: clamp(34px, 5vw, 52px);
+        }
+
+        .gp-hero p {
+            max-width: 720px;
+            margin: 12px auto 0;
+            color: #65778c;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .gp-card {
+            background: #fff;
+            border: 1px solid #dbe8f5;
+            border-radius: 18px;
+            box-shadow: 0 14px 38px rgba(25, 74, 120, .10);
+            overflow: hidden;
+        }
+
+        .gp-card-header {
+            padding: 25px 32px;
+            border-bottom: 1px solid #e5edf5;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .gp-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: #e8f3ff;
+            color: #176ab0;
+            display: grid;
+            place-items: center;
+            font-size: 19px;
+        }
+
+        .gp-card-header h2 {
+            margin: 0;
+            color: #123f73;
+            font-size: 21px;
+        }
+
+        .gp-card-header p {
+            margin: 4px 0 0;
+            color: #7a8b9d;
+            font-size: 13px;
+        }
+
+        .gp-form {
+            padding: 32px;
+        }
+
+        .gp-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .gp-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .gp-field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #254866;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .gp-required {
+            color: #d85a3a;
+        }
+
+        .gp-field input,
+        .gp-field select,
+        .gp-field textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #cdddeb;
+            border-radius: 10px;
+            background: #fff;
+            color: #263e55;
+            font: inherit;
+            font-size: 14px;
+            padding: 13px 14px;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .gp-field input:focus,
+        .gp-field select:focus,
+        .gp-field textarea:focus {
+            border-color: #2878bd;
+            box-shadow: 0 0 0 3px rgba(40, 120, 189, .10);
+        }
+
+        .gp-field textarea {
+            min-height: 130px;
+            resize: vertical;
+        }
+
+        .gp-file-box {
+            border: 1.5px dashed #a9c8e4;
+            border-radius: 12px;
+            padding: 22px;
+            background: #f8fbff;
+        }
+
+        .gp-file-box input[type=file] {
+            border: 0;
+            padding: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .gp-file-help {
+            margin: 8px 0 0;
+            color: #7a8b9d;
+            font-size: 12px;
+        }
+
+        .gp-message {
+            display: none;
+            margin-bottom: 22px;
+            padding: 13px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .gp-message.success {
+            display: block;
+            background: #eaf8f0;
+            color: #187345;
+            border: 1px solid #bfe6ce;
+        }
+
+        .gp-message.error {
+            display: block;
+            background: #fff0ed;
+            color: #b54831;
+            border: 1px solid #f0c7bd;
+        }
+
+        .gp-actions {
+            margin-top: 28px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .gp-submit {
+            border: 0;
+            border-radius: 10px;
+            padding: 13px 25px;
+            background: #236fb0;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(35,111,176,.18);
+        }
+
+        .gp-submit:hover {
+            background: #195d97;
+        }
+
+        .gp-submit:disabled {
+            opacity: .65;
+            cursor: wait;
+        }
+
+        .gp-note {
+            margin-top: 22px;
+            padding: 16px 18px;
+            border-radius: 11px;
+            background: #f4f8fc;
+            color: #65778c;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 720px) {
+            .gp-page {
+                padding: 34px 14px 50px;
+            }
+
+            .gp-form,
+            .gp-card-header {
+                padding: 22px;
+            }
+
+            .gp-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gp-field.full {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="header-container"></div>
+
+<main class="gp-page">
+    <div class="gp-container">
+
+        <section class="gp-hero">
+            <p class="gp-eyebrow">Reading Planet</p>
+            <h1>Getting Published</h1>
+            <p>
+                Have a manuscript you would like us to consider?
+                Send us your details and manuscript for publishing consideration.
+            </p>
+        </section>
+
+        <section class="gp-card" style="margin-bottom:24px;">
+            <div class="gp-card-header">
+                <div class="gp-icon"><i class="fas fa-circle-info"></i></div>
+                <div>
+                    <h2>Before You Submit</h2>
+                    <p>Important information for publishing consideration</p>
+                </div>
+            </div>
+            <div class="gp-form">
+                <div class="gp-grid">
+                    <div class="gp-field full">
+                        <label>Submission Guidelines</label>
+                        <div class="gp-note" style="margin-top:0;">
+                            <ul style="margin:0;padding-left:20px;line-height:1.8;">
+                                <li>Provide your correct author name and contact information.</li>
+                                <li>Enter the complete title of your manuscript.</li>
+                                <li>Select the most appropriate type of book.</li>
+                                <li>Upload the complete manuscript for consideration.</li>
+                                <li>Accepted file formats: PDF, DOC and DOCX.</li>
+                                <li>Maximum file size: 20MB.</li>
+                                <li>Make sure the uploaded file is readable and complete.</li>
+                                <li>Submission does not guarantee publication; every application is subject to publishing-house review.</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="gp-field full">
+                        <label>Possible Reasons an Application May Be Rejected</label>
+                        <div class="gp-note" style="margin-top:0;">Incomplete manuscript, failure to meet submission requirements, poor or unsuitable file quality, incorrect or incomplete application information, manuscript not suitable for the publishing house, duplicate or previously submitted manuscript, or other publishing requirements.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="gp-card">
+            <div class="gp-card-header">
+                <div class="gp-icon">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <h2>Submit Your Manuscript for Consideration</h2>
+                    <p>Complete the form below. Required fields are marked with *</p>
+                </div>
+            </div>
+
+            <form id="gettingPublishedForm" class="gp-form" enctype="multipart/form-data">
+                <div id="gpMessage" class="gp-message"></div>
+
+                <div class="gp-grid">
+                    <div class="gp-field">
+                        <label for="authorName">Author's Name <span class="gp-required">*</span></label>
+                        <input id="authorName" name="authorName" type="text" maxlength="150" required placeholder="Enter your full name">
+                    </div>
+
+                    <div class="gp-field">
+                        <label for="contactInformation">Contact Information</label>
+                        <input id="contactInformation" name="contactInformation" type="text" maxlength="500" placeholder="Address or other contact details">
+                    </div>
+
+                    <div class="gp-field">
+                        <label for="phone">Phone <span class="gp-required">*</span></label>
+                        <input id="phone" name="phone" type="tel" maxlength="30" required placeholder="Enter your phone number">
+                    </div>
+
+                    <div class="gp-field">
+                        <label for="email">Email <span class="gp-required">*</span></label>
+                        <input id="email" name="email" type="email" maxlength="255" required placeholder="Enter your email address">
+                    </div>
+
+                    <div class="gp-field full">
+                        <label for="manuscriptName">Name of the Manuscript <span class="gp-required">*</span></label>
+                        <input id="manuscriptName" name="manuscriptName" type="text" maxlength="255" required placeholder="Enter the title of your manuscript">
+                    </div>
+
+                    <div class="gp-field full">
+                        <label for="bookType">Type of Book <span class="gp-required">*</span></label>
+                        <select id="bookType" name="bookType" required>
+                            <option value="">Select Type of Book</option>
+                            <option>Treasures</option>
+                            <option>Adult</option>
+                            <option>Contemporary</option>
+                            <option>Philosophy</option>
+                            <option>Fiction</option>
+                            <option>Literary fiction</option>
+                            <option>Erotica</option>
+                            <option>Social Commentary</option>
+                            <option>Paranormal</option>
+                            <option>Crime</option>
+                            <option>Mystery</option>
+                            <option>Historical Fiction</option>
+                            <option>Poetry</option>
+                            <option>Short Stories</option>
+                            <option>Action and Adventure</option>
+                            <option>Falk Stories</option>
+                            <option>Suspense and Thriller</option>
+                            <option>Thriller</option>
+                            <option>Political Fiction</option>
+                            <option>Post-World Destructive Fiction</option>
+                            <option>Comedy</option>
+                            <option>Romance</option>
+                            <option>Horror</option>
+                            <option>Psychological Thriller</option>
+                            <option>Psychological Fiction</option>
+                            <option>Other Books</option>
+                        </select>
+                    </div>
+
+                    <div class="gp-field full">
+                        <label for="shortDescription">Short Description</label>
+                        <textarea id="shortDescription" name="shortDescription" maxlength="2000" placeholder="Tell us briefly about your manuscript"></textarea>
+                    </div>
+
+                    <div class="gp-field full">
+                        <label for="manuscriptFile">Manuscript File <span class="gp-required">*</span></label>
+                        <div class="gp-file-box">
+                            <input id="manuscriptFile" name="manuscriptFile" type="file" accept=".pdf,.doc,.docx" required>
+                            <p class="gp-file-help">Accepted formats: PDF, DOC, DOCX. Maximum file size: 20MB.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gp-note">
+                    Your application will be recorded as <strong>Pending</strong> and reviewed by the publishing team.
+                    Approval is handled separately before an author account is activated.
+                </div>
+
+                <div class="gp-actions">
+                    <button id="gpSubmitBtn" class="gp-submit" type="submit">
+                        <i class="fas fa-paper-plane"></i>
+                        Submit for Publishing Consideration
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="gp-card" style="margin-top:24px;">
+            <div class="gp-card-header">
+                <div class="gp-icon"><i class="fas fa-magnifying-glass"></i></div>
+                <div>
+                    <h2>Check Application Status</h2>
+                    <p>Use your Application ID and email address to view the latest status.</p>
+                </div>
+            </div>
+            <div class="gp-form">
+                <form id="gpStatusForm">
+                    <div class="gp-grid">
+                        <div class="gp-field">
+                            <label for="statusApplicationId">Application ID</label>
+                            <input id="statusApplicationId" type="number" min="1" required placeholder="e.g. 1">
+                        </div>
+                        <div class="gp-field">
+                            <label for="statusEmail">Email</label>
+                            <input id="statusEmail" type="email" required placeholder="Enter the email used for your application">
+                        </div>
+                    </div>
+                    <div id="gpStatusMessage" class="gp-message"></div>
+                    <div id="gpStatusResult" class="gp-note" style="display:none;"></div>
+                    <div class="gp-actions">
+                        <button class="gp-submit" type="submit"><i class="fas fa-magnifying-glass"></i> Check Status</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </div>
+</main>
+
+<div id="footer-container"></div>
+
+<script src="/js/header.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/load-components.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('gettingPublishedForm');
+        const message = document.getElementById('gpMessage');
+        const button = document.getElementById('gpSubmitBtn');
+        const fileInput = document.getElementById('manuscriptFile');
+
+        function showMessage(text, type) {
+            message.textContent = text;
+            message.className = 'gp-message ' + type;
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            if (!fileInput.files.length) {
+                showMessage('Please upload your manuscript file.', 'error');
+                return;
+            }
+
+            if (fileInput.files[0].size > 20 * 1024 * 1024) {
+                showMessage('Manuscript file must not exceed 20MB.', 'error');
+                return;
+            }
+
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            message.className = 'gp-message';
+
+            try {
+                const formData = new FormData(form);
+
+                const response = await fetch('/api/publishing-applications', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Unable to submit application.');
+                }
+
+                showMessage(
+                    'Application submitted successfully. Your application ID is #' + (result.data && result.data.applicationId) + '. Keep it to check your status.',
+                    'success'
+                );
+
+                form.reset();
+
+            } catch (error) {
+                showMessage(
+                    error.message || 'Unable to submit application. Please try again.',
+                    'error'
+                );
+            } finally {
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Publishing Consideration';
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const statusForm = document.getElementById('gpStatusForm');
+        if (!statusForm) return;
+        const statusMessage = document.getElementById('gpStatusMessage');
+        const statusResult = document.getElementById('gpStatusResult');
+        statusForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            statusMessage.className = 'gp-message';
+            statusResult.style.display = 'none';
+            const applicationId = document.getElementById('statusApplicationId').value;
+            const email = document.getElementById('statusEmail').value.trim();
+            try {
+                const response = await fetch('/api/publishing-applications/status?applicationId=' + encodeURIComponent(applicationId) + '&email=' + encodeURIComponent(email));
+                const result = await response.json();
+                if (!response.ok || !result.success) throw new Error(result.message || 'Unable to load application status.');
+                const d = result.data || {};
+                let html = '<strong>Status: ' + escapeStatus(d.status) + '</strong><br>' +
+                    'Application #' + escapeStatus(d.applicationId) + '<br>' +
+                    'Manuscript: ' + escapeStatus(d.manuscriptName) + '<br>' +
+                    'Submitted: ' + escapeStatus(formatStatusDate(d.submittedAt));
+                if (String(d.status).toUpperCase() === 'APPROVED') {
+                    html += '<br><br><strong>Congratulations!</strong> Your application has been approved. ' +
+                        (d.authorCode ? 'Your Author Code is <strong>' + escapeStatus(d.authorCode) + '</strong>. ' : '') +
+                        'Please register for an Author Portal account using this email address. After registration, you can log in and submit your manuscripts.';
+                }
+                if (String(d.status).toUpperCase() === 'REJECTED') {
+                    html += '<br><br><strong>Reason:</strong> ' + escapeStatus(d.rejectionReason || 'Not specified.');
+                }
+                statusResult.innerHTML = html;
+                statusResult.style.display = 'block';
+                statusMessage.className = 'gp-message success';
+                statusMessage.textContent = 'Application status loaded successfully.';
+            } catch (error) {
+                statusMessage.className = 'gp-message error';
+                statusMessage.textContent = error.message || 'Unable to load application status.';
+            }
+        });
+        function escapeStatus(value) {
+            return String(value == null ? '-' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+        function formatStatusDate(value) {
+            if (!value) return '-';
+            try { return new Date(value).toLocaleString(); } catch (e) { return value; }
+        }
+    });
+</script>
+
+</body>
+</html>

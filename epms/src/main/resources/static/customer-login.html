@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Login | Reading Planet</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* High-specificity so header.css cannot hide the forms */
+    body.customer-login-page { margin: 0; font-family: system-ui, Segoe UI, sans-serif; background: #eef4fa !important; color: #1a2b3c; }
+    body.customer-login-page .customer-wrap {
+      max-width: 1000px; margin: 0 auto; padding: 2rem 1rem 3rem;
+      display: block !important; visibility: visible !important;
+    }
+    body.customer-login-page .customer-wrap h1 { color: #123d73; font-family: Georgia, serif; margin: 0 0 0.35rem; }
+    body.customer-login-page .customer-sub { color: #5a6f85; margin: 0 0 1.5rem; }
+    body.customer-login-page .customer-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      visibility: visible !important;
+    }
+    @media (max-width: 800px) {
+      body.customer-login-page .customer-grid { grid-template-columns: 1fr; }
+    }
+    body.customer-login-page .customer-card {
+      display: block !important;
+      visibility: visible !important;
+      background: #fff !important;
+      border: 1px solid #d8e5f2;
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 8px 24px rgba(28,76,125,.08);
+    }
+    body.customer-login-page .customer-card h2 { margin: 0 0 1rem; color: #123d73; font-size: 1.25rem; }
+    body.customer-login-page .customer-card label {
+      display: block !important; font-size: .85rem; font-weight: 600; margin: 0 0 .35rem; color: #334e68;
+    }
+    body.customer-login-page .customer-card input {
+      display: block !important; width: 100%; box-sizing: border-box;
+      padding: .65rem .75rem; border: 1px solid #c9d8e8; border-radius: 8px;
+      margin-bottom: .85rem; font-size: 1rem; background: #fff;
+    }
+    body.customer-login-page .btn-c {
+      display: inline-flex !important; align-items: center; justify-content: center; gap: .4rem;
+      width: 100%; padding: .75rem 1rem; border: none; border-radius: 8px;
+      font-weight: 600; cursor: pointer; font-size: .95rem;
+    }
+    body.customer-login-page .btn-c-primary { background: #1a5f9e; color: #fff; }
+    body.customer-login-page .btn-c-primary:hover { background: #154e82; }
+    body.customer-login-page .btn-c-google {
+      background: #fff; color: #333; border: 1px solid #dadce0; margin-top: .75rem;
+    }
+    body.customer-login-page .c-msg {
+      display: none; padding: .65rem .85rem; border-radius: 8px; margin-bottom: .85rem; font-size: .9rem;
+    }
+    body.customer-login-page .c-msg.show { display: block !important; }
+    body.customer-login-page .c-msg.error { background: #fde8e8; color: #9b1c1c; }
+    body.customer-login-page .c-msg.success { background: #e6f6ed; color: #0f6b3c; }
+    body.customer-login-page .c-link { color: #1a5f9e; text-decoration: none; font-size: .9rem; }
+    body.customer-login-page .forgot-box { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e2eef8; }
+    body.customer-login-page .forgot-box.open { display: block !important; }
+    body.customer-login-page .c-hint { font-size: .85rem; color: #6b7c8f; margin-top: .5rem; }
+    /* Never show author portal chrome on this page */
+    body.customer-login-page .author-header-nav,
+    body.customer-login-page .author-header-user { display: none !important; }
+  </style>
+</head>
+<body class="customer-login-page">
+  <div id="header-container"></div>
+
+  <main class="customer-wrap">
+    <h1>Customer Account</h1>
+    <p class="customer-sub">
+      Login or register as a <strong>customer</strong>.
+      Authors must use <a class="c-link" href="/getting-published.html">Getting Published</a> → Author login
+      (not this page).
+    </p>
+
+    <div class="customer-grid">
+      <!-- LOGIN -->
+      <section class="customer-card" id="loginCard">
+        <h2>Login</h2>
+        <div id="loginMsg" class="c-msg"></div>
+        <form id="loginForm" autocomplete="on">
+          <label for="loginEmail">Email</label>
+          <input type="email" id="loginEmail" name="email" required autocomplete="email" placeholder="you@email.com">
+
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" name="password" required autocomplete="current-password" placeholder="Your password">
+
+          <button type="submit" class="btn-c btn-c-primary" id="loginBtn">Login as Customer</button>
+        </form>
+        <p style="margin:.75rem 0 0;">
+          <a href="#" class="c-link" id="showForgot">Forgot password?</a>
+        </p>
+        <div class="forgot-box" id="forgotBox">
+          <div id="forgotMsg" class="c-msg"></div>
+          <label for="forgotEmail">Email</label>
+          <input type="email" id="forgotEmail" autocomplete="email" placeholder="you@email.com">
+          <button type="button" class="btn-c btn-c-primary" id="forgotBtn">Send reset link</button>
+        </div>
+        <button type="button" class="btn-c btn-c-google" id="googleLoginBtn">
+          <i class="fab fa-google"></i> Continue with Google (Customer)
+        </button>
+      </section>
+
+      <!-- REGISTER -->
+      <section class="customer-card" id="registerCard">
+        <h2>Register</h2>
+        <div id="regMsg" class="c-msg"></div>
+        <form id="regForm" autocomplete="on">
+          <label for="regUsername">Username</label>
+          <input type="text" id="regUsername" required autocomplete="username" placeholder="username">
+
+          <label for="regFirst">First name</label>
+          <input type="text" id="regFirst" required autocomplete="given-name">
+
+          <label for="regLast">Last name</label>
+          <input type="text" id="regLast" required autocomplete="family-name">
+
+          <label for="regEmail">Email</label>
+          <input type="email" id="regEmail" required autocomplete="email">
+
+          <label for="regPassword">Password (min 8 characters)</label>
+          <input type="password" id="regPassword" required minlength="8" autocomplete="new-password">
+
+          <button type="submit" class="btn-c btn-c-primary" id="regBtn">Create Customer Account</button>
+        </form>
+        <p class="c-hint">Creates role <strong>CUSTOMER</strong> only — not Author.</p>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+
+  <script src="/js/header.js"></script>
+  <script src="/js/footer.js"></script>
+  <script src="/js/load-components.js"></script>
+  <script src="/js/cart-utils.js"></script>
+  <script src="/js/customer-auth.js"></script>
+</body>
+</html>

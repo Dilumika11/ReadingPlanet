@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Google Login</title></head>
+<body style="font-family:system-ui;display:flex;min-height:100vh;align-items:center;justify-content:center;">
+<p>Completing customer Google sign-in...</p>
+<script src="/js/cart-utils.js"></script>
+<script>
+fetch("/api/auth/oauth2/exchange", { credentials: "same-origin" })
+  .then(function (r) { return r.json(); })
+  .then(function (res) {
+    if (!res.success || !res.data) {
+      location.replace("/customer-login.html?googleError=" + encodeURIComponent(res.message || "Failed"));
+      return;
+    }
+    var d = res.data;
+    var role = d.role;
+    if (role && typeof role === "object") role = role.name || "";
+    role = String(role || "").toUpperCase().replace(/^ROLE_/, "");
+    if (role !== "CUSTOMER") {
+      location.replace("/customer-login.html?googleError=" + encodeURIComponent("Not a CUSTOMER account (" + role + ")"));
+      return;
+    }
+    var payload = JSON.stringify({
+      userId: d.userId, fullName: d.fullName, email: d.email, role: "CUSTOMER"
+    });
+    localStorage.setItem("rp_customer_token", d.token);
+    localStorage.setItem("rp_customer_user", payload);
+    sessionStorage.setItem("rp_customer_token", d.token);
+    sessionStorage.setItem("rp_customer_user", payload);
+    RpCart.syncToServer().catch(function () {}).then(function () { location.replace("/"); });
+  })
+  .catch(function () {
+    location.replace("/customer-login.html?googleError=Network%20error");
+  });
+</script>
+</body>
+</html>

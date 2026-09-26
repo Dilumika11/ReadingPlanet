@@ -6,6 +6,7 @@
         "ADMIN",
         "PRODUCTION_MANAGER",
         "EDITOR",
+        "CHIEF_EDITOR",
         "PROOFREADER",
         "DESIGNER",
         "INVENTORY_STAFF",
@@ -56,7 +57,7 @@
     function dashboardPathForRoles(roles) {
         // Authors have their own royalty page; all staff share the same
         // dashboard shell, with navigation filtered by role inside it.
-        if (roles.length === 1 && roles[0] === "AUTHOR") return "/author/royalties.html";
+        if (roles.length === 1 && roles[0] === "AUTHOR") return "/author/dashboard.html";
         return "/admin/dashboard.html";
     }
 

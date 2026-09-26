@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Author Portal – Reading Planet
+    </title>
+
+
+    <!-- =====================================================
+         SHARED HOME PAGE STYLES
+    ====================================================== -->
+
+    <link
+            rel="stylesheet"
+            href="/css/header.css?v=20260911"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/footer.css?v=20260911"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/author.css?v=20260911"
+    >
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           AUTHOR LOGIN PAGE
+        ===================================================== */
+
+        body.author-login-page {
+
+            margin:
+                    0;
+
+            min-height:
+                    100vh;
+
+            font-family:
+                    "Segoe UI",
+                    "Helvetica Neue",
+                    Arial,
+                    sans-serif;
+
+            color:
+                    #183b63;
+
+            background:
+                    linear-gradient(
+                            180deg,
+                            #f3f8fd 0%,
+                            #f8fafc 52%,
+                            #eef4f9 100%
+                    );
+
+        }
+
+
+        /* =====================================================
+           MAIN
+        ===================================================== */
+
+        .login-page-main {
+
+            width:
+                    min(
+                            1100px,
+                            calc(100% - 48px)
+                    );
+
+            margin:
+                    0 auto;
+
+            padding:
+                    34px 0 44px;
+
+        }
+
+
+        /* =====================================================
+           LOGIN + REGISTER GRID
+        ===================================================== */
+
+        .login-page-grid {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            minmax(
+                                    0,
+                                    1fr
+                            )
+                    );
+
+            gap:
+                    20px;
+
+            align-items:
+                    stretch;
+
+        }
+
+
+        /* =====================================================
+           CARD
+        ===================================================== */
+
+        .login-card {
+
+            background:
+                    #ffffff;
+
+            border:
+                    1px solid #d8e5f2;
+
+            border-radius:
+                    14px;
+
+            box-shadow:
+                    0 12px 28px
+                    rgba(
+                            28,
+                            76,
+                            125,
+                            0.08
+                    );
+
+            padding:
+                    30px;
+
+        }
+
+
+        .login-card-title {
+
+            margin:
+                    0 0 22px;
+
+            color:
+                    #123d73;
+
+            font-family:
+                    Georgia,
+                    "Times New Roman",
+                    serif;
+
+            font-size:
+                    23px;
+
+            line-height:
+                    1.2;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        /* =====================================================
+           FIELD
+        ===================================================== */
+
+        .auth-field {
+
+            margin-bottom:
+                    14px;
+
+        }
+
+
+        .auth-field label {
+
+            display:
+                    block;
+
+            margin:
+                    0 0 6px;
+
+            color:
+                    #365675;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    600;
+
+        }
+
+
+        .auth-field input {
+
+            width:
+                    100%;
+
+            height:
+                    34px;
+
+            padding:
+                    7px 10px;
+
+            border:
+                    1px solid #cfddec;
+
+            border-radius:
+                    6px;
+
+            background:
+                    #fbfdff;
+
+            color:
+                    #274766;
+
+            font:
+                    inherit;
+
+            font-size:
+                    11px;
+
+            outline:
+                    none;
+
+        }
+
+
+        .auth-field input::placeholder {
+
+            color:
+                    #8ca0b5;
+
+        }
+
+
+        .auth-field input:focus {
+
+            border-color:
+                    #6a9fd2;
+
+            box-shadow:
+                    0 0 0 3px
+                    rgba(
+                            53,
+                            120,
+                            183,
+                            0.08
+                    );
+
+            background:
+                    #ffffff;
+
+        }
+
+
+        /* =====================================================
+           TWO COLUMN REGISTER FIELDS
+        ===================================================== */
+
+        .auth-field-row {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    repeat(
+                            2,
+                            minmax(
+                                    0,
+                                    1fr
+                            )
+                    );
+
+            gap:
+                    12px;
+
+        }
+
+
+        /* =====================================================
+           PASSWORD
+        ===================================================== */
+
+        .password-wrapper {
+
+            position:
+                    relative;
+
+        }
+
+
+        .password-wrapper input {
+
+            padding-right:
+                    36px;
+
+        }
+
+
+        .toggle-password {
+
+            position:
+                    absolute;
+
+            top:
+                    50%;
+
+            right:
+                    9px;
+
+            transform:
+                    translateY(-50%);
+
+            width:
+                    24px;
+
+            height:
+                    24px;
+
+            color:
+                    #36658f;
+
+            background:
+                    transparent;
+
+            border:
+                    0;
+
+            padding:
+                    0;
+
+            cursor:
+                    pointer;
+
+        }
+
+
+        .toggle-password i {
+
+            font-size:
+                    12px;
+
+        }
+
+
+        /* =====================================================
+           FORGOT PASSWORD
+        ===================================================== */
+
+        .author-portal-form__forgot {
+
+            display:
+                    flex;
+
+            justify-content:
+                    flex-end;
+
+            margin:
+                    -3px 0 12px;
+
+        }
+
+
+        .author-portal-form__forgot a,
+        .login-switch a {
+
+            color:
+                    #165c9c;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    600;
+
+            text-decoration:
+                    none;
+
+        }
+
+
+        .author-portal-form__forgot a:hover,
+        .login-switch a:hover {
+
+            text-decoration:
+                    underline;
+
+        }
+
+
+        /* =====================================================
+           BUTTON
+        ===================================================== */
+
+        .auth-btn {
+
+            width:
+                    100%;
+
+            min-height:
+                    35px;
+
+            border-radius:
+                    6px;
+
+            font-family:
+                    inherit;
+
+            font-size:
+                    11px;
+
+            font-weight:
+                    700;
+
+            cursor:
+                    pointer;
+
+        }
+
+
+        .auth-btn-primary {
+
+            border:
+                    0;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #347dbd 0%,
+                            #1b5c96 100%
+                    );
+
+            color:
+                    #ffffff;
+
+            box-shadow:
+                    0 8px 16px
+                    rgba(
+                            29,
+                            91,
+                            147,
+                            0.18
+                    );
+
+        }
+
+
+        .auth-btn-primary:hover {
+
+            filter:
+                    brightness(
+                            0.97
+                    );
+
+        }
+
+
+        .auth-btn:disabled {
+
+            opacity:
+                    0.65;
+
+            cursor:
+                    not-allowed;
+
+        }
+
+
+        /* =====================================================
+           DIVIDER
+        ===================================================== */
+
+        .auth-divider {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    10px;
+
+            margin:
+                    17px 0;
+
+            color:
+                    #93a4b7;
+
+            font-size:
+                    9px;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        .auth-divider::before,
+        .auth-divider::after {
+
+            content:
+                    "";
+
+            flex:
+                    1;
+
+            height:
+                    1px;
+
+            background:
+                    #dce5ee;
+
+        }
+
+
+        .auth-divider span {
+
+            flex:
+                    0 0 auto;
+
+        }
+
+
+        /* =====================================================
+           GOOGLE BUTTON
+        ===================================================== */
+
+        .auth-btn-google {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            gap:
+                    8px;
+
+            border:
+                    1px solid #cfddec;
+
+            background:
+                    #ffffff;
+
+            color:
+                    #24496d;
+
+        }
+
+
+        .auth-btn-google:hover {
+
+            background:
+                    #f7fafe;
+
+        }
+
+
+        .google-icon {
+
+            width:
+                    15px;
+
+            height:
+                    15px;
+
+            display:
+                    block;
+
+        }
+
+
+        /* =====================================================
+           LOGIN SWITCH
+        ===================================================== */
+
+        .login-switch {
+
+            margin:
+                    17px 0 0;
+
+            text-align:
+                    center;
+
+            color:
+                    #6c8197;
+
+            font-size:
+                    10px;
+
+        }
+
+
+        /* =====================================================
+           AUTHOR NOTE
+        ===================================================== */
+
+        .author-portal-note {
+
+            margin:
+                    17px 0 0;
+
+            padding:
+                    8px 10px;
+
+            border:
+                    1px solid #d8e7f6;
+
+            border-radius:
+                    6px;
+
+            background:
+                    #eef6ff;
+
+            color:
+                    #547391;
+
+            font-size:
+                    9px;
+
+            line-height:
+                    1.4;
+
+            text-align:
+                    center;
+
+        }
+
+
+        .author-portal-note strong {
+
+            color:
+                    #2e5f88;
+
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        .auth-message {
+
+            margin-bottom:
+                    12px;
+
+            padding:
+                    8px 10px;
+
+            border-radius:
+                    6px;
+
+            font-size:
+                    10px;
+
+        }
+
+
+        .auth-message.success {
+
+            background:
+                    #e8f7ef;
+
+            border:
+                    1px solid #bfe4ce;
+
+            color:
+                    #23764f;
+
+        }
+
+
+        .auth-message.error {
+
+            background:
+                    #fff0f0;
+
+            border:
+                    1px solid #efc4c4;
+
+            color:
+                    #a53d3d;
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 900px) {
+
+            .login-page-main {
+
+                width:
+                        min(
+                                94%,
+                                700px
+                        );
+
+            }
+
+
+            .login-page-grid {
+
+                grid-template-columns:
+                        1fr;
+
+            }
+
+        }
+
+
+        @media (max-width: 560px) {
+
+            .login-page-main {
+
+                width:
+                        calc(
+                                100% - 24px
+                        );
+
+                padding:
+                        22px 0 30px;
+
+            }
+
+
+            .login-card {
+
+                padding:
+                        22px;
+
+            }
+
+
+            .auth-field-row {
+
+                grid-template-columns:
+                        1fr;
+
+                gap:
+                        0;
+
+            }
+
+        }
+
+    
+        /* Readable author login/register typography */
+        body.author-login-page .login-card-title { font-size: 30px; }
+        body.author-login-page .auth-field label { font-size: 13px; }
+        body.author-login-page .auth-field input { height: 42px; font-size: 13px; }
+        body.author-login-page .auth-btn { min-height: 42px; font-size: 13px; }
+        body.author-login-page .auth-divider { font-size: 11px; }
+        body.author-login-page .login-switch { font-size: 12px; }
+        body.author-login-page .author-portal-note { font-size: 11px; }
+
+    </style>
+
+</head>
+
+
+<body class="author-login-page">
+
+
+<!-- =========================================================
+     EXISTING HOME PAGE HEADER
+========================================================= -->
+
+<div id="header-container"></div>
+
+
+<!-- =========================================================
+     LOGIN + REGISTER
+========================================================= -->
+
+<main class="login-page-main">
+
+    <div class="login-page-grid">
+
+
+        <!-- =================================================
+             LOGIN
+        ================================================== -->
+
+        <section
+                class="login-card"
+                aria-labelledby="login-heading"
+        >
+
+            <h2
+                    id="login-heading"
+                    class="login-card-title"
+            >
+                Login
+            </h2>
+
+
+            <div
+                    id="login-message"
+                    class="auth-message"
+                    hidden
+            ></div>
+
+
+            <form
+                    id="authorLoginForm"
+                    class="author-portal-form"
+                    novalidate
+            >
+
+
+                <!-- EMAIL -->
+
+                <div class="auth-field">
+
+                    <label for="loginEmail">
+                        Email
+                    </label>
+
+                    <input
+                            type="email"
+                            id="loginEmail"
+                            name="email"
+                            placeholder="Enter your email"
+                            autocomplete="username"
+                            required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="auth-field">
+
+                    <label for="loginPassword">
+                        Password
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+                        <input
+                                type="password"
+                                id="loginPassword"
+                                name="password"
+                                placeholder="Enter your password"
+                                autocomplete="current-password"
+                                required
+                        >
+
+
+                        <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="loginPassword"
+                                aria-label="Show or hide password"
+                        >
+
+                            <i class="fas fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FORGOT PASSWORD -->
+
+                <div
+                        class="author-portal-form__forgot"
+                >
+
+                    <a
+                            href="#"
+                            id="forgotPasswordLink"
+                    >
+                        Forgot Password?
+                    </a>
+
+                </div>
+
+
+                <!-- LOGIN BUTTON -->
+
+                <button
+                        type="submit"
+                        id="loginBtn"
+                        class="auth-btn auth-btn-primary"
+                >
+                    Login
+                </button>
+
+            </form>
+
+
+            <!-- GOOGLE -->
+
+            <div
+                    class="auth-divider"
+                    role="separator"
+            >
+                <span>
+                    OR
+                </span>
+            </div>
+
+
+            <button
+                    type="button"
+                    id="googleLoginBtn"
+                    class="auth-btn auth-btn-google"
+            >
+
+                <svg
+                        class="google-icon"
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                >
+
+                    <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+
+                    <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+
+                    <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    />
+
+                    <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    />
+
+                </svg>
+
+
+                Continue with Google
+
+            </button>
+
+
+            <!-- REGISTER LINK -->
+
+            <p class="login-switch">
+
+                Don't have an account?
+
+                <a
+                        href="#register-heading"
+                        id="scrollToRegister"
+                >
+                    Register
+                </a>
+
+            </p>
+
+
+            <p class="author-portal-note">
+
+                Only accounts with the
+                <strong>
+                    AUTHOR
+                </strong>
+                role can access this portal.
+
+            </p>
+
+        </section>
+
+
+        <!-- =================================================
+             REGISTER
+        ================================================== -->
+
+        <section
+                class="login-card"
+                aria-labelledby="register-heading"
+        >
+
+            <h2
+                    id="register-heading"
+                    class="login-card-title"
+            >
+                Register
+            </h2>
+
+
+            <div
+                    id="register-message"
+                    class="auth-message"
+                    hidden
+            ></div>
+
+
+            <form
+                    id="authorRegisterForm"
+                    class="author-portal-form"
+                    novalidate
+            >
+
+
+                <!-- USERNAME -->
+
+                <div class="auth-field">
+
+                    <label for="regUsername">
+                        Username
+                    </label>
+
+                    <input
+                            type="text"
+                            id="regUsername"
+                            name="username"
+                            placeholder="Choose a username"
+                            autocomplete="username"
+                            required
+                    >
+
+                </div>
+
+
+                <!-- FIRST + LAST NAME -->
+
+                <div class="auth-field-row">
+
+
+                    <div class="auth-field">
+
+                        <label for="regFirstName">
+                            First Name
+                        </label>
+
+                        <input
+                                type="text"
+                                id="regFirstName"
+                                name="firstName"
+                                placeholder="First name"
+                                autocomplete="given-name"
+                                required
+                        >
+
+                    </div>
+
+
+                    <div class="auth-field">
+
+                        <label for="regLastName">
+                            Last Name
+                        </label>
+
+                        <input
+                                type="text"
+                                id="regLastName"
+                                name="lastName"
+                                placeholder="Last name"
+                                autocomplete="family-name"
+                                required
+                        >
+
+                    </div>
+
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="auth-field">
+
+                    <label for="regEmail">
+                        Email
+                    </label>
+
+                    <input
+                            type="email"
+                            id="regEmail"
+                            name="email"
+                            placeholder="Enter your email"
+                            autocomplete="email"
+                            required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="auth-field">
+
+                    <label for="regPassword">
+                        Password
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+                        <input
+                                type="password"
+                                id="regPassword"
+                                name="password"
+                                placeholder="At least 8 characters"
+                                autocomplete="new-password"
+                                required
+                        >
+
+
+                        <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="regPassword"
+                                aria-label="Show or hide password"
+                        >
+
+                            <i class="fas fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONFIRM PASSWORD -->
+
+                <div class="auth-field">
+
+                    <label for="regConfirmPassword">
+                        Confirm Password
+                    </label>
+
+
+                    <div class="password-wrapper">
+
+                        <input
+                                type="password"
+                                id="regConfirmPassword"
+                                name="confirmPassword"
+                                placeholder="Re-enter your password"
+                                autocomplete="new-password"
+                                required
+                        >
+
+
+                        <button
+                                type="button"
+                                class="toggle-password"
+                                data-target="regConfirmPassword"
+                                aria-label="Show or hide password"
+                        >
+
+                            <i class="fas fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REGISTER BUTTON -->
+
+                <button
+                        type="submit"
+                        id="registerBtn"
+                        class="auth-btn auth-btn-primary"
+                >
+                    Register
+                </button>
+
+            </form>
+
+
+            <!-- LOGIN LINK -->
+
+            <p class="login-switch">
+
+                Already have an account?
+
+                <a
+                        href="#login-heading"
+                        id="scrollToLogin"
+                >
+                    Login
+                </a>
+
+            </p>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<!-- =========================================================
+     EXISTING HOME PAGE FOOTER
+========================================================= -->
+
+<div id="footer-container"></div>
+
+
+<!-- =========================================================
+     EXISTING SCRIPTS
+========================================================= -->
+
+<script src="/js/header.js"></script>
+
+<script src="/js/footer.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+<script src="/js/author-auth.js"></script>
+
+
+</body>
+
+</html>

@@ -68,6 +68,7 @@ public class RoyaltyServiceImpl implements RoyaltyService {
     private final DocumentNumberService documentNumberService;
     private final RoyaltyPaymentService royaltyPaymentService;
     private final AuditService auditService;
+    private final org.springframework.context.ApplicationEventPublisher events;
 
     // ===================== Agreements =====================
 
@@ -461,6 +462,11 @@ public class RoyaltyServiceImpl implements RoyaltyService {
 
         auditService.record(userId, "ROYALTY_STATEMENT_ISSUED", "RoyaltyCalculation", calculationId,
                 "Statement " + saved.getStatementNumber());
+        RoyaltyAgreement agreement = getAgreementById(saved.getRoyaltyAgreementId());
+        publish(new com.epms.service.AuthorNotice(agreement.getAuthorId(), "STATEMENT_ISSUED",
+                "Royalty statement " + saved.getStatementNumber() + " issued",
+                "Your royalty statement for " + saved.getSalesPeriodStart() + " to " + saved.getSalesPeriodEnd()
+                        + " is ready. Payable: " + saved.getPayableAmount() + "."));
         return saved;
     }
 
@@ -522,7 +528,20 @@ public class RoyaltyServiceImpl implements RoyaltyService {
         RoyaltyPayment payment = royaltyPaymentRepository.findByCalculationId(calc.getCalculationId())
                 .orElseThrow(() -> new BusinessRuleException(
                         "Royalty calculation " + calculationId + " has no approved payment to record"));
-        return royaltyPaymentService.markPaid(payment.getRoyaltyPaymentId(), request, userId);
+        RoyaltyPayment paid = royaltyPaymentService.markPaid(payment.getRoyaltyPaymentId(), request, userId);
+        RoyaltyAgreement agreement = getAgreementById(calc.getRoyaltyAgreementId());
+        publish(new com.epms.service.AuthorNotice(agreement.getAuthorId(), "ROYALTY_PAID",
+                "Royalty payment made",
+                paid.getAmount() + " was paid for statement " + calc.getStatementNumber() + " by "
+                        + String.valueOf(paid.getPaymentMethod()).replace('_', ' ').toLowerCase()
+                        + " (reference " + paid.getTransactionReference() + ")."));
+        return paid;
+    }
+
+    private void publish(Object event) {
+        if (events != null) {
+            events.publishEvent(event);
+        }
     }
 
     private RoyaltyCalculation requireStatus(Long calculationId, String required, String action) {

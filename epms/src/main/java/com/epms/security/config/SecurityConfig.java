@@ -1,6 +1,10 @@
 package com.epms.security.config;
 
+import com.epms.controller.GoogleLoginSuccessHandler;
 import com.epms.security.jwt.JwtAuthenticationFilter;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,6 +58,8 @@ public class SecurityConfig {
     };
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ObjectProvider<ClientRegistrationRepository> googleClients;
+    private final GoogleLoginSuccessHandler googleLoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(
@@ -63,16 +69,25 @@ public class SecurityConfig {
                 // Stateless bearer-token API: no session cookie, so no CSRF exposure.
                 .csrf(csrf -> csrf.disable())
 
+                // The API authenticates with the JWT only. A session exists solely
+                // for the Google sign-in hand-shake; the login is never stored in
+                // it, so a session cookie can never authorise an API call.
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
-                                SessionCreationPolicy.STATELESS
+                                SessionCreationPolicy.IF_REQUIRED
                         )
                 )
+                .securityContext(c -> c.securityContextRepository(new RequestAttributeSecurityContextRepository()))
 
                 .authorizeHttpRequests(auth -> auth
 
-                        .requestMatchers("/api/auth/**", "/api/public/**")
+                        .requestMatchers("/api/auth/**", "/api/public/**", "/oauth2/**", "/login/oauth2/**")
                         .permitAll()
+
+                        // "Getting Published": anyone may apply and check their application
+                        .requestMatchers(HttpMethod.POST, "/api/publishing-applications").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/publishing-applications/status").permitAll()
+                        .requestMatchers("/api/publishing-applications/**").hasRole(ADMIN)
 
                         .requestMatchers(
                                 "/swagger-ui/**",
@@ -91,9 +106,12 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/uploads/**",
                                 "/favicon.ico",
-                                "/error"
+                                "/error",
+                                "/components/**",
+                                "/customer/**"
                         )
                         .permitAll()
+                        .requestMatchers(HttpMethod.GET, com.epms.controller.PublicPageController.PATHS).permitAll()
 
                         // Reference data Epics 2 and 3 read from Epic 4
                         .requestMatchers(HttpMethod.GET, "/api/categories/**", "/api/genres/**", "/api/settings/public")
@@ -101,7 +119,7 @@ public class SecurityConfig {
 
                         // Current user and their own data
                         .requestMatchers("/api/me/royalty/**").hasRole(AUTHOR)
-                        .requestMatchers("/api/me", "/api/announcements/active").authenticated()
+                        .requestMatchers("/api/me", "/api/me/login-activity", "/api/announcements/active").authenticated()
 
                         // Epic 1: an author's own profile and manuscripts
                         .requestMatchers("/api/author/**").hasRole(AUTHOR)
@@ -155,6 +173,12 @@ public class SecurityConfig {
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 );
+
+        if (googleClients.getIfAvailable() != null) {
+            http.oauth2Login(o -> o.successHandler(googleLoginSuccessHandler)
+                    .failureHandler((request, response, e) ->
+                            response.sendRedirect("/customer-login.html?googleError=Google+sign-in+was+cancelled+or+failed")));
+        }
 
         return http.build();
     }

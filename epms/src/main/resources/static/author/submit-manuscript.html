@@ -1,0 +1,2509 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Submit Manuscript | Reading Planet
+  </title>
+
+
+  <!-- COMMON HOME PAGE STYLES -->
+
+  <link
+          rel="stylesheet"
+          href="/css/header.css"
+  >
+
+  <link
+          rel="stylesheet"
+          href="/css/footer.css"
+  >
+
+  <link
+          rel="stylesheet"
+          href="/css/author.css"
+  >
+
+
+  <!-- FONT AWESOME -->
+
+  <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  >
+
+
+  <style>
+
+    /* =====================================================
+       GLOBAL
+    ===================================================== */
+
+    * {
+      box-sizing: border-box;
+    }
+
+
+    html {
+      min-height: 100%;
+    }
+
+
+    body {
+      margin: 0;
+
+      min-height: 100vh;
+
+      font-family:
+              "Segoe UI",
+              Arial,
+              sans-serif;
+
+      background:
+              radial-gradient(
+                      circle at 8% 12%,
+                      rgba(45,114,184,.07),
+                      transparent 24%
+              ),
+              linear-gradient(
+                      135deg,
+                      #eef5fb 0%,
+                      #f7fafd 52%,
+                      #edf4fa 100%
+              );
+
+      color:
+              #173653;
+    }
+
+
+    /* =====================================================
+       MAIN
+    ===================================================== */
+
+    .submit-page {
+
+      width:
+              min(
+                      1480px,
+                      calc(100% - 70px)
+              );
+
+      margin:
+              0 auto;
+
+      padding:
+              42px 0 70px;
+
+    }
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .submit-hero {
+
+      margin-bottom:
+              30px;
+
+      padding:
+              5px 2px;
+
+    }
+
+
+    .submit-eyebrow {
+
+      margin:
+              0 0 8px;
+
+      color:
+              #1d64a7;
+
+      font-size:
+              12px;
+
+      font-weight:
+              800;
+
+      letter-spacing:
+              .12em;
+
+      text-transform:
+              uppercase;
+
+    }
+
+
+    .submit-title {
+
+      margin:
+              0;
+
+      color:
+              #123f75;
+
+      font-family:
+              Georgia,
+              "Times New Roman",
+              serif;
+
+      font-size:
+              43px;
+
+      line-height:
+              1.08;
+
+    }
+
+
+    .submit-title-line {
+
+      width:
+              65px;
+
+      height:
+              3px;
+
+      margin:
+              14px 0 12px;
+
+      border-radius:
+              10px;
+
+      background:
+              #2d72b8;
+
+    }
+
+
+    .submit-subtitle {
+
+      margin:
+              0;
+
+      color:
+              #61758c;
+
+      font-size:
+              14px;
+
+    }
+
+
+    /* =====================================================
+       LAYOUT
+    ===================================================== */
+
+    .submit-layout {
+
+      display:
+              grid;
+
+      grid-template-columns:
+                    minmax(0, 1.55fr)
+                    minmax(320px, .75fr);
+
+      gap:
+              24px;
+
+      align-items:
+              start;
+
+    }
+
+
+    /* =====================================================
+       COMMON CARD
+    ===================================================== */
+
+    .submit-card {
+
+      background:
+              rgba(255,255,255,.98);
+
+      border:
+              1px solid #dce7f2;
+
+      border-radius:
+              18px;
+
+      box-shadow:
+              0
+              10px
+              28px
+              rgba(30,75,140,.07);
+
+    }
+
+
+    /* =====================================================
+       FORM CARD
+    ===================================================== */
+
+    .submit-form-card {
+
+      padding:
+              30px;
+
+    }
+
+
+    .submit-card-heading {
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      gap:
+              14px;
+
+      padding-bottom:
+              20px;
+
+      margin-bottom:
+              24px;
+
+      border-bottom:
+              1px solid #e5edf4;
+
+    }
+
+
+    .submit-heading-icon {
+
+      width:
+              48px;
+
+      height:
+              48px;
+
+      flex:
+              0 0 48px;
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      justify-content:
+              center;
+
+      border-radius:
+              12px;
+
+      background:
+              #eaf3ff;
+
+      color:
+              #1d64a7;
+
+      font-size:
+              19px;
+
+    }
+
+
+    .submit-heading-text h2 {
+
+      margin:
+              0 0 5px;
+
+      color:
+              #17477d;
+
+      font-size:
+              20px;
+
+    }
+
+
+    .submit-heading-text p {
+
+      margin:
+              0;
+
+      color:
+              #7b8da0;
+
+      font-size:
+              12px;
+
+    }
+
+
+    /* =====================================================
+       MESSAGE
+    ===================================================== */
+
+    .submit-message {
+
+      display:
+              none;
+
+      margin-bottom:
+              20px;
+
+      padding:
+              12px 14px;
+
+      border-radius:
+              9px;
+
+      font-size:
+              12px;
+
+      line-height:
+              1.5;
+
+    }
+
+
+    .submit-message.success {
+
+      display:
+              block;
+
+      background:
+              #ecfdf3;
+
+      border:
+              1px solid #abefc6;
+
+      color:
+              #027a48;
+
+    }
+
+
+    .submit-message.error {
+
+      display:
+              block;
+
+      background:
+              #fff1f2;
+
+      border:
+              1px solid #fecdca;
+
+      color:
+              #b42318;
+
+    }
+
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    .submit-form-row {
+
+      display:
+              grid;
+
+      grid-template-columns:
+                    1fr 1fr;
+
+      gap:
+              20px;
+
+    }
+
+
+    .submit-form-group {
+
+      min-width:
+              0;
+
+    }
+
+
+    .submit-form-group.full {
+
+      grid-column:
+              1 / -1;
+
+    }
+
+
+    .submit-form-group label {
+
+      display:
+              block;
+
+      margin-bottom:
+              8px;
+
+      color:
+              #3d5b76;
+
+      font-size:
+              12px;
+
+      font-weight:
+              700;
+
+    }
+
+
+    .required {
+
+      color:
+              #d45c1b;
+
+    }
+
+
+    .submit-form-group input,
+    .submit-form-group select,
+    .submit-form-group textarea {
+
+      width:
+              100%;
+
+      border:
+              1px solid #d7e2ec;
+
+      border-radius:
+              9px;
+
+      padding:
+              12px 14px;
+
+      background:
+              #ffffff;
+
+      color:
+              #294966;
+
+      font-family:
+              inherit;
+
+      font-size:
+              13px;
+
+      outline:
+              none;
+
+      transition:
+              border-color .2s ease,
+              box-shadow .2s ease;
+
+    }
+
+
+    .submit-form-group input,
+    .submit-form-group select {
+
+      height:
+              46px;
+
+    }
+
+
+    .submit-form-group textarea {
+
+      min-height:
+              145px;
+
+      resize:
+              vertical;
+
+      line-height:
+              1.6;
+
+    }
+
+
+    .submit-form-group input:focus,
+    .submit-form-group select:focus,
+    .submit-form-group textarea:focus {
+
+      border-color:
+              #337ab7;
+
+      box-shadow:
+              0 0 0 3px
+              rgba(51,122,183,.10);
+
+    }
+
+
+    /* =====================================================
+       SYNOPSIS
+    ===================================================== */
+
+    .synopsis-meta {
+
+      display:
+              flex;
+
+      justify-content:
+              flex-end;
+
+      margin-top:
+              6px;
+
+      color:
+              #8a9cad;
+
+      font-size:
+              10px;
+
+    }
+
+
+    /* =====================================================
+       FILE UPLOAD
+    ===================================================== */
+
+    .file-upload-box {
+
+      position:
+              relative;
+
+      padding:
+              30px 20px;
+
+      text-align:
+              center;
+
+      border:
+              1.5px dashed #b9d0e5;
+
+      border-radius:
+              13px;
+
+      background:
+              #f8fbfe;
+
+      overflow:
+              hidden;
+
+      cursor:
+              pointer;
+
+    }
+
+
+    .file-upload-box:hover {
+
+      border-color:
+              #79a8d0;
+
+      background:
+              #f3f8fd;
+
+    }
+
+
+    .file-upload-icon {
+
+      width:
+              55px;
+
+      height:
+              55px;
+
+      margin:
+              0 auto 14px;
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      justify-content:
+              center;
+
+      border-radius:
+              50%;
+
+      background:
+              #eaf3ff;
+
+      color:
+              #1d64a7;
+
+      font-size:
+              22px;
+
+    }
+
+
+    .file-upload-title {
+
+      margin:
+              0 0 5px;
+
+      color:
+              #355b7b;
+
+      font-size:
+              14px;
+
+      font-weight:
+              750;
+
+    }
+
+
+    .file-upload-subtitle {
+
+      margin:
+              0 0 11px;
+
+      color:
+              #8192a2;
+
+      font-size:
+              12px;
+
+    }
+
+
+    .file-upload-help {
+
+      color:
+              #7f91a3;
+
+      font-size:
+              10px;
+
+      line-height:
+              1.6;
+
+    }
+
+
+    .file-input {
+
+      position:
+              absolute;
+
+      inset:
+              0;
+
+      width:
+              100%;
+
+      height:
+              100%;
+
+      opacity:
+              0;
+
+      cursor:
+              pointer;
+
+    }
+
+
+    .selected-file {
+
+      display:
+              none;
+
+      margin-top:
+              15px;
+
+      padding:
+              10px 12px;
+
+      border:
+              1px solid #c9dfef;
+
+      border-radius:
+              8px;
+
+      background:
+              #edf6fd;
+
+      color:
+              #2169a8;
+
+      font-size:
+              11px;
+
+      font-weight:
+              700;
+
+      text-align:
+              left;
+
+      word-break:
+              break-word;
+
+    }
+
+
+    /* =====================================================
+       SUBMIT BUTTON
+    ===================================================== */
+
+    .submit-button {
+
+      width:
+              100%;
+
+      min-height:
+              48px;
+
+      margin-top:
+              24px;
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      justify-content:
+              center;
+
+      gap:
+              8px;
+
+      border:
+              none;
+
+      border-radius:
+              9px;
+
+      background:
+              linear-gradient(
+                      135deg,
+                      #2d72b8,
+                      #16548f
+              );
+
+      color:
+              #ffffff;
+
+      font-family:
+              inherit;
+
+      font-size:
+              13px;
+
+      font-weight:
+              750;
+
+      cursor:
+              pointer;
+
+      box-shadow:
+              0 7px 18px
+              rgba(25,86,150,.21);
+
+      transition:
+              transform .2s ease,
+              box-shadow .2s ease;
+
+    }
+
+
+    .submit-button:hover {
+
+      transform:
+              translateY(-1px);
+
+      box-shadow:
+              0 10px 22px
+              rgba(25,86,150,.25);
+
+    }
+
+
+    .submit-button:disabled {
+
+      opacity:
+              .65;
+
+      cursor:
+              not-allowed;
+
+      transform:
+              none;
+
+    }
+
+
+    /* =====================================================
+       INFO CARD
+    ===================================================== */
+
+    .submit-info-card {
+
+      padding:
+              27px;
+
+    }
+
+
+    .submit-info-heading {
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      gap:
+              13px;
+
+      padding-bottom:
+              20px;
+
+      margin-bottom:
+              20px;
+
+      border-bottom:
+              1px solid #e7edf3;
+
+    }
+
+
+    .submit-info-icon {
+
+      width:
+              45px;
+
+      height:
+              45px;
+
+      flex:
+              0 0 45px;
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      justify-content:
+              center;
+
+      border-radius:
+              11px;
+
+      background:
+              #eaf3ff;
+
+      color:
+              #1d64a7;
+
+      font-size:
+              18px;
+
+    }
+
+
+    .submit-info-heading h2 {
+
+      margin:
+              0 0 5px;
+
+      color:
+              #17477d;
+
+      font-size:
+              18px;
+
+    }
+
+
+    .submit-info-heading p {
+
+      margin:
+              0;
+
+      color:
+              #7b8da0;
+
+      font-size:
+              11px;
+
+    }
+
+
+    .info-panel {
+
+      display:
+              flex;
+
+      flex-direction:
+              column;
+
+      gap:
+              12px;
+
+    }
+
+
+    .info-item {
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      gap:
+              12px;
+
+      padding:
+              14px;
+
+      border:
+              1px solid #e1eaf2;
+
+      border-radius:
+              11px;
+
+      background:
+              #fbfdff;
+
+    }
+
+
+    .info-item-icon {
+
+      width:
+              38px;
+
+      height:
+              38px;
+
+      flex:
+              0 0 38px;
+
+      display:
+              flex;
+
+      align-items:
+              center;
+
+      justify-content:
+              center;
+
+      border-radius:
+              9px;
+
+      background:
+              #edf5fd;
+
+      color:
+              #2169a8;
+
+      font-size:
+              14px;
+
+    }
+
+
+    .info-item.check
+    .info-item-icon {
+
+      background:
+              #e8f7ef;
+
+      color:
+              #237d55;
+
+    }
+
+
+    .info-item-text {
+
+      min-width:
+              0;
+
+      display:
+              flex;
+
+      flex-direction:
+              column;
+
+      gap:
+              4px;
+
+    }
+
+
+    .info-item-text strong {
+
+      color:
+              #3d5b76;
+
+      font-size:
+              12px;
+
+    }
+
+
+    .info-item-text span {
+
+      color:
+              #7a8da0;
+
+      font-size:
+              11px;
+
+      line-height:
+              1.45;
+
+    }
+
+
+    /* =====================================================
+       QUOTE
+    ===================================================== */
+
+    .submit-quote {
+
+      margin-top:
+              22px;
+
+      padding:
+              20px;
+
+      border-radius:
+              12px;
+
+      background:
+              linear-gradient(
+                      135deg,
+                      #edf6ff,
+                      #f8fbff
+              );
+
+      border:
+              1px solid #dce9f5;
+
+    }
+
+
+    .quote-mark {
+
+      color:
+              #4d82b0;
+
+      font-family:
+              Georgia,
+              serif;
+
+      font-size:
+              32px;
+
+      line-height:
+              .7;
+
+    }
+
+
+    .quote-text {
+
+      margin:
+              9px 0 7px;
+
+      color:
+              #446883;
+
+      font-size:
+              15px;
+
+      font-family:
+              Georgia,
+              serif;
+
+    }
+
+
+    .quote-author {
+
+      color:
+              #7d95aa;
+
+      font-size:
+              10px;
+
+      font-weight:
+              600;
+
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+    ===================================================== */
+
+    @media (max-width: 1000px) {
+
+      .submit-page {
+
+        width:
+                calc(100% - 40px);
+
+      }
+
+
+      .submit-layout {
+
+        grid-template-columns:
+                        1fr;
+
+      }
+
+    }
+
+
+    @media (max-width: 700px) {
+
+      .submit-page {
+
+        width:
+                calc(100% - 24px);
+
+        padding:
+                28px 0 45px;
+
+      }
+
+
+      .submit-title {
+
+        font-size:
+                32px;
+
+      }
+
+
+      .submit-form-card,
+      .submit-info-card {
+
+        padding:
+                20px;
+
+      }
+
+
+      .submit-form-row {
+
+        grid-template-columns:
+                        1fr;
+
+      }
+
+
+      .submit-form-group.full {
+
+        grid-column:
+                auto;
+
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body class="author-page">
+
+
+<!-- =====================================================
+     COMMON HOME HEADER
+===================================================== -->
+
+<div id="header-container"></div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="submit-page">
+
+
+  <!-- =================================================
+       HERO
+  ================================================= -->
+
+  <section class="submit-hero">
+
+    <p class="submit-eyebrow">
+      Author workspace
+    </p>
+
+
+    <h1 class="submit-title">
+      Submit Manuscript
+    </h1>
+
+
+    <div class="submit-title-line"></div>
+
+
+    <p class="submit-subtitle">
+      Submit your manuscript online to Reading Planet.
+    </p>
+
+  </section>
+
+
+  <!-- =================================================
+       TWO COLUMN LAYOUT
+  ================================================= -->
+
+  <div class="submit-layout">
+
+
+    <!-- =================================================
+         LEFT — FORM
+    ================================================= -->
+
+    <section class="submit-card submit-form-card">
+
+
+      <div class="submit-card-heading">
+
+        <div class="submit-heading-icon">
+
+          <i class="fas fa-file-pen"></i>
+
+        </div>
+
+
+        <div class="submit-heading-text">
+
+          <h2>
+            Manuscript Details
+          </h2>
+
+
+          <p>
+            Provide the information about your manuscript.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- MESSAGE -->
+
+      <div
+              id="message"
+              class="submit-message"
+      ></div>
+
+
+      <!-- FORM -->
+
+      <form id="manuscriptForm">
+
+
+        <div class="submit-form-row">
+
+
+          <!-- TITLE -->
+
+          <div class="submit-form-group">
+
+            <label for="title">
+
+              Manuscript Title
+
+              <span class="required">
+                                *
+                            </span>
+
+            </label>
+
+
+            <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Enter manuscript title"
+                    required
+            >
+
+          </div>
+
+
+          <!-- GENRE -->
+
+          <div class="submit-form-group">
+
+            <label for="genreId">
+
+              Genre
+
+              <span class="required">
+                                *
+                            </span>
+
+            </label>
+
+
+            <select
+                    id="genreId"
+                    name="genreId"
+                    required
+            >
+
+              <option value="">
+                Select Genre
+              </option>
+
+
+              <option value="1">
+                Fiction
+              </option>
+
+
+              <option value="2">
+                Non-Fiction
+              </option>
+
+
+              <option value="3">
+                Romance
+              </option>
+
+
+              <option value="4">
+                Mystery
+              </option>
+
+
+              <option value="5">
+                Fantasy
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- LANGUAGE -->
+
+          <div class="submit-form-group">
+
+            <label for="language">
+
+              Language
+
+              <span class="required">
+                                *
+                            </span>
+
+            </label>
+
+
+            <input
+                    type="text"
+                    id="language"
+                    name="language"
+                    placeholder="Example: English"
+                    required
+            >
+
+          </div>
+
+
+          <!-- WORD COUNT -->
+
+          <div class="submit-form-group">
+
+            <label for="wordCount">
+              Word Count
+            </label>
+
+
+            <input
+                    type="number"
+                    id="wordCount"
+                    name="wordCount"
+                    min="0"
+                    placeholder="Enter word count"
+            >
+
+          </div>
+
+
+          <!-- SYNOPSIS -->
+
+          <div class="submit-form-group full">
+
+            <label for="synopsis">
+
+              Synopsis
+
+              <span class="required">
+                                *
+                            </span>
+
+            </label>
+
+
+            <textarea
+                    id="synopsis"
+                    name="synopsis"
+                    maxlength="1000"
+                    placeholder="Enter a short synopsis of your manuscript"
+                    required
+            ></textarea>
+
+
+            <div class="synopsis-meta">
+
+                            <span id="synopsisCount">
+                                0
+                            </span>
+
+              /1000
+
+            </div>
+
+          </div>
+
+
+          <!-- MANUSCRIPT FILE -->
+
+          <div class="submit-form-group full">
+
+            <label>
+
+              Manuscript File
+
+              <span class="required">
+                                *
+                            </span>
+
+            </label>
+
+
+            <label class="file-upload-box" for="manuscriptFile">
+
+
+              <div class="file-upload-icon">
+
+                <i class="fas fa-cloud-arrow-up"></i>
+
+              </div>
+
+
+              <p class="file-upload-title">
+                Drag and drop your file here
+              </p>
+
+
+              <p class="file-upload-subtitle">
+                or click to choose a file
+              </p>
+
+
+              <div class="file-upload-help">
+
+                Accepted formats:
+                PDF, DOC, DOCX.
+                Maximum size: 20MB.
+
+              </div>
+
+
+              <input
+                      type="file"
+                      id="manuscriptFile"
+                      class="file-input"
+                      name="manuscriptFile"
+                      accept=".pdf,.doc,.docx"
+                      required
+              >
+
+
+              <div
+                      id="selectedFile"
+                      class="selected-file"
+              ></div>
+
+
+            </label>
+
+          </div>
+
+
+          <!-- SUPPORTING FILES -->
+
+          <div class="submit-form-group full">
+
+            <label>
+              Supporting Files
+              <span class="required">(Optional)</span>
+            </label>
+
+            <label class="file-upload-box" for="supportingFiles">
+
+              <div class="file-upload-icon">
+                <i class="fas fa-paperclip"></i>
+              </div>
+
+              <p class="file-upload-title">
+                Drag and drop supporting files here
+              </p>
+
+              <p class="file-upload-subtitle">
+                or click to choose files
+              </p>
+
+              <div class="file-upload-help">
+                Accepted formats: PDF, DOC, DOCX. Maximum size: 10MB per file.
+              </div>
+
+              <input
+                      type="file"
+                      id="supportingFiles"
+                      class="file-input"
+                      name="supportingFiles"
+                      accept=".pdf,.doc,.docx"
+                      multiple
+              >
+
+              <div
+                      id="selectedSupportingFiles"
+                      class="selected-file"
+              ></div>
+
+            </label>
+
+          </div>
+
+
+        </div>
+
+
+        <!-- SUBMIT -->
+
+        <button
+                type="submit"
+                id="submitBtn"
+                class="submit-button"
+        >
+
+          <i class="fas fa-paper-plane"></i>
+
+          Submit Manuscript
+
+        </button>
+
+
+      </form>
+
+    </section>
+
+
+    <!-- =================================================
+         RIGHT — INFORMATION
+    ================================================= -->
+
+    <aside class="submit-card submit-info-card">
+
+
+      <div class="submit-info-heading">
+
+        <div class="submit-info-icon">
+
+          <i class="fas fa-book-open"></i>
+
+        </div>
+
+
+        <div>
+
+          <h2>
+            Submission Information
+          </h2>
+
+
+          <p>
+            Please follow the guidelines below.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="info-panel">
+
+
+        <!-- ACCEPTED FORMATS -->
+
+        <div class="info-item">
+
+          <div class="info-item-icon">
+
+            <i class="fas fa-file-lines"></i>
+
+          </div>
+
+
+          <div class="info-item-text">
+
+            <strong>
+              Accepted formats
+            </strong>
+
+
+            <span>
+                            PDF, DOC, DOCX
+                        </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- MAXIMUM FILE SIZE -->
+
+        <div class="info-item">
+
+          <div class="info-item-icon">
+
+            <i class="fas fa-hard-drive"></i>
+
+          </div>
+
+
+          <div class="info-item-text">
+
+            <strong>
+              Maximum file size
+            </strong>
+
+
+            <span>
+                            20MB
+                        </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- AUTO GENERATED ID -->
+
+        <div class="info-item check">
+
+          <div class="info-item-icon">
+
+            <i class="fas fa-check"></i>
+
+          </div>
+
+
+          <div class="info-item-text">
+
+            <strong>
+              Your manuscript ID
+            </strong>
+
+
+            <span>
+                            Will be generated automatically
+                            after submission.
+                        </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- QUOTE -->
+
+      <div class="submit-quote">
+
+        <div class="quote-mark">
+          “
+        </div>
+
+
+        <div class="quote-text">
+          Every manuscript has a home.
+        </div>
+
+
+        <div class="quote-author">
+          — Reading Planet
+        </div>
+
+      </div>
+
+
+    </aside>
+
+
+  </div>
+
+</main>
+
+
+<!-- =====================================================
+     COMMON HOME FOOTER
+===================================================== -->
+
+<div id="footer-container"></div>
+
+
+<!-- =====================================================
+     COMMON COMPONENT SCRIPTS
+===================================================== -->
+
+<script src="/js/author-api.js"></script>
+<script src="/js/footer.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+
+<!-- =====================================================
+     SUBMISSION JAVASCRIPT
+===================================================== -->
+
+<script>
+
+
+  /* =====================================================
+     ELEMENTS
+  ===================================================== */
+
+  const form =
+          document.getElementById(
+                  "manuscriptForm"
+          );
+
+
+  const message =
+          document.getElementById(
+                  "message"
+          );
+
+
+  const submitBtn =
+          document.getElementById(
+                  "submitBtn"
+          );
+
+
+  const fileInput =
+          document.getElementById(
+                  "manuscriptFile"
+          );
+
+
+  const selectedFile =
+          document.getElementById(
+                  "selectedFile"
+          );
+
+
+  const supportingFilesInput =
+          document.getElementById(
+                  "supportingFiles"
+          );
+
+
+  const selectedSupportingFiles =
+          document.getElementById(
+                  "selectedSupportingFiles"
+          );
+
+
+  const synopsis =
+          document.getElementById(
+                  "synopsis"
+          );
+
+
+  const synopsisCount =
+          document.getElementById(
+                  "synopsisCount"
+          );
+
+
+  /* =====================================================
+     GET JWT TOKEN
+  ===================================================== */
+
+  function getToken() {
+
+    return localStorage.getItem(
+                    "rp_token"
+            ) ||
+            sessionStorage.getItem(
+                    "rp_token"
+            );
+
+  }
+
+
+  /* =====================================================
+     SHOW MESSAGE
+  ===================================================== */
+
+  function showMessage(
+          text,
+          success
+  ) {
+
+    message.style.display =
+            "block";
+
+
+    message.textContent =
+            text;
+
+
+    message.className =
+            success
+                    ? "submit-message success"
+                    : "submit-message error";
+
+  }
+
+
+  /* =====================================================
+     SYNOPSIS CHARACTER COUNT
+  ===================================================== */
+
+  synopsis.addEventListener(
+          "input",
+          function () {
+
+            synopsisCount.textContent =
+                    synopsis.value.length;
+
+          }
+  );
+
+
+  /* =====================================================
+     FILE DISPLAY
+  ===================================================== */
+
+  fileInput.addEventListener(
+          "change",
+          function () {
+
+            if (
+                    !fileInput.files.length
+            ) {
+
+              selectedFile.style.display =
+                      "none";
+
+              selectedFile.textContent =
+                      "";
+
+              return;
+
+            }
+
+
+            const file =
+                    fileInput.files[0];
+
+
+            selectedFile.style.display =
+                    "block";
+
+
+            selectedFile.textContent =
+                    "Selected file: " +
+                    file.name;
+
+          }
+  );
+
+
+  /* =====================================================
+     DRAG AND DROP SUPPORT
+  ===================================================== */
+
+  const fileUploadBox =
+          document.querySelector(".file-upload-box");
+
+
+  fileUploadBox.addEventListener(
+          "dragover",
+          function (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+          }
+  );
+
+
+  fileUploadBox.addEventListener(
+          "drop",
+          function (event) {
+
+            event.preventDefault();
+
+            event.stopPropagation();
+
+            if (
+                    event.dataTransfer &&
+                    event.dataTransfer.files &&
+                    event.dataTransfer.files.length
+            ) {
+
+              fileInput.files =
+                      event.dataTransfer.files;
+
+              fileInput.dispatchEvent(
+                      new Event("change", { bubbles: true })
+              );
+
+            }
+
+          }
+  );
+
+
+  /* =====================================================
+     SUPPORTING FILE DISPLAY
+  ===================================================== */
+
+  function showSupportingFiles() {
+
+    if (!supportingFilesInput.files.length) {
+
+      selectedSupportingFiles.style.display = "none";
+      selectedSupportingFiles.textContent = "";
+      return;
+
+    }
+
+    selectedSupportingFiles.style.display = "block";
+    selectedSupportingFiles.textContent =
+            "Selected supporting files: " +
+            Array.from(supportingFilesInput.files)
+                    .map(file => file.name)
+                    .join(", ");
+
+  }
+
+
+  supportingFilesInput.addEventListener(
+          "change",
+          showSupportingFiles
+  );
+
+
+  const supportingUploadBox =
+          document.querySelector(
+                  '.file-upload-box[for="supportingFiles"]'
+          );
+
+
+  supportingUploadBox.addEventListener(
+          "dragover",
+          function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+  );
+
+
+  supportingUploadBox.addEventListener(
+          "drop",
+          function (event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (
+                    event.dataTransfer &&
+                    event.dataTransfer.files &&
+                    event.dataTransfer.files.length
+            ) {
+
+              supportingFilesInput.files =
+                      event.dataTransfer.files;
+
+              supportingFilesInput.dispatchEvent(
+                      new Event("change", { bubbles: true })
+              );
+
+            }
+
+          }
+  );
+
+
+  /* =====================================================
+     FORM SUBMISSION
+  ===================================================== */
+
+  form.addEventListener(
+          "submit",
+          async function (event) {
+
+            event.preventDefault();
+
+
+            /* =============================================
+               GET TOKEN
+            ============================================= */
+
+            const token =
+                    getToken();
+
+
+            if (!token) {
+
+              window.location.href =
+                      "/author-login.html";
+
+              return;
+
+            }
+
+
+            /* =============================================
+               FILE REQUIRED
+            ============================================= */
+
+            if (
+                    !fileInput.files.length
+            ) {
+
+              showMessage(
+                      "Please select a manuscript file.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            const file =
+                    fileInput.files[0];
+
+
+            /* =============================================
+               FILE SIZE
+            ============================================= */
+
+            if (
+                    file.size >
+                    20 * 1024 * 1024
+            ) {
+
+              showMessage(
+                      "File size must not exceed 20MB.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            /* =============================================
+               FILE TYPE
+            ============================================= */
+
+            const fileName =
+                    file.name.toLowerCase();
+
+
+            const supported =
+                    fileName.endsWith(".pdf") ||
+                    fileName.endsWith(".doc") ||
+                    fileName.endsWith(".docx");
+
+
+            if (!supported) {
+
+              showMessage(
+                      "Only PDF, DOC and DOCX files are supported.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            /* =============================================
+               REQUIRED FORM VALUES
+            ============================================= */
+
+            const genreValue =
+                    document
+                            .getElementById(
+                                    "genreId"
+                            )
+                            .value;
+
+
+            const titleValue =
+                    document
+                            .getElementById(
+                                    "title"
+                            )
+                            .value
+                            .trim();
+
+
+            const synopsisValue =
+                    document
+                            .getElementById(
+                                    "synopsis"
+                            )
+                            .value
+                            .trim();
+
+
+            const languageValue =
+                    document
+                            .getElementById(
+                                    "language"
+                            )
+                            .value
+                            .trim();
+
+
+            if (!genreValue) {
+
+              showMessage(
+                      "Please select a genre.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            if (!titleValue) {
+
+              showMessage(
+                      "Please enter the manuscript title.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            if (!synopsisValue) {
+
+              showMessage(
+                      "Please enter a synopsis.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            if (!languageValue) {
+
+              showMessage(
+                      "Please enter the manuscript language.",
+                      false
+              );
+
+              return;
+
+            }
+
+
+            /* =============================================
+               REQUEST DATA
+            ============================================= */
+
+            const data = {
+
+              genreId:
+                      Number(
+                              genreValue
+                      ),
+
+              title:
+              titleValue,
+
+              synopsis:
+              synopsisValue,
+
+              language:
+              languageValue,
+
+              wordCount:
+                      document
+                              .getElementById(
+                                      "wordCount"
+                              )
+                              .value
+                              ?
+                              Number(
+                                      document
+                                              .getElementById(
+                                                      "wordCount"
+                                              )
+                                              .value
+                              )
+                              :
+                              null
+
+            };
+
+
+            /* =============================================
+               FORM DATA
+            ============================================= */
+
+            const formData =
+                    new FormData();
+
+
+            formData.append(
+                    "data",
+                    new Blob(
+                            [
+                              JSON.stringify(
+                                      data
+                              )
+                            ],
+                            {
+                              type:
+                                      "application/json"
+                            }
+                    )
+            );
+
+
+            formData.append(
+                    "file",
+                    file
+            );
+
+
+            /* =============================================
+               SUPPORTING FILES
+            ============================================= */
+
+            for (const supportingFile of supportingFilesInput.files) {
+
+              if (supportingFile.size > 10 * 1024 * 1024) {
+
+                showMessage(
+                        "Each supporting file must not exceed 10MB.",
+                        false
+                );
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML =
+                        '<i class="fas fa-paper-plane"></i> Submit Manuscript';
+                return;
+
+              }
+
+              const supportingName =
+                      supportingFile.name.toLowerCase();
+
+              const supportingSupported =
+                      supportingName.endsWith(".pdf") ||
+                      supportingName.endsWith(".doc") ||
+                      supportingName.endsWith(".docx");
+
+              if (!supportingSupported) {
+
+                showMessage(
+                        "Only PDF, DOC and DOCX supporting files are supported.",
+                        false
+                );
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML =
+                        '<i class="fas fa-paper-plane"></i> Submit Manuscript';
+                return;
+
+              }
+
+              formData.append(
+                      "supportingFiles",
+                      supportingFile
+              );
+
+            }
+
+
+            /* =============================================
+               BUTTON
+            ============================================= */
+
+            submitBtn.disabled =
+                    true;
+
+
+            submitBtn.innerHTML =
+                    '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+
+            try {
+
+
+              /* =========================================
+                 SEND REQUEST
+              ========================================= */
+
+              const response =
+                      await fetch(
+                              "/api/manuscripts/submit",
+                              {
+
+                                method:
+                                        "POST",
+
+                                headers:
+                                        {
+                                          "Authorization":
+                                                  "Bearer " +
+                                                  token
+                                        },
+
+                                body:
+                                formData
+
+                              }
+                      );
+
+
+              /* =========================================
+                 RESPONSE
+              ========================================= */
+
+              const result =
+                      await response.json();
+
+
+              /* =========================================
+                 ERROR
+              ========================================= */
+
+              if (
+                      !response.ok ||
+                      !result.success
+              ) {
+
+                showMessage(
+                        result.message ||
+                        "Manuscript submission failed.",
+                        false
+                );
+
+                return;
+
+              }
+
+
+              /* =========================================
+                 SUCCESS
+              ========================================= */
+
+              const submission =
+                      result.data ||
+                      {};
+
+
+              showMessage(
+                      "Manuscript submitted successfully! " +
+                      "Manuscript ID: " +
+                      (
+                              submission.manuscriptCode ||
+                              "N/A"
+                      ),
+                      true
+              );
+
+
+              /* =========================================
+                 RESET FORM
+              ========================================= */
+
+              form.reset();
+
+
+              synopsisCount.textContent =
+                      "0";
+
+
+              selectedFile.style.display =
+                      "none";
+
+
+              selectedFile.textContent =
+                      "";
+
+
+            } catch (error) {
+
+              console.error(
+                      error
+              );
+
+
+              showMessage(
+                      "Something went wrong while submitting the manuscript.",
+                      false
+              );
+
+
+            } finally {
+
+              submitBtn.disabled =
+                      false;
+
+
+              submitBtn.innerHTML =
+                      '<i class="fas fa-paper-plane"></i> Submit Manuscript';
+
+            }
+
+          }
+  );
+
+</script>
+
+
+</body>
+
+</html>

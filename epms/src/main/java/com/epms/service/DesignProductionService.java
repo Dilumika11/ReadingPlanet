@@ -67,14 +67,106 @@ public class DesignProductionService {
     private final AuthorPortalService authorPortal;
     private final AuditService auditService;
     private final ObjectMapper objectMapper;
+    private final com.epms.repository.DesignAssignmentRepository assignmentRepository;
+    private final com.epms.repository.UserRepository userRepository;
+    private final UserNames names;
 
     // ---------- design queue ----------
 
+    /** The designer's own work: manuscripts assigned to them (current and completed). */
     @Transactional(readOnly = true)
-    public List<ManuscriptSummary> designQueue() {
+    public List<ManuscriptSummary> designQueue(Long designerId) {
+        List<Long> ids = assignmentRepository.findByDesignerIdAndAssignmentStatusIn(designerId, List.of("ACTIVE", "COMPLETED"))
+                .stream().map(com.epms.entity.DesignAssignment::getManuscriptId).distinct().toList();
+        return queries.summaries(manuscriptRepository.findAllById(ids).stream()
+                .sorted((a, b) -> b.getUpdatedAt().compareTo(a.getUpdatedAt())).toList());
+    }
+
+    // ---------- design assignments (production manager) ----------
+
+    /** Accepted manuscripts still waiting for a designer. */
+    @Transactional(readOnly = true)
+    public List<ManuscriptSummary> awaitingDesigner() {
         return queries.summaries(manuscriptRepository.findByStatusInOrderByUpdatedAtDesc(List.of(
-                ManuscriptStatus.ACCEPTED, ManuscriptStatus.IN_DESIGN, ManuscriptStatus.AWAITING_AUTHOR_APPROVAL,
-                ManuscriptStatus.DESIGN_APPROVED)));
+                        ManuscriptStatus.ACCEPTED, ManuscriptStatus.IN_DESIGN)).stream()
+                .filter(m -> assignmentRepository.findFirstByManuscriptIdAndAssignmentStatus(m.getManuscriptId(), "ACTIVE").isEmpty())
+                .toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> designers() {
+        return userRepository.findByRoleInOrderByFullName(List.of(com.epms.enums.Role.DESIGNER)).stream()
+                .filter(u -> "ACTIVE".equals(u.getAccountStatus()))
+                .map(u -> {
+                    Map<String, Object> m = new LinkedHashMap<>();
+                    m.put("userId", u.getUserId());
+                    m.put("fullName", u.getFullName());
+                    m.put("activeAssignments", assignmentRepository
+                            .findByDesignerIdAndAssignmentStatusIn(u.getUserId(), List.of("ACTIVE")).size());
+                    return m;
+                }).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> activeAssignments() {
+        return assignmentRepository.findByAssignmentStatusOrderByAssignedAtDesc("ACTIVE").stream().map(a -> {
+            Manuscript m = manuscriptRepository.findById(a.getManuscriptId()).orElse(null);
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("assignment", a);
+            row.put("manuscriptCode", m == null ? null : m.getManuscriptCode());
+            row.put("title", m == null ? null : m.getTitle());
+            row.put("manuscriptStatus", m == null ? null : m.getStatus());
+            row.put("designerName", names.user(a.getDesignerId()));
+            return row;
+        }).toList();
+    }
+
+    /** Assigns (or reassigns) the designer; the previous active assignment is cancelled. */
+    public com.epms.entity.DesignAssignment assignDesigner(Long managerId, Long manuscriptId, Long designerId, String remarks) {
+        Manuscript m = workflow.get(manuscriptId);
+        workflow.requireStatus(m, "assign a designer to", ManuscriptStatus.ACCEPTED, ManuscriptStatus.IN_DESIGN,
+                ManuscriptStatus.AWAITING_AUTHOR_APPROVAL);
+        com.epms.entity.User designer = userRepository.findById(designerId)
+                .orElseThrow(() -> new ResourceNotFoundException("Designer not found: " + designerId));
+        if (designer.getRole() != com.epms.enums.Role.DESIGNER || !"ACTIVE".equals(designer.getAccountStatus())) {
+            throw new InvalidRequestException(designer.getFullName() + " is not an active designer");
+        }
+        assignmentRepository.findFirstByManuscriptIdAndAssignmentStatus(manuscriptId, "ACTIVE").ifPresent(prev -> {
+            if (prev.getDesignerId().equals(designerId)) {
+                throw new BusinessRuleException(designer.getFullName() + " is already the designer of this manuscript");
+            }
+            prev.setAssignmentStatus("CANCELLED");
+            prev.setCompletedAt(LocalDateTime.now());
+            assignmentRepository.saveAndFlush(prev);
+        });
+        com.epms.entity.DesignAssignment a = new com.epms.entity.DesignAssignment();
+        a.setManuscriptId(manuscriptId);
+        a.setDesignerId(designerId);
+        a.setAssignedBy(managerId);
+        a.setAssignmentStatus("ACTIVE");
+        a.setRemarks(remarks == null || remarks.isBlank() ? null : remarks.trim());
+        com.epms.entity.DesignAssignment saved = assignmentRepository.save(a);
+        workflow.changeStatus(m, m.getStatus(), managerId, "Designer assigned: " + designer.getFullName());
+        return saved;
+    }
+
+    public void cancelAssignment(Long managerId, Long assignmentId) {
+        com.epms.entity.DesignAssignment a = assignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Assignment not found: " + assignmentId));
+        if (!"ACTIVE".equals(a.getAssignmentStatus())) {
+            throw new BusinessRuleException("Only an active assignment can be cancelled");
+        }
+        a.setAssignmentStatus("CANCELLED");
+        a.setCompletedAt(LocalDateTime.now());
+        assignmentRepository.save(a);
+    }
+
+    private void requireAssignedDesigner(Long designerId, Long manuscriptId) {
+        boolean assigned = assignmentRepository.findFirstByManuscriptIdAndAssignmentStatus(manuscriptId, "ACTIVE")
+                .map(a -> a.getDesignerId().equals(designerId)).orElse(false);
+        if (!assigned) {
+            throw new AccessDeniedException("You are not the assigned designer for this manuscript");
+        }
     }
 
     @Transactional(readOnly = true)
@@ -92,6 +184,7 @@ public class DesignProductionService {
     public BookDesign uploadVersion(Long designerId, Long manuscriptId, MultipartFile cover, MultipartFile layout,
                                     MultipartFile printFile, String notes) {
         Manuscript m = workflow.get(manuscriptId);
+        requireAssignedDesigner(designerId, manuscriptId);
         workflow.requireStatus(m, "add a design version to", ManuscriptStatus.ACCEPTED, ManuscriptStatus.IN_DESIGN);
         boolean hasCover = cover != null && !cover.isEmpty();
         boolean hasLayout = layout != null && !layout.isEmpty();
@@ -129,6 +222,7 @@ public class DesignProductionService {
     public BookDesign submitForApproval(Long designerId, Long designId) {
         BookDesign d = design(designId);
         Manuscript m = workflow.get(d.getManuscriptId());
+        requireAssignedDesigner(designerId, m.getManuscriptId());
         workflow.requireStatus(m, "send a design for approval on", ManuscriptStatus.IN_DESIGN);
         BookDesign latest = designRepository.findFirstByManuscriptIdOrderByDesignVersionDesc(m.getManuscriptId()).orElseThrow();
         if (!latest.getDesignId().equals(designId)) {
@@ -170,6 +264,13 @@ public class DesignProductionService {
         designRepository.save(d);
         workflow.changeStatus(m, approve ? ManuscriptStatus.DESIGN_APPROVED : ManuscriptStatus.IN_DESIGN, authorUserId,
                 "Author " + (approve ? "approved" : "rejected") + " design v" + d.getDesignVersion());
+        if (approve) {
+            assignmentRepository.findFirstByManuscriptIdAndAssignmentStatus(m.getManuscriptId(), "ACTIVE").ifPresent(x -> {
+                x.setAssignmentStatus("COMPLETED");
+                x.setCompletedAt(LocalDateTime.now());
+                assignmentRepository.save(x);
+            });
+        }
         return saved;
     }
 

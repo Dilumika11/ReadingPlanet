@@ -1,0 +1,80 @@
+<header class="site-header">
+    <div class="top-header">
+        <div class="top-header-inner">
+            <a href="/" class="logo-link">
+                <img src="/images/reading-planet-logo.png" alt="Reading Planet Logo" class="logo">
+            </a>
+
+            <nav class="main-nav public-header-nav" aria-label="Main navigation">
+                <ul class="nav-list">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/store">Online Store</a></li>
+                    <li><a href="/about">About Us</a></li>
+                    <li><a href="/authors">All Authors</a></li>
+                    <li><a href="/faqs">FAQs</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+
+            <nav class="main-nav author-header-nav" aria-label="Author navigation">
+                <ul class="nav-list">
+                    <li><a href="/author/dashboard.html" data-author-nav="dashboard">Home</a></li>
+                    <li><a href="/author/my-submissions.html" data-author-nav="submissions">My Manuscripts</a></li>
+                    <li><a href="/author/submit-manuscript.html" data-author-nav="submit">Submit Manuscript</a></li>
+                    <li><a href="/author/my-submissions.html?status=UNDER_REVIEW" data-author-nav="reviews">Reviews &amp; Comments</a></li>
+                    <li><a href="/author/profile.html" data-author-nav="profile">My Profile</a></li>
+                </ul>
+            </nav>
+
+            <div class="public-account-wrap" id="publicAccountWrap">
+                <a href="/customer-login.html" class="account-btn public-account-btn" id="publicAccountBtn">
+                    <i class="fas fa-user"></i>
+                    <span id="publicAccountLabel">Account</span>
+                    <i class="fas fa-chevron-down public-account-caret" aria-hidden="true"></i>
+                </a>
+                <div class="public-account-menu" id="publicAccountMenu" hidden>
+                    <a href="/account.html" class="public-account-menu-item" id="menuMyAccount">
+                        <i class="fas fa-id-card"></i> My Account
+                    </a>
+                    <button type="button" class="public-account-menu-item" id="menuLogout">
+                        <i class="fas fa-right-from-bracket"></i> Log out
+                    </button>
+                </div>
+            </div>
+
+            <div class="author-header-user" aria-label="Author account">
+                <div class="author-header-user-text">
+                    <span id="authorHeaderName">Author</span>
+                    <small>AUTHOR</small>
+                </div>
+                <button type="button" class="author-header-logout" id="authorLogoutBtn">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-header">
+        <div class="bottom-header-inner">
+            <div class="social-icons">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://pinterest.com" target="_blank" rel="noopener noreferrer" aria-label="Pinterest"><i class="fab fa-pinterest-p"></i></a>
+            </div>
+
+            <div class="search-container public-search-container">
+                <form class="search-form" id="searchForm" role="search">
+                    <button type="submit" class="search-btn" aria-label="Search"><i class="fas fa-search"></i></button>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search books, ISBN, authors..." autocomplete="off" aria-label="Search">
+                </form>
+            </div>
+
+            <div class="user-actions public-user-actions">
+                <button type="button" class="action-btn wishlist-btn" id="wishlistBtn" aria-label="Wishlist"><i class="far fa-heart"></i><span class="badge" id="wishlistBadge">0</span></button>
+                <span class="actions-divider"></span>
+                <button type="button" class="action-btn cart-btn" id="cartBtn" aria-label="Shopping cart"><i class="fas fa-shopping-basket"></i><span class="badge" id="cartBadge">0</span></button>
+            </div>
+        </div>
+    </div>
+</header>

@@ -110,7 +110,11 @@ echo "     version history: $(json "', '.join('v%s %s' % (f['fileVersion'], f['f
 expect "Editor accepts" 200 "$(call POST /api/editorial/manuscripts/$MS/decision "$EDITOR" '{"decision":"ACCEPT","comments":"Ready for production."}')"
 expect "Chief editor monitors progress" 200 "$(call GET /api/editorial/overview "$CHIEF")"
 
-step "3. Epic 2: design versions, author approval, QC, ready for printing (US16-US20)"
+step "3. Epic 2: designer assignment, versions, author approval, QC, ready for printing (US16-US20)"
+call GET /api/production/design-assignments/designers "$PM" >/dev/null
+DESIGNER_ID=$(json "[e['userId'] for e in d['data'] if e['fullName']=='DESIGNER Demo'][-1]")
+expect "Unassigned designer cannot upload" 403 "$(upload /api/design/manuscripts/$MS/versions "$DESIGNER" "cover=@$TMPD/cover.png;type=image/png")"
+expect "Production manager assigns the designer" 200 "$(call POST /api/production/design-assignments "$PM" "{\"manuscriptId\":$MS,\"designerId\":$DESIGNER_ID}")"
 expect "Designer uploads cover only (v1)" 200 "$(upload /api/design/manuscripts/$MS/versions "$DESIGNER" "cover=@$TMPD/cover.png;type=image/png" "notes=First cover")"
 D1=$(json "d['data']['designId']")
 expect "Incomplete design cannot go to the author" 409 "$(call POST /api/design/designs/$D1/submit "$DESIGNER")"
@@ -175,7 +179,25 @@ expect "Second order rejected with a reason" 200 "$(call POST /api/sales/booksto
 BO2=$(json "d['data']['order']['bookstoreOrderId']")
 expect "  reject" 200 "$(call POST /api/sales/bookstore-orders/$BO2/reject "$SALES" '{"reason":"Credit limit reached"}')"
 
-step "8. Hand-over to Epic 4: delivered orders are revenue"
+step "8. Team features: password reset, Getting Published, contracts, bank details"
+expect "Forgot password (same answer for any e-mail)" 200 "$(call POST /api/auth/forgot-password "" "{\"email\":\"cust$R@x.lk\"}")"
+expect "Reset with a bad token refused" 400 "$(call POST /api/auth/reset-password "" '{"token":"nope","newPassword":"NewPass123","confirmPassword":"NewPass123"}')"
+expect "Staff login refuses a customer" 200 "$(call POST /api/auth/staff-login "" "{\"email\":\"cust$R@x.lk\",\"password\":\"$PW\"}")"
+[ "$(json "d['success']")" = "False" ] && ok "  ...refused" || bad "Staff login refuses customer" "$(head -c 150 "$BODY")"
+expect "Store login refuses staff" 200 "$(call POST /api/auth/store-login "" "{\"email\":\"editor$R@x.lk\",\"password\":\"$PW\"}")"
+[ "$(json "d['success']")" = "False" ] && ok "  ...refused" || bad "Store login refuses staff" "$(head -c 150 "$BODY")"
+expect "Apply to get published" 200 "$(upload /api/publishing-applications "" "authorName=New Writer" "phone=0771112233" "email=apply$R@x.lk" "manuscriptName=First Novel" "bookType=Novel" "manuscriptFile=@$TMPD/manuscript.pdf;type=application/pdf")"
+APP=$(json "d['data']['applicationId']")
+expect "Check status with number and e-mail" 200 "$(call GET "/api/publishing-applications/status?applicationId=$APP&email=apply$R@x.lk" "")"
+expect "Wrong e-mail finds nothing" 404 "$(call GET "/api/publishing-applications/status?applicationId=$APP&email=other@x.lk" "")"
+expect "Admin approves the application" 200 "$(call POST /api/publishing-applications/$APP/approve "$ADMIN")"
+expect "Author saves bank details" 200 "$(call PUT /api/author/bank-details "$AUTH" '{"accountName":"N Perera","bankName":"Commercial Bank","accountNumber":"8001234567","branch":"Galle"}')"
+expect "Author opens Contracts & Royalties" 200 "$(call GET /api/author/contracts-royalties "$AUTH")"
+expect "Customer profile" 200 "$(call PUT /api/customer/profile "$CUST" '{"firstName":"Kasun","lastName":"Silva","phoneNumber":"0771234567"}')"
+expect "Login activity" 200 "$(call GET /api/me/login-activity "$CUST")"
+echo "     $(json "len(d['data'])") logins recorded"
+
+step "9. Hand-over to Epic 4: delivered orders are revenue"
 FIN=$(login finance@readingplanet.lk 'Password@123')
 expect "Revenue for today" 200 "$(call GET "/api/finance/revenue?from=$TODAY&to=$TODAY&bookId=$BOOK" "$FIN")"
 echo "     book #$BOOK today: $(json "d['data']['completedSales']") completed sales, $(json "d['data']['booksSold']") books, net $(json "d['data']['totalRevenue']")"

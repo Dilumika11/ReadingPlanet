@@ -3,188 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reading Planet – Book Publishing House</title>
-    <meta name="description" content="Reading Planet connects global masterpieces with Sri Lankan readers and elevates local voices to international standards.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Playfair+Display:wght@500&family=Noto+Sans+Sinhala:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/public.css">
+    <title>Reading Planet</title>
+
+    <!-- Shared Header Styles -->
+    <link rel="stylesheet" href="/css/header.css">
+
+    <!-- Shared Footer Styles -->
+    <link rel="stylesheet" href="/css/footer.css">
+
+    <!-- Home page specific styles (Vision / Mission section) -->
+    <link rel="stylesheet" href="/css/home.css">
+
+    <!-- Font Awesome (required by Header & Footer icons) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-<header class="site-header">
-    <div class="container">
-        <a class="site-logo" href="/">
-            <img src="/images/reading-planet-logo.png" alt="Reading Planet">
-        </a>
+<!-- ==================== SHARED HEADER ==================== -->
+<div id="header-container"></div>
 
-        <button type="button" class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
-            <i class="fas fa-bars"></i>
-        </button>
+<!-- ==================== PAGE CONTENT ==================== -->
+<section id="about-reading-planet" class="rp-section" aria-labelledby="rp-section-heading">
+    <div class="rp-container">
 
-        <nav class="site-nav" id="siteNav">
-            <a href="/" class="active">Home</a>
-            <a href="/store.html">Online Store</a>
-            <a href="#about">About Us</a>
-            <a href="#authors">All Authors</a>
-            <a href="#faqs">FAQs</a>
-            <a href="#contact">Contact</a>
-            <a class="account-pill" href="/admin-login.html"><i class="fas fa-user"></i> Account</a>
-        </nav>
+        <!-- Three clickable image cards -->
+        <div class="rp-image-grid">
+            <a href="/reading-planet" class="rp-image-card">
+                <img src="/images/reading-planet.png"
+                     alt="Reading Planet"
+                     class="rp-image-card__img"
+                     loading="lazy">
+            </a>
 
-        <a class="account-pill" href="/admin-login.html"><i class="fas fa-user"></i> Account</a>
+            <a href="/work-with-us" class="rp-image-card">
+                <img src="/images/work-with-us.png"
+                     alt="Work With Us"
+                     class="rp-image-card__img"
+                     loading="lazy">
+            </a>
+
+            <a href="/getting-published.html" class="rp-image-card">
+                <img src="/images/getting-published.png"
+                     alt="Getting Published"
+                     class="rp-image-card__img"
+                     loading="lazy">
+            </a>
+        </div>
+
+        <!-- Vision + Mission cards -->
+        <div class="rp-info-grid">
+            <article class="rp-info-card rp-vision">
+                <h2 class="rp-info-card__heading">Vision</h2>
+                <p class="rp-info-card__text">
+                    To create a vibrant reading community that connects readers with inspiring stories and knowledge, fostering a lifelong love for books while empowering local authors to reach readers around the world.
+                </p>
+            </article>
+
+            <article class="rp-info-card rp-mission">
+                <h2 class="rp-info-card__heading">Mission</h2>
+                <p class="rp-info-card__text">
+                    To discover, promote, and connect readers with quality literature by providing a platform for readers and authors to explore, share, and celebrate the power of books, while supporting emerging writers and enriching the reading experience.
+                </p>
+            </article>
+        </div>
+
     </div>
-</header>
+</section>
 
-<div class="search-band">
-    <div class="container">
-        <div class="social-links">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
-        </div>
-
-        <form class="search-form" id="searchForm" role="search">
-            <input type="search" id="searchInput" placeholder="Search books" aria-label="Search books">
-            <button type="submit" aria-label="Search"><i class="fas fa-search"></i></button>
-        </form>
-
-        <div class="band-actions">
-            <a href="#" aria-label="Wishlist"><i class="far fa-heart"></i></a>
-            <span class="divider"></span>
-            <a href="#" aria-label="Cart"><i class="fas fa-shopping-cart"></i></a>
-        </div>
-    </div>
-</div>
-
-<main>
-    <section class="hero" id="store">
-        <div class="container">
-            <div class="feature-grid">
-                <!-- Drop the photos into /images with these names and remove the placeholder-* class -->
-                <a class="feature-card placeholder-a" href="/store.html"
-                   style="background-image: url('/images/home-reading-planet.jpg'), linear-gradient(135deg, #6b4a2b, #2f2117);">
-                    <div class="feature-text">
-                        <h2>Reading Planet</h2>
-                        <p>Books · Stories · Ideas</p>
-                    </div>
-                </a>
-                <a class="feature-card placeholder-b" href="#authors"
-                   style="background-image: url('/images/home-work-with-us.jpg'), linear-gradient(135deg, #7a5a3a, #3a2a1c);">
-                    <div class="feature-text">
-                        <h2>Work With us</h2>
-                        <p>Careers &amp; Partnerships</p>
-                    </div>
-                </a>
-                <a class="feature-card placeholder-c" href="#authors"
-                   style="background-image: url('/images/home-getting-published.jpg'), linear-gradient(135deg, #8a6a45, #3f2e1e);">
-                    <div class="feature-text">
-                        <h2>Getting Published</h2>
-                        <p>For Authors</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section class="about" id="about">
-        <div class="container">
-            <div class="info-grid">
-                <div class="info-card">
-                    <h2>Vision</h2>
-                    <p>To create a vibrant literary bridge that connects global masterpieces with Sri Lankan
-                        readers while elevating local voices to international standards, enriching culture and
-                        imagination through the power of storytelling.</p>
-                </div>
-                <div class="info-card">
-                    <h2>Mission</h2>
-                    <p>To discover, develop, and promote authentic Sri Lankan authors while collaborating with
-                        international publishers to deliver high-quality translated works, producing books that
-                        combine editorial excellence, cultural relevance, and premium craftsmanship for readers.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+<main style="padding: 2rem; text-align: center; color: #666;">
+    <p></p>
 </main>
 
-<footer class="site-footer" id="contact">
-    <div class="container">
-        <div class="footer-main">
-            <div class="footer-brand">
-                <img src="/images/reading-planet-logo-white.png" alt="Reading Planet">
-                <p>1470/1F, Delgahawaththa Road,<br>Pannipitiya</p>
-                <p>Monday – Friday: 8:30 AM – 05:30 PM<br>Saturday: 08:30 AM – 1:00 PM</p>
-                <p><a class="footer-email" href="mailto:readingplanetpub@gmail.com">readingplanetpub@gmail.com</a></p>
-            </div>
+<!-- ==================== SHARED FOOTER ==================== -->
+<div id="footer-container"></div>
 
-            <div class="footer-col">
-                <h3>Company</h3>
-                <ul>
-                    <li><a href="#about">About us</a></li>
-                    <li><a href="#contact">Contact Us</a></li>
-                    <li><a href="#">Delivery information</a></li>
-                    <li><a href="#">Site Map</a></li>
-                </ul>
-            </div>
+<!-- ==================== SCRIPTS ==================== -->
+<!-- Order is important -->
+<script src="/js/header.js"></script>
+<script src="/js/footer.js"></script>
+<script src="/js/load-components.js"></script>
 
-            <div class="footer-col">
-                <h3>Our Company</h3>
-                <ul>
-                    <li><a href="#">Loyalty Program</a></li>
-                    <li><a href="#">Career</a></li>
-                    <li><a href="#">Delivery information</a></li>
-                    <li><a href="#blog">The Unbound Mic</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Legal</h3>
-                <ul>
-                    <li><a href="#">Privacy Policy</a></li>
-                    <li><a href="#">Terms and Conditions</a></li>
-                    <li><a href="#">Payment information</a></li>
-                    <li><a href="#">Pre Orders Terms Of Service</a></li>
-                </ul>
-            </div>
-
-            <div class="footer-col">
-                <h3>Follow Us</h3>
-                <div class="footer-social">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
-                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer-bottom">
-        <div class="container">
-            <span class="copyright">Copyright © 2026 <a href="/">Reading Planet</a>. All rights reserved.</span>
-            <span class="call"><i class="fas fa-phone-volume"></i> Call Us: +94 71 446 5690</span>
-        </div>
-    </div>
-</footer>
-
-<script>
-    (function () {
-        var toggle = document.getElementById("navToggle");
-        var nav = document.getElementById("siteNav");
-        toggle.addEventListener("click", function () {
-            var open = nav.classList.toggle("open");
-            toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        });
-        nav.querySelectorAll("a").forEach(function (a) {
-            a.addEventListener("click", function () { nav.classList.remove("open"); });
-        });
-
-        // Store search is Epic 3's; until it exists the box just clears itself.
-        document.getElementById("searchForm").addEventListener("submit", function (e) {
-            e.preventDefault();
-        });
-    })();
-</script>
 </body>
 </html>

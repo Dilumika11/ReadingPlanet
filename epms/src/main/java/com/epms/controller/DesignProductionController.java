@@ -27,8 +27,41 @@ public class DesignProductionController {
     // ---------- designer (US16, US17) ----------
 
     @GetMapping("/api/design/queue")
-    public ApiResponse<?> designQueue() {
-        return new ApiResponse<>(true, "Design queue", service.designQueue());
+    public ApiResponse<?> designQueue(Authentication auth) {
+        return new ApiResponse<>(true, "Your design assignments", service.designQueue(currentUserService.getCurrentUserId(auth)));
+    }
+
+    // ---------- design assignments (production manager) ----------
+
+    @GetMapping("/api/production/design-assignments/eligible")
+    public ApiResponse<?> awaitingDesigner() {
+        return new ApiResponse<>(true, "Manuscripts waiting for a designer", service.awaitingDesigner());
+    }
+
+    @GetMapping("/api/production/design-assignments/designers")
+    public ApiResponse<?> designers() {
+        return new ApiResponse<>(true, "Designers", service.designers());
+    }
+
+    @GetMapping("/api/production/design-assignments")
+    public ApiResponse<?> activeAssignments() {
+        return new ApiResponse<>(true, "Active design assignments", service.activeAssignments());
+    }
+
+    @PostMapping("/api/production/design-assignments")
+    public ApiResponse<?> assignDesigner(@RequestBody Map<String, Object> body, Authentication auth) {
+        Object m = body.get("manuscriptId"), d = body.get("designerId"), r = body.get("remarks");
+        if (m == null || d == null) {
+            throw new com.epms.exception.InvalidRequestException("Choose the manuscript and the designer");
+        }
+        return new ApiResponse<>(true, "Designer assigned", service.assignDesigner(currentUserService.getCurrentUserId(auth),
+                Long.valueOf(m.toString()), Long.valueOf(d.toString()), r == null ? null : r.toString()));
+    }
+
+    @DeleteMapping("/api/production/design-assignments/{id}")
+    public ApiResponse<?> cancelAssignment(@PathVariable Long id, Authentication auth) {
+        service.cancelAssignment(currentUserService.getCurrentUserId(auth), id);
+        return new ApiResponse<>(true, "Assignment cancelled", null);
     }
 
     @GetMapping("/api/design/manuscripts/{id}")

@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Author Profile - Reading Planet
+    </title>
+
+
+    <!-- COMMON HOME PAGE STYLES -->
+    <link
+            rel="stylesheet"
+            href="/css/header.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/footer.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/author.css"
+    >
+
+
+    <!-- FONT AWESOME -->
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           PROFILE PAGE
+        ===================================================== */
+
+        body.author-profile-page {
+
+            margin: 0;
+
+            min-height: 100vh;
+
+            background: #f7fbff;
+
+            font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+        }
+
+
+        .author-profile-main {
+
+            width: 100%;
+
+            padding:
+                    35px
+                    0
+                    55px;
+
+        }
+
+
+        .author-profile-container {
+
+            width:
+                    min(
+                            1480px,
+                            calc(100% - 70px)
+                    );
+
+            margin:
+                    0 auto;
+
+        }
+
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .ap-hero {
+
+            position: relative;
+
+            min-height: 230px;
+
+            display: flex;
+
+            align-items: center;
+
+            padding:
+                    32px
+                    40px;
+
+            overflow: hidden;
+
+            border-radius: 22px;
+
+            background:
+                    radial-gradient(
+                            circle at 82% 5%,
+                            rgba(255,255,255,.75),
+                            transparent 34%
+                    ),
+                    linear-gradient(
+                            135deg,
+                            #edf7ff 0%,
+                            #dceeff 48%,
+                            #c7def4 100%
+                    );
+
+            border:
+                    1px solid #c8def2;
+
+            box-shadow:
+                    0
+                    10px
+                    28px
+                    rgba(30,85,135,.10);
+
+        }
+
+
+        .ap-hero-content {
+
+            position: relative;
+
+            z-index: 10;
+
+            width: 48%;
+
+            max-width: 560px;
+
+        }
+
+
+        .ap-hero-label {
+
+            margin-bottom: 9px;
+
+            color: #15599b;
+
+            font-size: .78rem;
+
+            font-weight: 800;
+
+            letter-spacing: .18em;
+
+        }
+
+
+        .ap-hero h1 {
+
+            margin:
+                    0 0 10px;
+
+            color: #124b87;
+
+            font-size:
+                    2.25rem;
+
+            font-weight: 800;
+
+            line-height: 1.1;
+
+        }
+
+
+        .ap-hero-content p {
+
+            margin: 0;
+
+            max-width: 470px;
+
+            color: #557695;
+
+            font-size: .95rem;
+
+            line-height: 1.6;
+
+        }
+
+
+        .ap-hero-art {
+
+            position: absolute;
+
+            top: 0;
+
+            right: 0;
+
+            width: 63%;
+
+            height: 100%;
+
+            overflow: hidden;
+
+            pointer-events: none;
+
+        }
+
+
+        .ap-story-message {
+
+            position: absolute;
+
+            z-index: 8;
+
+            left: 13%;
+
+            top: 50%;
+
+            transform:
+                    translateY(-50%);
+
+            color: #075eaa;
+
+            font-family:
+                    "Segoe Script",
+                    "Brush Script MT",
+                    "Lucida Handwriting",
+                    cursive;
+
+            font-size: 2rem;
+
+            font-style: italic;
+
+            font-weight: 600;
+
+            line-height: .95;
+
+            text-align: center;
+
+            white-space: nowrap;
+
+        }
+
+
+        .ap-story-message span {
+
+            display: inline-block;
+
+            margin-left: 35px;
+
+            margin-top: 7px;
+
+        }
+
+
+        .ap-hero-image-wrap {
+
+            position: absolute;
+
+            right: 0;
+
+            bottom: 0;
+
+            width: 62%;
+
+            height: 100%;
+
+            display: flex;
+
+            align-items: flex-end;
+
+            justify-content: flex-end;
+
+            overflow: hidden;
+
+        }
+
+
+        .ap-hero-image {
+
+            display: block;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            object-position: right center;
+
+            border: none;
+
+            box-shadow: none;
+
+            background:
+                    transparent;
+
+        }
+
+
+        /* =====================================================
+           LAYOUT
+        ===================================================== */
+
+        .ap-layout {
+
+            display: grid;
+
+            grid-template-columns:
+                    285px
+                    minmax(0, 1fr);
+
+            gap: 24px;
+
+            margin-top: 25px;
+
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ===================================================== */
+
+        .ap-sidebar-card {
+
+            background:
+                    #ffffff;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    18px;
+
+            box-shadow:
+                    0
+                    8px
+                    24px
+                    rgba(30,75,140,.07);
+
+            overflow: hidden;
+
+        }
+
+
+        .ap-profile-summary {
+
+            padding:
+                    28px
+                    22px
+                    24px;
+
+            text-align: center;
+
+            border-bottom:
+                    1px solid #e6edf4;
+
+        }
+
+
+        .ap-avatar {
+
+            position: relative;
+
+            width: 112px;
+
+            height: 112px;
+
+            margin:
+                    0 auto
+                    18px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            background:
+                    linear-gradient(
+                            145deg,
+                            #e9f4ff,
+                            #c9def3
+                    );
+
+            border:
+                    5px solid #ffffff;
+
+            box-shadow:
+                    0
+                    7px
+                    22px
+                    rgba(21,84,154,.20);
+
+            font-size: 0;
+
+        }
+
+
+        .ap-author-icon {
+
+            color: #5c85ad;
+
+            font-size:
+                    3.5rem;
+
+        }
+
+
+        .ap-avatar img {
+
+            position: absolute;
+
+            inset: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+
+            border-radius: 50%;
+
+        }
+
+
+        .ap-camera {
+
+            position: absolute;
+
+            right: -7px;
+
+            bottom: -7px;
+
+            z-index: 30;
+
+            width: 39px;
+
+            height: 39px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            border-radius: 50%;
+
+            border:
+                    3px solid #ffffff;
+
+            background: #075eaa;
+
+            color: #ffffff;
+
+            cursor: pointer;
+
+            box-shadow:
+                    0
+                    5px
+                    14px
+                    rgba(0,0,0,.18);
+
+        }
+
+
+        .ap-camera:hover {
+
+            background:
+                    #0b4d8a;
+
+        }
+
+
+        #profilePhotoInput {
+
+            display: none;
+
+        }
+
+
+        .ap-profile-summary h2 {
+
+            margin:
+                    0 0 7px;
+
+            color:
+                    #204b72;
+
+            font-size:
+                    18px;
+
+        }
+
+
+        .ap-profile-summary > p {
+
+            margin:
+                    0 0 12px;
+
+            color:
+                    #2d75ae;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        .ap-status-badge {
+
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    7px;
+
+            padding:
+                    6px
+                    10px;
+
+            border-radius:
+                    999px;
+
+            background:
+                    #e8f7ef;
+
+            color:
+                    #23764f;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    800;
+
+        }
+
+
+        .ap-status-dot {
+
+            width:
+                    7px;
+
+            height:
+                    7px;
+
+            border-radius:
+                    50%;
+
+            background:
+                    #27805a;
+
+        }
+
+
+        .ap-sidebar-nav {
+
+            padding:
+                    14px;
+
+        }
+
+
+        .ap-sidebar-nav a {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    11px;
+
+            padding:
+                    11px
+                    12px;
+
+            margin-bottom:
+                    5px;
+
+            border-radius:
+                    9px;
+
+            color:
+                    #58738c;
+
+            text-decoration:
+                    none;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    650;
+
+        }
+
+
+        .ap-sidebar-nav a:hover {
+
+            background:
+                    #eef5fb;
+
+            color:
+                    #1d5798;
+
+        }
+
+
+        .ap-sidebar-nav a.active {
+
+            background:
+                    #e9f3fc;
+
+            color:
+                    #155b98;
+
+            font-weight:
+                    750;
+
+        }
+
+
+        .ap-sidebar-nav i {
+
+            width:
+                    18px;
+
+            text-align:
+                    center;
+
+        }
+
+
+        .ap-quote-card {
+
+            margin:
+                    8px
+                    14px
+                    18px;
+
+            padding:
+                    18px;
+
+            position: relative;
+
+            border-radius:
+                    12px;
+
+            background:
+                    linear-gradient(
+                            135deg,
+                            #edf6ff,
+                            #f8fbff
+                    );
+
+            border:
+                    1px solid #dce9f5;
+
+        }
+
+
+        .ap-quote-card i {
+
+            color:
+                    #5b89b6;
+
+            font-size:
+                    15px;
+
+        }
+
+
+        .ap-quote-card p {
+
+            margin:
+                    9px 0 7px;
+
+            color:
+                    #496b88;
+
+            font-size:
+                    12px;
+
+            line-height:
+                    1.6;
+
+        }
+
+
+        .ap-quote-card span {
+
+            color:
+                    #7d95aa;
+
+            font-size:
+                    10px;
+
+        }
+
+
+        /* =====================================================
+           FORM AREA
+        ===================================================== */
+
+        .ap-form-area {
+
+            min-width: 0;
+
+        }
+
+
+        .ap-form-card {
+
+            background:
+                    #ffffff;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    18px;
+
+            box-shadow:
+                    0
+                    8px
+                    24px
+                    rgba(30,75,140,.07);
+
+            padding:
+                    28px;
+
+        }
+
+
+        .ap-form-header {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    space-between;
+
+            gap:
+                    15px;
+
+            padding-bottom:
+                    20px;
+
+            margin-bottom:
+                    22px;
+
+            border-bottom:
+                    1px solid #e7edf3;
+
+        }
+
+
+        .ap-form-header h2 {
+
+            margin:
+                    0 0 5px;
+
+            color:
+                    #1d4f7e;
+
+            font-size:
+                    20px;
+
+        }
+
+
+        .ap-form-header p {
+
+            margin:
+                    0;
+
+            color:
+                    #7890a5;
+
+            font-size:
+                    12px;
+
+        }
+
+
+        .ap-form-header-icon {
+
+            width:
+                    46px;
+
+            height:
+                    46px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    12px;
+
+            background:
+                    #eaf4fd;
+
+            color:
+                    #1f6ba8;
+
+            font-size:
+                    19px;
+
+        }
+
+
+        .ap-form-grid {
+
+            display:
+                    grid;
+
+            grid-template-columns:
+                    1fr
+                    1fr;
+
+            gap:
+                    20px;
+
+        }
+
+
+        .ap-field {
+
+            min-width:
+                    0;
+
+        }
+
+
+        .ap-biography-field {
+
+            margin-top:
+                    20px;
+
+        }
+
+
+        .ap-field label {
+
+            display:
+                    block;
+
+            margin-bottom:
+                    8px;
+
+            color:
+                    #3d5b76;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+
+        }
+
+
+        .ap-field label .required {
+
+            color:
+                    #d45c1b;
+
+        }
+
+
+        .ap-input-wrapper,
+        .ap-readonly {
+
+            position:
+                    relative;
+
+        }
+
+
+        .ap-input-wrapper i,
+        .ap-readonly i {
+
+            position:
+                    absolute;
+
+            left:
+                    14px;
+
+            top:
+                    50%;
+
+            transform:
+                    translateY(-50%);
+
+            color:
+                    #7895ae;
+
+            pointer-events:
+                    none;
+
+        }
+
+
+        .ap-field input,
+        .ap-field textarea {
+
+            width:
+                    100%;
+
+            border:
+                    1px solid #d7e2ec;
+
+            border-radius:
+                    9px;
+
+            padding:
+                    12px
+                    14px;
+
+            background:
+                    #ffffff;
+
+            color:
+                    #294966;
+
+            font-family:
+                    inherit;
+
+            font-size:
+                    13px;
+
+            outline:
+                    none;
+
+            transition:
+                    border-color .2s ease,
+                    box-shadow .2s ease;
+
+        }
+
+
+        .ap-input-wrapper input,
+        .ap-readonly input {
+
+            padding-left:
+                    40px;
+
+        }
+
+
+        .ap-field input:focus,
+        .ap-field textarea:focus {
+
+            border-color:
+                    #337ab7;
+
+            box-shadow:
+                    0 0 0 3px
+                    rgba(51,122,183,.10);
+
+        }
+
+
+        .ap-readonly {
+
+            background:
+                    #f4f7fa;
+
+            border-radius:
+                    9px;
+
+        }
+
+
+        .ap-readonly input {
+
+            background:
+                    #f4f7fa;
+
+        }
+
+
+        .ap-field textarea {
+
+            resize:
+                    vertical;
+
+            min-height:
+                    150px;
+
+            line-height:
+                    1.6;
+
+        }
+
+
+        .ap-meta {
+
+            display:
+                    block;
+
+            margin-top:
+                    6px;
+
+            color:
+                    #8a9cad;
+
+            font-size:
+                    10px;
+
+        }
+
+
+        .ap-character-count {
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    space-between;
+
+            margin-top:
+                    6px;
+
+            color:
+                    #8a9cad;
+
+            font-size:
+                    10px;
+
+        }
+
+
+        .ap-character-count strong {
+
+            color:
+                    #567793;
+
+        }
+
+
+        /* =====================================================
+           TIPS
+        ===================================================== */
+
+        .ap-tips-card {
+
+            margin-top:
+                    20px;
+
+            display:
+                    flex;
+
+            align-items:
+                    flex-start;
+
+            gap:
+                    15px;
+
+            background:
+                    #f7fbff;
+
+        }
+
+
+        .ap-tips-icon {
+
+            width:
+                    40px;
+
+            height:
+                    40px;
+
+            flex:
+                    0 0 40px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    10px;
+
+            background:
+                    #eaf4fd;
+
+            color:
+                    #216aa7;
+
+        }
+
+
+        .ap-tips-content h3 {
+
+            margin:
+                    0 0 6px;
+
+            color:
+                    #315a7e;
+
+            font-size:
+                    14px;
+
+        }
+
+
+        .ap-tips-content p {
+
+            margin:
+                    0 0 8px;
+
+            color:
+                    #748aa0;
+
+            font-size:
+                    11px;
+
+            line-height:
+                    1.6;
+
+        }
+
+
+        .ap-tips-content ul {
+
+            margin:
+                    0;
+
+            padding-left:
+                    18px;
+
+            color:
+                    #71869a;
+
+            font-size:
+                    11px;
+
+            line-height:
+                    1.7;
+
+        }
+
+
+        /* =====================================================
+           MESSAGE
+        ===================================================== */
+
+        .ap-profile-message {
+
+            display:
+                    none;
+
+            margin-bottom:
+                    18px;
+
+            padding:
+                    11px
+                    13px;
+
+            border-radius:
+                    8px;
+
+            font-size:
+                    12px;
+
+        }
+
+
+        .ap-profile-message.success {
+
+            display:
+                    block;
+
+            background:
+                    #ecfdf3;
+
+            border:
+                    1px solid #abefc6;
+
+            color:
+                    #027a48;
+
+        }
+
+
+        .ap-profile-message.error {
+
+            display:
+                    block;
+
+            background:
+                    #fff1f2;
+
+            border:
+                    1px solid #fecdca;
+
+            color:
+                    #b42318;
+
+        }
+
+
+        /* =====================================================
+           ACTIONS
+        ===================================================== */
+
+        .ap-actions {
+
+            display:
+                    flex;
+
+            justify-content:
+                    flex-end;
+
+            gap:
+                    10px;
+
+            margin-top:
+                    22px;
+
+        }
+
+
+        .ap-reset-btn,
+        .ap-save-btn {
+
+            min-width:
+                    120px;
+
+            padding:
+                    11px
+                    16px;
+
+            border-radius:
+                    8px;
+
+            font-family:
+                    inherit;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    700;
+
+            cursor:
+                    pointer;
+
+            transition:
+                    .2s ease;
+
+        }
+
+
+        .ap-reset-btn {
+
+            border:
+                    1px solid #cbd8e4;
+
+            background:
+                    #ffffff;
+
+            color:
+                    #5f7890;
+
+        }
+
+
+        .ap-reset-btn:hover {
+
+            background:
+                    #f4f8fb;
+
+        }
+
+
+        .ap-save-btn {
+
+            border:
+                    1px solid #1d5798;
+
+            background:
+                    #1d5798;
+
+            color:
+                    #ffffff;
+
+        }
+
+
+        .ap-save-btn:hover {
+
+            background:
+                    #174879;
+
+        }
+
+
+        .ap-save-btn:disabled {
+
+            opacity:
+                    .65;
+
+            cursor:
+                    not-allowed;
+
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1050px) {
+
+            .ap-layout {
+
+                grid-template-columns:
+                        240px
+                        minmax(0,1fr);
+
+            }
+
+        }
+
+
+        @media (max-width: 850px) {
+
+            .author-profile-container {
+
+                width:
+                        calc(100% - 30px);
+
+            }
+
+            .ap-layout {
+
+                grid-template-columns:
+                        1fr;
+
+            }
+
+            .ap-sidebar-card {
+
+                max-width:
+                        100%;
+
+            }
+
+            .ap-form-grid {
+
+                grid-template-columns:
+                        1fr;
+
+            }
+
+            .ap-hero-content {
+
+                width:
+                        60%;
+
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .author-profile-main {
+
+                padding:
+                        20px
+                        0
+                        35px;
+
+            }
+
+            .author-profile-container {
+
+                width:
+                        calc(100% - 20px);
+
+            }
+
+            .ap-hero {
+
+                min-height:
+                        340px;
+
+                display:
+                        block;
+
+                padding:
+                        28px
+                        22px;
+
+            }
+
+            .ap-hero-content {
+
+                width:
+                        100%;
+
+                max-width:
+                        100%;
+
+            }
+
+            .ap-hero h1 {
+
+                font-size:
+                        1.8rem;
+
+            }
+
+            .ap-hero-art {
+
+                top:
+                        auto;
+
+                bottom:
+                        0;
+
+                width:
+                        100%;
+
+                height:
+                        175px;
+
+            }
+
+            .ap-story-message {
+
+                left:
+                        5%;
+
+                font-size:
+                        1.25rem;
+
+            }
+
+            .ap-hero-image-wrap {
+
+                width:
+                        68%;
+
+            }
+
+            .ap-form-card {
+
+                padding:
+                        22px
+                        18px;
+
+            }
+
+            .ap-actions {
+
+                flex-direction:
+                        column-reverse;
+
+            }
+
+            .ap-reset-btn,
+            .ap-save-btn {
+
+                width:
+                        100%;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="author-profile-page author-page">
+
+
+<!-- =====================================================
+     COMMON HOME HEADER
+===================================================== -->
+
+<div id="header-container"></div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<main class="author-profile-main">
+
+    <div class="author-profile-container">
+
+
+        <!-- =================================================
+             HERO
+        ================================================= -->
+
+        <section class="ap-hero">
+
+            <div class="ap-hero-content">
+
+                <div class="ap-hero-label">
+                    AUTHOR PROFILE
+                </div>
+
+                <h1>
+                    Your Author Identity
+                </h1>
+
+                <p>
+                    Keep your information up to date so we can
+                    stay connected throughout your publishing journey.
+                </p>
+
+            </div>
+
+
+            <div class="ap-hero-art">
+
+                <div class="ap-story-message">
+
+                    Every story<br>
+
+                    <span>
+                        matters
+                    </span>
+
+                </div>
+
+
+                <div class="ap-hero-image-wrap">
+
+                    <img
+                            src="/images/author-hero-books.png"
+                            alt="Books and plant illustration"
+                            class="ap-hero-image"
+                    >
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PROFILE LAYOUT
+        ================================================= -->
+
+        <section class="ap-layout">
+
+
+            <!-- =================================================
+                 LEFT SIDEBAR
+            ================================================= -->
+
+            <aside class="ap-sidebar-card">
+
+
+                <div class="ap-profile-summary">
+
+
+                    <!-- AVATAR -->
+
+                    <div
+                            class="ap-avatar"
+                            id="profileAvatar"
+                    >
+
+                        <i
+                                class="fas fa-user ap-author-icon"
+                                id="defaultAvatarIcon"
+                        ></i>
+
+
+                        <img
+                                id="profileAvatarImage"
+                                src=""
+                                alt="Author profile photo"
+                                hidden
+                        >
+
+
+                        <label
+                                for="profilePhotoInput"
+                                class="ap-camera"
+                                aria-label="Change author image"
+                                title="Change author image"
+                        >
+
+                            <i class="fas fa-camera"></i>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- PHOTO INPUT -->
+
+                    <input
+                            type="file"
+                            id="profilePhotoInput"
+                            accept="image/jpeg,image/png,image/webp"
+                            hidden
+                    >
+
+
+                    <h2 id="sidebarFullName">
+                        Author Name
+                    </h2>
+
+
+                    <p id="sidebarAuthorCode">
+                        AUTH-1
+                    </p>
+
+
+                    <span class="ap-status-badge">
+
+                        <span class="ap-status-dot"></span>
+
+                        <span id="sidebarStatus">
+                            ACTIVE
+                        </span>
+
+                    </span>
+
+                </div>
+
+
+                <!-- =================================================
+                     SIDEBAR NAVIGATION
+                ================================================= -->
+
+                <nav class="ap-sidebar-nav">
+
+                    <a href="/author/dashboard.html">
+
+                        <i class="fas fa-house"></i>
+
+                        <span>
+                            Dashboard
+                        </span>
+
+                    </a>
+
+
+                    <a
+                            href="/author/profile.html"
+                            class="active"
+                    >
+
+                        <i class="fas fa-user"></i>
+
+                        <span>
+                            My Profile
+                        </span>
+
+                    </a>
+
+
+                    <a href="/author/my-submissions.html">
+
+                        <i class="fas fa-file-lines"></i>
+
+                        <span>
+                            My Submissions
+                        </span>
+
+                    </a>
+
+
+                    <a href="/author/my-submissions.html?status=UNDER_REVIEW">
+
+                        <i class="fas fa-comments"></i>
+
+                        <span>
+                            Reviews &amp; Comments
+                        </span>
+
+                    </a>
+
+
+                    <a href="#">
+
+                        <i class="fas fa-clock-rotate-left"></i>
+
+                        <span>
+                            Version History
+                        </span>
+
+                    </a>
+
+
+                    <a href="#">
+
+                        <i class="fas fa-file-contract"></i>
+
+                        <span>
+                            Contracts &amp; Royalties
+                        </span>
+
+                    </a>
+
+                </nav>
+
+
+                <!-- =================================================
+                     QUOTE
+                ================================================= -->
+
+                <div class="ap-quote-card">
+
+                    <i class="fas fa-quote-left"></i>
+
+                    <p>
+                        Every story deserves a chance
+                        to be heard.
+                    </p>
+
+                    <span>
+                        Reading Planet
+                    </span>
+
+                </div>
+
+
+            </aside>
+
+
+            <!-- =====================================================
+                 RIGHT SIDE — PROFILE FORM
+            ===================================================== -->
+
+            <div class="ap-form-area">
+
+
+                <!-- =================================================
+                     PROFILE INFORMATION
+                ================================================= -->
+
+                <div class="ap-form-card">
+
+
+                    <div class="ap-form-header">
+
+                        <div>
+
+                            <h2>
+                                Profile Information
+                            </h2>
+
+                            <p>
+                                Update your personal and professional author details.
+                            </p>
+
+                        </div>
+
+
+                        <div class="ap-form-header-icon">
+
+                            <i class="fas fa-id-card"></i>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- MESSAGE -->
+
+                    <div
+                            id="profileMessage"
+                            class="ap-profile-message"
+                            role="alert"
+                    ></div>
+
+
+                    <!-- =================================================
+                         FORM
+                    ================================================= -->
+
+                    <form id="authorProfileForm">
+
+
+                        <div class="ap-form-grid">
+
+
+                            <!-- AUTHOR CODE -->
+
+                            <div class="ap-field">
+
+                                <label for="authorCode">
+                                    Author Code
+                                </label>
+
+
+                                <div class="ap-readonly">
+
+                                    <i class="fas fa-hashtag"></i>
+
+                                    <input
+                                            type="text"
+                                            id="authorCode"
+                                            name="authorCode"
+                                            readonly
+                                            value=""
+                                    >
+
+                                </div>
+
+
+                                <small class="ap-meta">
+                                    Your unique author identification code.
+                                </small>
+
+                            </div>
+
+
+                            <!-- FULL NAME -->
+
+                            <div class="ap-field">
+
+                                <label for="fullName">
+                                    Full Name
+                                </label>
+
+
+                                <div class="ap-readonly">
+
+                                    <i class="fas fa-user"></i>
+
+                                    <input
+                                            type="text"
+                                            id="fullName"
+                                            name="fullName"
+                                            readonly
+                                            value=""
+                                    >
+
+                                </div>
+
+
+                                <small class="ap-meta">
+                                    Your registered account name cannot be changed here.
+                                </small>
+
+                            </div>
+
+
+                            <!-- PEN NAME -->
+
+                            <div class="ap-field">
+
+                                <label for="penName">
+
+                                    Pen Name
+
+                                    <span class="required">
+                                        *
+                                    </span>
+
+                                </label>
+
+
+                                <div class="ap-input-wrapper">
+
+                                    <i class="fas fa-pen-nib"></i>
+
+                                    <input
+                                            type="text"
+                                            id="penName"
+                                            name="penName"
+                                            maxlength="150"
+                                            placeholder="Enter your pen name"
+                                    >
+
+                                </div>
+
+
+                                <small class="ap-meta">
+                                    The name you would like to use for your published work.
+                                </small>
+
+                            </div>
+
+
+                            <!-- DATE OF BIRTH -->
+
+                            <div class="ap-field">
+
+                                <label for="dateOfBirth">
+                                    Date of Birth
+                                </label>
+
+
+                                <div class="ap-input-wrapper">
+
+                                    <i class="fas fa-calendar"></i>
+
+                                    <input
+                                            type="date"
+                                            id="dateOfBirth"
+                                            name="dateOfBirth"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- NATIONALITY -->
+
+                            <div class="ap-field">
+
+                                <label for="nationality">
+                                    Nationality
+                                </label>
+
+
+                                <div class="ap-input-wrapper">
+
+                                    <i class="fas fa-earth-americas"></i>
+
+                                    <input
+                                            type="text"
+                                            id="nationality"
+                                            name="nationality"
+                                            maxlength="100"
+                                            placeholder="Enter your nationality"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- PHONE (needed before a manuscript can be submitted) -->
+
+                            <div class="ap-field">
+
+                                <label for="phoneNumber">
+                                    Phone number
+                                </label>
+
+                                <div class="ap-input-wrapper">
+
+                                    <i class="fas fa-phone"></i>
+
+                                    <input
+                                            type="tel"
+                                            id="phoneNumber"
+                                            name="phoneNumber"
+                                            maxlength="20"
+                                            placeholder="e.g. 0771234567"
+                                    >
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- WEBSITE -->
+
+                            <div class="ap-field">
+
+                                <label for="website">
+                                    Website
+                                </label>
+
+
+                                <div class="ap-input-wrapper">
+
+                                    <i class="fas fa-globe"></i>
+
+                                    <input
+                                            type="url"
+                                            id="website"
+                                            name="website"
+                                            maxlength="255"
+                                            placeholder="https://yourwebsite.com"
+                                    >
+
+                                </div>
+
+
+                                <small class="ap-meta">
+                                    Optional. Add your personal or professional website.
+                                </small>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- BIOGRAPHY -->
+
+                        <div class="ap-field ap-biography-field">
+
+                            <label for="biography">
+                                Biography
+                            </label>
+
+
+                            <textarea
+                                    id="biography"
+                                    name="biography"
+                                    maxlength="5000"
+                                    rows="7"
+                                    placeholder="Tell readers a little about yourself, your writing journey, interests, and published work..."
+                            ></textarea>
+
+
+                            <div class="ap-character-count">
+
+                                <span>
+                                    Your author biography
+                                </span>
+
+
+                                <span>
+
+                                    <strong id="bioCharCount">
+                                        0
+                                    </strong>
+
+                                    / 5000
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="ap-actions">
+
+
+                            <button
+                                    type="button"
+                                    class="ap-reset-btn"
+                                    id="resetProfileBtn"
+                            >
+
+                                <i class="fas fa-rotate-left"></i>
+
+                                Reset
+
+                            </button>
+
+
+                            <button
+                                    type="submit"
+                                    class="ap-save-btn"
+                                    id="saveProfileBtn"
+                            >
+
+                                <i class="fas fa-check"></i>
+
+                                Save Profile
+
+                            </button>
+
+
+                        </div>
+
+
+                    </form>
+
+
+                </div>
+
+
+                <!-- =================================================
+                     PROFILE TIPS
+                ================================================= -->
+
+                <div class="ap-form-card ap-tips-card">
+
+
+                    <div class="ap-tips-icon">
+
+                        <i class="fas fa-lightbulb"></i>
+
+                    </div>
+
+
+                    <div class="ap-tips-content">
+
+                        <h3>
+                            Profile Tips
+                        </h3>
+
+                        <p>
+                            A complete author profile helps
+                            editors and publishers learn more
+                            about you and your work.
+                        </p>
+
+
+                        <ul>
+
+                            <li>
+                                Use a professional pen name
+                                if applicable.
+                            </li>
+
+                            <li>
+                                Keep your biography clear
+                                and up to date.
+                            </li>
+
+                            <li>
+                                Add your website or portfolio
+                                to help showcase your work.
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+
+<!-- =====================================================
+     COMMON HOME FOOTER
+===================================================== -->
+
+<div id="footer-container"></div>
+
+
+<!-- =====================================================
+     COMMON COMPONENT LOADER
+===================================================== -->
+
+<script src="/js/author-api.js"></script>
+<script src="/js/footer.js"></script>
+
+<script src="/js/header.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+
+<!-- =====================================================
+     EXISTING US1 PROFILE JAVASCRIPT
+===================================================== -->
+
+<script src="/js/author-profile.js"></script>
+
+
+</body>
+
+</html>

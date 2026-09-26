@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account | Reading Planet</title>
+  <link rel="stylesheet" href="/css/header.css">
+  <link rel="stylesheet" href="/css/footer.css">
+  <link rel="stylesheet" href="/css/account.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+  <div id="header-container"></div>
+
+  <main class="account-page">
+    <div class="account-shell">
+      <aside class="account-sidebar">
+        <h1>My Account</h1>
+        <nav>
+          <button type="button" class="account-nav active" data-panel="profile">
+            <i class="fas fa-user-edit"></i> Account details
+          </button>
+          <button type="button" class="account-nav" data-panel="orders">
+            <i class="fas fa-shopping-bag"></i> My orders
+          </button>
+          <button type="button" class="account-nav" data-panel="activity">
+            <i class="fas fa-clock-rotate-left"></i> Login activity
+          </button>
+        </nav>
+      </aside>
+
+      <section class="account-content">
+        <div id="accountMsg" class="account-msg" hidden></div>
+
+        <!-- Profile -->
+        <div class="account-panel active" id="panel-profile">
+          <h2>Account details</h2>
+          <p class="muted">Update your name and phone number. Email cannot be changed here.</p>
+          <form id="profileForm" class="account-form">
+            <label>Email</label>
+            <input type="email" id="profEmail" readonly>
+
+            <label>Username</label>
+            <input type="text" id="profUsername" readonly>
+
+            <label for="profFirst">First name</label>
+            <input type="text" id="profFirst" required>
+
+            <label for="profLast">Last name</label>
+            <input type="text" id="profLast" required>
+
+            <label for="profPhone">Phone number</label>
+            <input type="text" id="profPhone" placeholder="Optional">
+
+            <button type="submit" class="btn-account">Save changes</button>
+          </form>
+        </div>
+
+        <!-- Orders -->
+        <div class="account-panel" id="panel-orders">
+          <h2>My orders</h2>
+          <p class="muted">Orders you place in the store appear here. Track status from confirmed → packed → dispatched.</p>
+          <div id="ordersList" class="account-table-wrap">
+            <div class="empty">Loading…</div>
+          </div>
+        </div>
+
+        <!-- Login activity -->
+        <div class="account-panel" id="panel-activity">
+          <h2>Login activity</h2>
+          <p class="muted">Recent devices / sessions for your account.</p>
+          <div id="activityList" class="account-table-wrap">
+            <div class="empty">Loading…</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-container"></div>
+  <script src="/js/header.js"></script>
+  <script src="/js/footer.js"></script>
+  <script src="/js/load-components.js"></script>
+  <script src="/js/account.js"></script>
+</body>
+</html>

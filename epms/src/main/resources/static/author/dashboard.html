@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Author Dashboard – Reading Planet
+    </title>
+
+    <!-- =====================================================
+         EXISTING SHARED STYLES
+    ====================================================== -->
+
+    <link
+            rel="stylesheet"
+            href="/css/header.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/footer.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="/css/author.css"
+    >
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           DASHBOARD WIDE LAYOUT
+        ===================================================== */
+
+        .author-main {
+            width:
+                    min(
+                            1480px,
+                            calc(100% - 70px)
+                    ) !important;
+
+            min-height:
+                    calc(100vh - 66px);
+
+            padding-top:
+                    34px;
+
+            padding-bottom:
+                    55px;
+        }
+
+
+        /* =====================================================
+           WELCOME
+        ===================================================== */
+
+        .author-welcome {
+            margin-bottom:
+                    25px;
+        }
+
+
+        .author-welcome-inner {
+            min-height:
+                    175px;
+
+            padding:
+                    32px 38px;
+        }
+
+
+        .author-welcome h1 {
+            font-size:
+                    37px;
+        }
+
+
+        /* =====================================================
+           SUMMARY CARDS
+        ===================================================== */
+
+        .author-summary-grid {
+            gap:
+                    18px;
+
+            margin-bottom:
+                    30px;
+        }
+
+
+        .author-summary-grid > a {
+            display:
+                    block;
+
+            color:
+                    inherit;
+
+            text-decoration:
+                    none;
+        }
+
+
+        .author-summary-grid > a:hover {
+            color:
+                    inherit;
+
+            text-decoration:
+                    none;
+        }
+
+
+        .author-stat-card {
+            min-height:
+                    155px;
+
+            padding:
+                    23px;
+        }
+
+
+        .stat-icon-wrap {
+            width:
+                    54px;
+
+            height:
+                    54px;
+
+            font-size:
+                    21px;
+        }
+
+
+        .stat-label {
+            font-size:
+                    13px;
+        }
+
+
+        .stat-value {
+            font-size:
+                    32px;
+        }
+
+
+        .stat-hint {
+            font-size:
+                    11px;
+        }
+
+
+        /* =====================================================
+           SECTION TITLES
+        ===================================================== */
+
+        .author-section-title {
+            margin-bottom:
+                    15px;
+
+            font-size:
+                    19px;
+        }
+
+
+        /* =====================================================
+           QUICK ACTIONS
+        ===================================================== */
+
+        .author-actions-grid {
+            gap:
+                    18px;
+
+            margin-bottom:
+                    30px;
+        }
+
+
+        .author-action-card {
+            min-height:
+                    165px;
+
+            padding:
+                    23px 18px;
+        }
+
+
+        .action-icon-circle {
+            width:
+                    56px;
+
+            height:
+                    56px;
+
+            font-size:
+                    21px;
+        }
+
+
+        .action-title {
+            font-size:
+                    15px;
+        }
+
+
+        .action-desc {
+            font-size:
+                    12px;
+        }
+
+
+        /* =====================================================
+           MORE
+        ===================================================== */
+
+        .author-future-grid {
+            gap:
+                    18px;
+
+            margin-bottom:
+                    30px;
+        }
+
+
+        .author-future-grid
+        .author-action-card {
+            min-height:
+                    155px;
+        }
+
+
+        /* =====================================================
+           TWO COLUMN AREA
+        ===================================================== */
+
+        .author-two-col {
+            display:
+                    grid;
+
+            grid-template-columns:
+                    minmax(0, 0.85fr)
+                    minmax(0, 1.45fr);
+
+            gap:
+                    20px;
+
+            margin-top:
+                    5px;
+        }
+
+
+        .author-panel {
+            min-height:
+                    245px;
+
+            border:
+                    1px solid #dce7f2;
+
+            border-radius:
+                    16px;
+
+            background:
+                    #ffffff;
+
+            box-shadow:
+                    0 8px 24px
+                    rgba(30,75,140,0.06);
+
+            overflow:
+                    hidden;
+        }
+
+
+        .author-panel-header {
+            min-height:
+                    55px;
+
+            padding:
+                    15px 19px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    10px;
+
+            border-bottom:
+                    1px solid #e2eaf2;
+
+            color:
+                    #17477d;
+
+            font-size:
+                    14px;
+
+            font-weight:
+                    750;
+        }
+
+
+        .panel-header-icon {
+            width:
+                    34px;
+
+            height:
+                    34px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    9px;
+
+            background:
+                    #e8f2fc;
+
+            color:
+                    #2069ab;
+        }
+
+
+        .author-panel-body {
+            padding:
+                    18px;
+        }
+
+
+        /* =====================================================
+           NOTIFICATIONS
+        ===================================================== */
+
+        .author-notification-list {
+            margin:
+                    0;
+
+            padding:
+                    0;
+
+            list-style:
+                    none;
+        }
+
+
+        .dashboard-notification {
+            display:
+                    flex;
+
+            gap:
+                    13px;
+
+            padding:
+                    13px 0;
+
+            border-bottom:
+                    1px solid #edf2f7;
+        }
+
+
+        .dashboard-notification:last-child {
+            border-bottom:
+                    none;
+        }
+
+
+        .dashboard-notification-icon {
+            width:
+                    38px;
+
+            height:
+                    38px;
+
+            flex:
+                    0 0 38px;
+
+            display:
+                    flex;
+
+            align-items:
+                    center;
+
+            justify-content:
+                    center;
+
+            border-radius:
+                    10px;
+
+            background:
+                    #edf5fd;
+
+            color:
+                    #2169a8;
+        }
+
+
+        .dashboard-notification-content {
+            min-width:
+                    0;
+        }
+
+
+        .dashboard-notification-title {
+            display:
+                    block;
+
+            margin-bottom:
+                    4px;
+
+            color:
+                    #2c4b68;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    750;
+        }
+
+
+        .dashboard-notification-text {
+            display:
+                    block;
+
+            color:
+                    #7b8ca0;
+
+            font-size:
+                    11px;
+
+            line-height:
+                    1.5;
+        }
+
+
+        /* =====================================================
+           TABLE
+        ===================================================== */
+
+        .author-table-wrap {
+            overflow-x:
+                    auto;
+        }
+
+
+        .author-table {
+            width:
+                    100%;
+
+            border-collapse:
+                    collapse;
+        }
+
+
+        .author-table th {
+            padding:
+                    11px 12px;
+
+            background:
+                    #f5f8fb;
+
+            border-bottom:
+                    1px solid #e4ebf2;
+
+            color:
+                    #70849a;
+
+            font-size:
+                    10px;
+
+            text-transform:
+                    uppercase;
+
+            letter-spacing:
+                    0.05em;
+
+            text-align:
+                    left;
+
+            white-space:
+                    nowrap;
+        }
+
+
+        .author-table td {
+            padding:
+                    14px 12px;
+
+            border-bottom:
+                    1px solid #edf2f7;
+
+            color:
+                    #536b83;
+
+            font-size:
+                    11px;
+
+            vertical-align:
+                    middle;
+        }
+
+
+        .author-table tbody tr:last-child td {
+            border-bottom:
+                    none;
+        }
+
+
+        .dashboard-manuscript-title {
+            display:
+                    flex;
+
+            flex-direction:
+                    column;
+
+            gap:
+                    3px;
+
+            min-width:
+                    180px;
+        }
+
+
+        .dashboard-manuscript-title strong {
+            color:
+                    #173f67;
+
+            font-size:
+                    12px;
+
+            font-weight:
+                    750;
+        }
+
+
+        .dashboard-manuscript-code {
+            color:
+                    #2672b5;
+
+            font-size:
+                    9px;
+
+            font-weight:
+                    800;
+
+            letter-spacing:
+                    0.06em;
+        }
+
+
+        .dashboard-status {
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    6px;
+
+            padding:
+                    6px 9px;
+
+            border-radius:
+                    999px;
+
+            font-size:
+                    9px;
+
+            font-weight:
+                    800;
+
+            white-space:
+                    nowrap;
+        }
+
+
+        .dashboard-status-dot {
+            width:
+                    6px;
+
+            height:
+                    6px;
+
+            border-radius:
+                    50%;
+        }
+
+
+        .dashboard-status-submitted {
+            background:
+                    #eaf3fb;
+
+            color:
+                    #2169a8;
+        }
+
+
+        .dashboard-status-submitted
+        .dashboard-status-dot {
+            background:
+                    #2877b9;
+        }
+
+
+        .dashboard-status-review {
+            background:
+                    #fff5dd;
+
+            color:
+                    #936600;
+        }
+
+
+        .dashboard-status-review
+        .dashboard-status-dot {
+            background:
+                    #c4901b;
+        }
+
+
+        .dashboard-status-approved {
+            background:
+                    #e8f7ef;
+
+            color:
+                    #23764f;
+        }
+
+
+        .dashboard-status-approved
+        .dashboard-status-dot {
+            background:
+                    #27805a;
+        }
+
+
+        .dashboard-status-revision {
+            background:
+                    #fff0e7;
+
+            color:
+                    #bd4f18;
+        }
+
+
+        .dashboard-status-revision
+        .dashboard-status-dot {
+            background:
+                    #d45c1b;
+        }
+
+
+        .dashboard-view-link {
+            display:
+                    inline-flex;
+
+            align-items:
+                    center;
+
+            gap:
+                    5px;
+
+            color:
+                    #2169a8;
+
+            text-decoration:
+                    none;
+
+            font-size:
+                    10px;
+
+            font-weight:
+                    750;
+
+            white-space:
+                    nowrap;
+        }
+
+
+        .dashboard-view-link:hover {
+            color:
+                    #0f4f91;
+
+            text-decoration:
+                    none;
+        }
+
+
+        .dashboard-table-empty {
+            padding:
+                    38px 20px !important;
+
+            text-align:
+                    center;
+        }
+
+
+        .dashboard-empty-content {
+            display:
+                    flex;
+
+            flex-direction:
+                    column;
+
+            align-items:
+                    center;
+
+            gap:
+                    7px;
+
+            color:
+                    #8293a6;
+        }
+
+
+        .dashboard-empty-content i {
+            font-size:
+                    24px;
+
+            color:
+                    #a8b9ca;
+
+            margin-bottom:
+                    4px;
+        }
+
+
+        .dashboard-empty-content strong {
+            color:
+                    #52687e;
+
+            font-size:
+                    12px;
+        }
+
+
+        .dashboard-empty-content span {
+            font-size:
+                    10px;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 1200px) {
+
+            .author-main {
+                width:
+                        calc(100% - 40px) !important;
+            }
+
+        }
+
+
+        @media (max-width: 900px) {
+
+            .author-two-col {
+                grid-template-columns:
+                        1fr;
+            }
+
+        }
+
+
+        @media (max-width: 640px) {
+
+            .author-main {
+                width:
+                        calc(100% - 24px) !important;
+
+                padding-top:
+                        20px;
+            }
+
+
+            .author-welcome-inner {
+                padding:
+                        23px 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body class="author-body author-page">
+
+
+<!-- =========================================================
+     SHARED HEADER
+========================================================= -->
+
+<div id="header-container"></div>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="author-main">
+
+
+    <!-- =====================================================
+         WELCOME
+    ===================================================== -->
+
+    <section class="author-welcome">
+
+        <div class="author-welcome-inner">
+
+            <div class="author-welcome-text">
+
+                <p class="author-welcome-eyebrow">
+                    Author workspace
+                </p>
+
+
+                <h1>
+
+                    Welcome,
+
+                    <span id="welcomeName">
+                        Author
+                    </span>
+
+                </h1>
+
+
+                <p class="author-welcome-lead">
+
+                    Manage your manuscripts,
+                    track submissions,
+                    and stay connected with
+                    the editorial process —
+                    all in one place.
+
+                </p>
+
+            </div>
+
+
+            <div
+                    class="author-welcome-accent"
+                    aria-hidden="true"
+            >
+
+                <i class="fas fa-book-open"></i>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         MANUSCRIPT SUMMARY
+    ===================================================== -->
+
+    <section
+            class="author-summary-grid"
+            aria-label="Manuscript summary"
+    >
+
+
+        <!-- TOTAL -->
+
+        <a
+                id="statCardTotal"
+                href="/author/my-submissions.html"
+        >
+
+            <div class="author-stat-card">
+
+                <div
+                        class="stat-icon-wrap
+                               stat-icon-total"
+                >
+
+                    <i class="fas fa-folder-open"></i>
+
+                </div>
+
+
+                <div class="stat-body">
+
+                    <span class="stat-label">
+                        My Manuscripts
+                    </span>
+
+
+                    <span
+                            class="stat-value"
+                            id="statTotal"
+                    >
+                        —
+                    </span>
+
+
+                    <span class="stat-hint">
+                        All submissions
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- UNDER REVIEW -->
+
+        <a
+                id="statCardUnderReview"
+                href="/author/my-submissions.html?status=UNDER_REVIEW"
+        >
+
+            <div
+                    class="author-stat-card
+                           under-review"
+            >
+
+                <div
+                        class="stat-icon-wrap
+                               stat-icon-review"
+                >
+
+                    <i class="fas fa-hourglass-half"></i>
+
+                </div>
+
+
+                <div class="stat-body">
+
+                    <span class="stat-label">
+                        Under Review
+                    </span>
+
+
+                    <span
+                            class="stat-value"
+                            id="statUnderReview"
+                    >
+                        —
+                    </span>
+
+
+                    <span class="stat-hint">
+                        With editors
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- APPROVED -->
+
+        <a
+                id="statCardApproved"
+                href="/author/my-submissions.html?status=APPROVED"
+        >
+
+            <div
+                    class="author-stat-card
+                           approved"
+            >
+
+                <div
+                        class="stat-icon-wrap
+                               stat-icon-approved"
+                >
+
+                    <i class="fas fa-check-circle"></i>
+
+                </div>
+
+
+                <div class="stat-body">
+
+                    <span class="stat-label">
+                        Approved
+                    </span>
+
+
+                    <span
+                            class="stat-value"
+                            id="statApproved"
+                    >
+                        —
+                    </span>
+
+
+                    <span class="stat-hint">
+                        Accepted works
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+
+        <!-- REVISION REQUIRED -->
+
+        <a
+                id="statCardRevision"
+                href="/author/my-submissions.html?status=REVISION_REQUIRED"
+        >
+
+            <div
+                    class="author-stat-card
+                           revision"
+            >
+
+                <div
+                        class="stat-icon-wrap
+                               stat-icon-revision"
+                >
+
+                    <i class="fas fa-pencil-alt"></i>
+
+                </div>
+
+
+                <div class="stat-body">
+
+                    <span class="stat-label">
+                        Revision Required
+                    </span>
+
+
+                    <span
+                            class="stat-value"
+                            id="statRevision"
+                    >
+                        —
+                    </span>
+
+
+                    <span class="stat-hint">
+                        Future editorial action
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </section>
+
+
+    <!-- =====================================================
+         QUICK ACTIONS
+    ===================================================== -->
+
+    <h2 class="author-section-title">
+
+        <span>
+            Quick Actions
+        </span>
+
+    </h2>
+
+
+    <section
+            class="author-actions-grid"
+            aria-label="Quick actions"
+    >
+
+
+        <!-- MY PROFILE -->
+
+        <a
+                href="/author/profile.html"
+                class="author-action-card"
+        >
+
+            <span class="action-icon-circle">
+
+                <i class="fas fa-user-edit"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                My Profile
+            </span>
+
+
+            <span class="action-desc">
+                View and update your author details
+            </span>
+
+        </a>
+
+
+        <!-- SUBMIT MANUSCRIPT -->
+
+        <a
+                href="/author/submit-manuscript.html"
+                class="author-action-card"
+        >
+
+            <span class="action-icon-circle">
+
+                <i class="fas fa-file-upload"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                Submit Manuscript
+            </span>
+
+
+            <span class="action-desc">
+                Send a new work for consideration
+            </span>
+
+        </a>
+
+        <!-- DESIGN APPROVALS (Epic 2 US18 – additive only) -->
+
+        <a
+                href="/author/design-approvals.html"
+                class="author-action-card"
+        >
+
+            <span class="action-icon-circle">
+
+                <i class="fas fa-palette"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                Design Approvals
+            </span>
+
+
+            <span class="action-desc">
+                Preview and approve or reject book designs
+            </span>
+
+        </a>
+
+
+        <!-- MY SUBMISSIONS -->
+
+        <a
+                href="/author/version-history.html"
+                class="author-action-card"
+                data-dashboard-link="submissions"
+        >
+
+            <span class="action-icon-circle">
+
+                <i class="fas fa-folder-open"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                My Submissions
+            </span>
+
+
+            <span class="action-desc">
+                Track the status of your manuscripts
+            </span>
+
+        </a>
+
+
+        <!-- REVIEWS & FEEDBACK -->
+
+        <a
+                href="/author/my-submissions.html?status=UNDER_REVIEW"
+                class="author-action-card"
+        >
+
+            <span class="action-icon-circle">
+
+                <i class="fas fa-comments"></i>
+
+            </span>
+
+
+            <span class="action-title">
+
+                Reviews &amp; Feedback
+
+            </span>
+
+
+            <span class="action-desc">
+                Editorial comments will appear here
+            </span>
+
+        </a>
+
+    </section>
+
+
+    <!-- =====================================================
+         MORE
+    ===================================================== -->
+
+    <h2 class="author-section-title">
+
+        <span>
+            More
+        </span>
+
+    </h2>
+
+
+    <section
+            class="author-future-grid"
+            aria-label="Upcoming features"
+    >
+
+
+        <!-- REVISIONS -->
+
+        <a
+                href="/author/my-submissions.html?status=REVISION_REQUIRED"
+                class="author-action-card"
+        >
+
+            <span
+                    class="action-icon-circle muted"
+            >
+
+                <i class="fas fa-sync-alt"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                Revisions
+            </span>
+
+
+            <span class="action-desc">
+                Upload revised manuscripts
+            </span>
+
+        </a>
+
+
+        <!-- VERSION HISTORY -->
+
+        <a
+                href="/author/my-submissions.html"
+                class="author-action-card"
+        >
+
+            <span
+                    class="action-icon-circle muted"
+            >
+
+                <i class="fas fa-history"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                Version History
+            </span>
+
+
+            <span class="action-desc">
+                Compare submission versions
+            </span>
+
+        </a>
+
+
+        <!-- CONTRACTS & ROYALTIES -->
+
+        <a
+                href="/author/contracts-royalties.html"
+                class="author-action-card"
+        >
+
+            <span
+                    class="action-icon-circle muted"
+            >
+
+                <i class="fas fa-file-contract"></i>
+
+            </span>
+
+
+            <span class="action-title">
+                Contracts &amp; Royalties
+            </span>
+
+
+            <span class="action-desc">
+                Agreements and payments
+            </span>
+
+        </a>
+
+    </section>
+
+
+    <!-- =====================================================
+         STATUS UPDATES + RECENT SUBMISSIONS
+    ===================================================== -->
+
+    <div class="author-two-col">
+
+
+        <!-- =================================================
+             STATUS UPDATES
+        ================================================= -->
+
+        <section class="author-panel">
+
+            <div class="author-panel-header">
+
+                <span class="panel-header-icon">
+
+                    <i class="fas fa-bell"></i>
+
+                </span>
+
+
+                <span>
+                    Status Updates
+                </span>
+
+            </div>
+
+
+            <div class="author-panel-body">
+
+
+                <!-- TRACKING -->
+
+                <div
+                        class="dashboard-notification"
+                >
+
+                    <div
+                            class="dashboard-notification-icon"
+                    >
+
+                        <i class="fas fa-chart-line"></i>
+
+                    </div>
+
+
+                    <div
+                            class="dashboard-notification-content"
+                    >
+
+                        <span
+                                class="dashboard-notification-title"
+                        >
+                            Manuscript tracking
+                        </span>
+
+
+                        <span
+                                class="dashboard-notification-text"
+                        >
+
+                            Your manuscript status is
+                            updated by the editorial
+                            workflow and reflected
+                            automatically in this dashboard.
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- UNDER REVIEW -->
+
+                <div
+                        class="dashboard-notification"
+                >
+
+                    <div
+                            class="dashboard-notification-icon"
+                    >
+
+                        <i class="fas fa-clock"></i>
+
+                    </div>
+
+
+                    <div
+                            class="dashboard-notification-content"
+                    >
+
+                        <span
+                                class="dashboard-notification-title"
+                        >
+                            Under Review
+                        </span>
+
+
+                        <span
+                                class="dashboard-notification-text"
+                        >
+
+                            Manuscripts currently with
+                            editors are shown in the
+                            Under Review category.
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <!-- APPROVED -->
+
+                <div
+                        class="dashboard-notification"
+                >
+
+                    <div
+                            class="dashboard-notification-icon"
+                    >
+
+                        <i class="fas fa-circle-check"></i>
+
+                    </div>
+
+
+                    <div
+                            class="dashboard-notification-content"
+                    >
+
+                        <span
+                                class="dashboard-notification-title"
+                        >
+                            Approved manuscripts
+                        </span>
+
+
+                        <span
+                                class="dashboard-notification-text"
+                        >
+
+                            Approved works remain visible
+                            in My Submissions for future
+                            reference.
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             RECENT SUBMISSIONS
+        ================================================= -->
+
+        <section class="author-panel">
+
+            <div class="author-panel-header">
+
+                <span class="panel-header-icon">
+
+                    <i class="fas fa-list"></i>
+
+                </span>
+
+
+                <span>
+                    Recent Submissions
+                </span>
+
+            </div>
+
+
+            <div class="author-panel-body">
+
+                <div class="author-table-wrap">
+
+                    <table class="author-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th>
+                                Manuscript
+                            </th>
+
+                            <th>
+                                Submission Date
+                            </th>
+
+                            <th>
+                                Current Status
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+
+                        <tbody id="submissionsBody">
+
+                        <tr>
+
+                            <td
+                                    colspan="4"
+                                    class="dashboard-table-empty"
+                            >
+
+                                <div
+                                        class="dashboard-empty-content"
+                                >
+
+                                    <i
+                                            class="fas fa-spinner fa-spin"
+                                    ></i>
+
+
+                                    <strong>
+                                        Loading submissions
+                                    </strong>
+
+
+                                    <span>
+                                        Please wait...
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </div>
+
+
+</main>
+
+
+<!-- =========================================================
+     SHARED FOOTER
+========================================================= -->
+
+<div id="footer-container"></div>
+
+
+<!-- =========================================================
+     EXISTING JAVASCRIPT
+========================================================= -->
+
+<script src="/js/author-api.js"></script>
+<script src="/js/header.js"></script>
+
+<script src="/js/footer.js"></script>
+
+<script src="/js/load-components.js"></script>
+
+<script src="/js/author-dashboard.js"></script>
+
+
+</body>
+
+</html>
